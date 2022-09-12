@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class StorageHelper
 {
-    private const MAX_DISK_USAGE = 8589934592;
+    public const EMAIL_QUOTA = 40000;
     private const CACHE_TTL = 3600;
 
     /**
@@ -28,13 +28,13 @@ class StorageHelper
     }
 
     /**
-     * @param int $currentDiskUsage
+     * @param int $currentEmailCount
      * @return float
      */
-    public static function getPercentDiskUsed(int $currentDiskUsage): float
+    public static function getQuotaUsed(int $currentEmailCount): float
     {
         return round(
-            ($currentDiskUsage / self::MAX_DISK_USAGE) * 100,
+            ($currentEmailCount / self::EMAIL_QUOTA) * 100,
             2
         );
     }

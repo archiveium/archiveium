@@ -19,14 +19,19 @@
   - [x] Password reset
 - [x] User's account password reset functionality
 - [x] Add landing page
-- [ ] Either save size of message in `emails` table in database and/or allow imposition based on no. of emails
+- [x] Update progress bar (in dashboard) based on no. of emails instead of disk usage
 - [ ] Disable search indexing by default
 - [ ] Encrypt message by user supplied key - idea is to allow only user to read its own emails
 - [ ] Rewrite ProcessDeleteAccounts command to delete values from index before purging db entries
 
 ## Roadmap
 - [ ] Create wiki and add instructions for self deployment
+- [ ] Migrate to version v0.29 of meilisearch
+- [ ] Upgrade to Laravel 9.x
+- [ ] Use Minio for saving email data (instead of database)
+- [ ] Save size of message in `emails` table in database
 - [ ] User's account change password functionality (when logged in)
+- [ ] Enforce quota on accounts
 - [ ] Meta data for different views
 - [ ] Check for credentials validity before (re)enabling sync
 - [ ] User's account deletion option (use Jetstream's password confirmation)

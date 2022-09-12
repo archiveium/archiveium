@@ -73,11 +73,18 @@
                             <div class="datagrid-content">{{ $emailCounts['failed'] }}</div>
                         </div>
                         <div class="datagrid-item">
-                            <div class="datagrid-title">Disk Usage (8 GB)</div>
+                            <div class="d-flex mb-2">
+                                <div class="datagrid-title">Quota Usage ({{ $quota }} emails)</div>
+                                <div class="ms-auto">
+                                    <span class="d-inline-flex align-items-center lh-1">
+                                      {{ $quotaUsed }} %
+                                    </span>
+                                </div>
+                            </div>
                             <div class="datagrid-content">
                                 <div class="progress progress-sm">
-                                    <div class="progress-bar" style="width: {{ $percentDiskUsed }}%" role="progressbar" aria-valuenow="{{ $percentDiskUsed }}" aria-valuemin="0" aria-valuemax="100" aria-label="{{ $percentDiskUsed }}% Used">
-                                        <span class="visually-hidden">{{ $percentDiskUsed }}% Used</span>
+                                    <div class="progress-bar" style="width: {{ $quotaUsed }}%" role="progressbar" aria-valuenow="{{ $quotaUsed }}" aria-valuemin="0" aria-valuemax="100" aria-label="{{ $quotaUsed }}% Used">
+                                        <span class="visually-hidden">{{ $quotaUsed }}% Used</span>
                                     </div>
                                 </div>
                             </div>

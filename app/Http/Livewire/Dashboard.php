@@ -8,8 +8,6 @@ use App\Services\EmailService;
 
 class Dashboard extends Base
 {
-    private const VIEW = 'dashboard';
-
     public $readyToLoad = false;
 
     public function loadVariables()
@@ -25,22 +23,23 @@ class Dashboard extends Base
             $emailCounts = EmailService::getEmailCounts($userId);
             $accountAddedCount = AccountService::getAllCountByUserId($userId);
             $accountSyncingCount = AccountService::getSyncingCountByUserId($userId);
-            $percentDiskUsed = StorageHelper::getPercentDiskUsed(StorageHelper::getDatabaseUsageByUser($userId));
+            $quotaUsed = StorageHelper::getQuotaUsed($emailCounts['processed']);
         } else {
             $emailCounts = ['processed' => 0, 'failed' => 0, 'successful' => 0];
-            $accountAddedCount = $accountSyncingCount = $percentDiskUsed = 0;
+            $accountAddedCount = $accountSyncingCount = $quotaUsed = 0;
         }
 
         return [
             'emailCounts' => $emailCounts,
             'accountAddedCount'=> $accountAddedCount,
             'accountSyncingCount' => $accountSyncingCount,
-            'percentDiskUsed' => $percentDiskUsed,
+            'quotaUsed' => $quotaUsed,
+            'quota' => number_format(StorageHelper::EMAIL_QUOTA)
         ];
     }
 
     public function getLivewireView(): string
     {
-        return self::VIEW;
+        return 'dashboard';
     }
 }
