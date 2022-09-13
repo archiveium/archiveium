@@ -116,7 +116,13 @@ class ScheduleBackup implements ShouldQueue
 //                Log::info("Nothing to update for mailbox -> " . $folder->name);
                 }
             } catch (ReopenMailboxException $e) {
-                Log::error(sprintf("Skipping folder '%s'. Exception occurred: %s", $folder->name, $e->getMessage()));
+                Log::warning(
+                    sprintf(
+                        "Skipping folder '%s'. Exception occurred: %s",
+                        $folder->name,
+                        $e->getMessage()
+                    )
+                );
             }
         }
 

@@ -47,7 +47,13 @@ class ScanProviderFolderChanges extends Command
                 Log::error($e->getMessage());
                 return self::FAILURE;
             } catch (ReopenMailboxException|ConflictingUidValidityException $f) {
-                Log::error(sprintf("Skipping account '%s'. Exception occurred: %s", $account->id, $f->getMessage()));
+                Log::warning(
+                    sprintf(
+                        "Skipping account '%s'. Exception occurred: %s",
+                        $account->id,
+                        $f->getMessage()
+                    )
+                );
             }
         }
 
