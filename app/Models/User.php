@@ -76,4 +76,19 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $this->notify(new VerifyEmail());
     }
+
+    /**
+     * @return string
+     */
+    public function getInitials(): string
+    {
+        $initials = '';
+
+        $words = explode(' ', $this->name, 2);
+        foreach ($words as $word) {
+            $initials .= mb_strtoupper(mb_substr($word, 0, 1));
+        }
+
+        return $initials;
+    }
 }
