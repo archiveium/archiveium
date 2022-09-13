@@ -39,35 +39,40 @@
                         </div>
                         <div class="card-body">
                             <form wire:submit.prevent="submitEmailProvider">
-                                <div class="form-group mb-3 ">
-                                    <label class="form-label">Name</label>
-                                    <input type="text" wire:model.defer="name" class="form-control @error('name') is-invalid @enderror" placeholder="Enter a name for this account">
-                                    @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                </div>
-                                <div class="form-group mb-3 ">
-                                    <label class="form-label">Email address</label>
-                                    <input type="text" wire:model.defer="email" class="form-control @error('email') is-invalid @enderror" placeholder="Enter the email used for logging in">
-                                    @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                </div>
-                                <div class="form-group mb-3 ">
-                                    <label class="form-label">Password</label>
-                                    <input type="password" wire:model.defer="password" class="form-control @error('password') is-invalid @enderror" placeholder="Enter application password (not the password used for logging in)">
-                                    @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                </div>
-                                <div class="form-group mb-3 ">
-                                    <label class="form-label">Select Provider</label>
-                                    <div class="form-selectgroup">
-                                        @foreach($allProviders as $provider)
-                                            <label class="form-selectgroup-item">
-                                                <input type="radio" name="provider" wire:model="selectedProvider" value="{{ $provider->id }}" class="form-selectgroup-input">
-                                                <span class="form-selectgroup-label">{{ $provider->name }}</span>
-                                            </label>
-                                        @endforeach
+                                <fieldset @if(!empty($folderSyncCandidates)) disabled @endif>
+                                    <div class="form-group mb-3 ">
+                                        <label class="form-label">Name</label>
+                                        <input type="text" wire:model.defer="name" class="form-control @error('name') is-invalid @enderror" placeholder="Enter a name for this account">
+                                        @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                     </div>
-                                </div>
-                                <div class="form-footer">
-                                    <button type="submit" class="btn btn-primary">Save Credentials</button>
-                                </div>
+                                    <div class="form-group mb-3 ">
+                                        <label class="form-label">Email address</label>
+                                        <input type="text" wire:model.defer="email" class="form-control @error('email') is-invalid @enderror" placeholder="Enter the email used for logging in">
+                                        @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </div>
+                                    <div class="form-group mb-3 ">
+                                        <label class="form-label">Password</label>
+                                        <input type="password" wire:model.defer="password" class="form-control @error('password') is-invalid @enderror" placeholder="Enter application password (not the password used for logging in)">
+                                        @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    </div>
+                                    <div class="form-group mb-3 ">
+                                        <label class="form-label">Select Provider</label>
+                                        <div class="form-selectgroup">
+                                            @foreach($allProviders as $provider)
+                                                <label class="form-selectgroup-item">
+                                                    <input type="radio" name="provider" wire:model="selectedProvider" value="{{ $provider->id }}" class="form-selectgroup-input">
+                                                    <span class="form-selectgroup-label">{{ $provider->name }}</span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    <div class="form-footer">
+                                        <button type="submit" class="btn btn-primary">
+                                            <div wire:loading.remove wire:target="submitEmailProvider">Fetch Folders</div>
+                                            <div wire:loading wire:target="submitEmailProvider">Connecting & Fetching Folders</div>
+                                        </button>
+                                    </div>
+                                </fieldset>
                             </form>
                         </div>
                     </div>
@@ -76,19 +81,19 @@
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Folder Sync Candidates</h3>
+                            <h3 class="card-title">Available Folders</h3>
                         </div>
 
                         @if(empty($folderSyncCandidates))
                             <div class="empty">
                                 <p class="empty-title">No folders found</p>
                                 <p class="empty-subtitle text-muted">
-                                    Save valid credentials to see available folders.
+                                    Enter valid credentials to see available folders for that account.
                                 </p>
                             </div>
                         @else
                             <form wire:submit.prevent="submitFolderSyncCandidates">
-                                <div class="table-responsive">
+                                <div class="table-responsive card-body-scrollable" style="height: 24em;">
                                     <table class="table card-table table-vcenter">
                                         <tbody>
                                             @foreach($folderSyncCandidates as $index => $syncCandidate)
@@ -117,7 +122,7 @@
                                     </table>
                                 </div>
                                 <div class="card-footer">
-                                    <button type="submit" class="btn btn-primary">Save Credentials</button>
+                                    <button type="submit" class="btn btn-primary">Save Account</button>
                                 </div>
                             </form>
                         @endif

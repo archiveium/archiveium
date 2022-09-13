@@ -20,7 +20,7 @@
 - [x] User's account password reset functionality
 - [x] Add landing page
 - [x] Update progress bar (in dashboard) based on no. of emails instead of disk usage
-- [ ] Streamline add account flow
+- [x] Streamline add account flow
 
 ## Roadmap
 - [ ] Create wiki and add instructions for self deployment
