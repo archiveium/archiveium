@@ -20,13 +20,18 @@
 - [x] User's account password reset functionality
 - [x] Add landing page
 - [x] Update progress bar (in dashboard) based on no. of emails instead of disk usage
-- [ ] Disable search indexing by default
-- [ ] Encrypt message by user supplied key - idea is to allow only user to read its own emails
-- [ ] Rewrite ProcessDeleteAccounts command to delete values from index before purging db entries
+- [ ] Streamline add account flow
 
 ## Roadmap
 - [ ] Create wiki and add instructions for self deployment
+- [ ] Integrate searching functionality
 - [ ] Migrate to version v0.29 of meilisearch
+- [x] Disable search indexing by default
+    - [x] Add columns in accounts table `searchable`
+    - [ ] Update add account view to show checkbox
+    - [ ] Update BuildEmailSearchIndex command to only build index for accounts that have `searchable = true`
+    - [ ] When user changes `searchable` to `false` trigger an event that removes account related data from index
+- [ ] Rewrite ProcessDeleteAccounts command to delete values from index before purging db entries
 - [ ] Upgrade to Laravel 9.x
 - [ ] Use Minio for saving email data (instead of database)
 - [ ] Save size of message in `emails` table in database

@@ -38,7 +38,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read \App\Models\Provider|null $provider
  * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder|Account whereDeleted($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Account whereSyncing($value)
  */
 class Account extends Model
 {
@@ -60,6 +59,7 @@ class Account extends Model
         'updated_at',
         'syncing',
         'deleted',
+        'searchable',
     ];
 
     /**
