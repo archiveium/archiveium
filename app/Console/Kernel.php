@@ -35,10 +35,10 @@ class Kernel extends ConsoleKernel
             ->everyFiveMinutes()
             ->withoutOverlapping(10);
 
-         $schedule
-             ->command(BuildEmailSearchIndex::class, ['--index-uid=' . config('services.meilisearch.index')])
-             ->everyTenMinutes()
-             ->withoutOverlapping(20);
+//         $schedule
+//             ->command(BuildEmailSearchIndex::class, ['--index-uid=' . config('services.meilisearch.index')])
+//             ->everyTenMinutes()
+//             ->withoutOverlapping(20);
 
         $schedule
             ->command(ScanProviderFolderChanges::class)

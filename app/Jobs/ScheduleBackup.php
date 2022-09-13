@@ -175,8 +175,6 @@ class ScheduleBackup implements ShouldQueue
      */
     private function processMailbox(EmailProvider $emailProvider, Connection $connection, Folder $folder): array
     {
-//        Log::debug(sprintf("Processing mailbox '%s'", $folder->name));
-
         $remoteFolder = $connection->getMailbox($folder->name);
         $status = $emailProvider->getFolderStatus($folder->name);
 
@@ -245,7 +243,7 @@ class ScheduleBackup implements ShouldQueue
      * @param array $messageNumbers
      * @param array $status
      * @param Folder $savedMailbox
-     * @return Folder
+     * @return Folder|null
      */
     private function updateMailbox(MailboxInterface $mailbox, array $messageNumbers, array $status, Folder $savedMailbox): ?Folder
     {
