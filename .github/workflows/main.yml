@@ -31,6 +31,6 @@ jobs:
           platforms: |-
               linux/arm64
           file: ./docker/prod/Dockerfile
-          pull: true
-          cache-from: type=gha
-          cache-to: type=gha
+#          pull: true
+#          cache-from: type=gha
+#          cache-to: type=gha
