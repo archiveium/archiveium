@@ -4,7 +4,7 @@ services:
     laravel:
         container_name: laravel
         build:
-            context: ./docker/8.1
+            context: ./docker/dev
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
@@ -81,10 +81,15 @@ services:
 networks:
     sail:
         driver: bridge
+
 volumes:
     sail-pgsql:
-        driver: local
+#        driver: local
+        external: true
+        name: offline-email-backup-search_sail-pgsql
     sail-meilisearch:
-        driver: local
+#        driver: local
+        external: true
+        name: offline-email-backup-search_sail-meilisearch
 #    sail-redis:
 #        driver: local
