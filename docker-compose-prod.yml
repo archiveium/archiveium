@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  archiveium_app:
+    image: archiveium/archiveium:latest
+    ports:
+      - '5292:80'
+    volumes:
+      - archiveium_app_storage:/var/www/html/storage
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/login"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - archiveium_prod
+    depends_on:
+      - archiveium_db
+
+  archiveium_db:
+    container_name: archiveium_db
+    image: 'postgres:13'
+    ports:
+      - '5432:5432'
+    environment:
+      PGPASSWORD: "$DB_PASSWORD"
+      POSTGRES_DB: "$DB_DATABASE"
+      POSTGRES_USER: "$DB_USERNAME"
+      POSTGRES_PASSWORD: "$DB_PASSWORD"
+    volumes:
+      - 'archiveium_db_data:/var/lib/postgresql/data'
+    networks:
+      - archiveium_prod
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}"]
+      retries: 3
+      timeout: 5s
+
+volumes:
+  archiveium_db_data:
+    name: archiveium_db_data
+  archiveium_app_storage:
+    name: archiveium_app_storage
+
+networks:
+  archiveium_prod:
+    name: archiveium_prod
