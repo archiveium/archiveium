@@ -91,7 +91,6 @@ RUN php artisan view:cache
 
 STOPSIGNAL SIGTERM
 
-#RUN ["chown", "-R", "unit:unit", "/var/www/html"]
 COPY docker/prod/docker-entrypoint.d/config.json /docker-entrypoint.d/
 
 RUN ["chmod", "+x", "/usr/local/bin/docker-entrypoint.sh"]

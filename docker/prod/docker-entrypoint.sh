@@ -8,7 +8,14 @@ mkdir -p /var/www/html/storage/framework/cache /var/www/html/storage/framework/s
 mkdir -p /var/www/html/storage/logs
 chown -R unit:unit /var/www/html/storage
 chown -R unit:unit /var/www/html/bootstrap
-php artisan migrate
+
+until PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -d "$DB_DATABASE" -U "$DB_USERNAME" -c '\q'; do
+  echo "Postgres is unavailable - sleeping"
+  sleep 1
+done
+echo "Postgres is up, executing commands"
+
+php artisan migrate --force
 php artisan config:cache
 # END - App related checks
 
