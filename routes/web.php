@@ -7,6 +7,10 @@ use App\Http\Livewire\Account\EditAccount;
 use App\Http\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', function () {
+    return redirect()->route('login');
+});
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
