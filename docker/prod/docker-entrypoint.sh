@@ -3,11 +3,8 @@
 set -e
 
 # START - App related checks
-mkdir -p /var/www/html/storage/app/attachments /var/www/html/storage/app/public
-mkdir -p /var/www/html/storage/framework/cache /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views
-mkdir -p /var/www/html/storage/logs
-chown -R unit:unit /var/www/html/storage
-chown -R unit:unit /var/www/html/bootstrap
+role=${CONTAINER_ROLE:-app}
+queue=${QUEUE_NAME:-default}
 
 until PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -d "$DB_DATABASE" -U "$DB_USERNAME" -c '\q'; do
   echo "Postgres is unavailable - sleeping"
@@ -16,7 +13,27 @@ done
 echo "Postgres is up, executing commands"
 
 php artisan migrate --force
+mkdir -p /var/www/html/storage/app/attachments /var/www/html/storage/app/public
+mkdir -p /var/www/html/storage/framework/cache /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views
+mkdir -p /var/www/html/storage/logs
+chown -R unit:unit /var/www/html/storage
+chown -R unit:unit /var/www/html/bootstrap
 php artisan config:cache
+
+echo "Running container under '$role' role"
+
+if [ "$role" = "queue" ]; then
+    echo "Running '$queue' queue"
+    php /var/www/html/artisan queue:work --queue="$queue"
+    exit 1
+elif [ "$role" = "scheduler" ]; then
+    while [ true ]
+    do
+      php /var/www/html/artisan schedule:run --verbose --no-interaction &
+      sleep 60
+    done
+    exit 1
+fi
 # END - App related checks
 
 curl_put()
