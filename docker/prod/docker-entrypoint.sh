@@ -19,6 +19,7 @@ mkdir -p /var/www/html/storage/logs
 chown -R unit:unit /var/www/html/storage
 chown -R unit:unit /var/www/html/bootstrap
 php artisan config:cache
+php artisan route:cache
 
 echo "Running container under '$role' role"
 
