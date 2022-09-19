@@ -17,11 +17,11 @@
             <div class="card-body">
                 <h2 class="card-title text-center mb-4">Forgot your password?</h2>
                 <p class="card-subtitle">
-                    Just let us know your email address and we will email you a password reset link.
+                    Just let us know your email address & we'll email you a password reset link.
                 </p>
                 <div class="mb-3">
                     <label class="form-label">Email address</label>
-                    <input type="email" wire:model="email" class="form-control @error('email') is-invalid @enderror" placeholder="Enter your email address">
+                    <input type="email" wire:model.lazy="email" class="form-control @error('email') is-invalid @enderror" placeholder="Enter your email address">
                     @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="form-footer">

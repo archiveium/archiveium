@@ -25,14 +25,14 @@
                 <div class="mb-3">
                     <label class="form-label">New Password</label>
                     <div class="form-group mb-3">
-                        <input type="password" wire:model="password" class="form-control @error('password') is-invalid @enderror" autocomplete="off" placeholder="Your new password">
+                        <input type="password" wire:model.lazy="password" class="form-control @error('password') is-invalid @enderror" autocomplete="off" placeholder="Your new password">
                         @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Confirm Password</label>
                     <div class="input-group input-group-flat">
-                        <input type="password" wire:model="password_confirmation" class="form-control" autocomplete="off" placeholder="Re-enter your password">
+                        <input type="password" wire:model.lazy="password_confirmation" class="form-control" autocomplete="off" placeholder="Re-enter your password">
                     </div>
                 </div>
                 <div class="form-footer">

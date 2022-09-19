@@ -12,25 +12,25 @@
                 <h2 class="card-title text-center mb-4">Register new account</h2>
                 <div class="mb-3">
                     <label class="form-label">Name</label>
-                    <input type="text" wire:model="name" class="form-control @error('name') is-invalid @enderror" placeholder="Enter your name">
+                    <input type="text" wire:model.lazy="name" class="form-control @error('name') is-invalid @enderror" placeholder="Enter your name">
                     @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Email address</label>
-                    <input type="email" wire:model="email" class="form-control @error('email') is-invalid @enderror" placeholder="Enter your email address">
+                    <input type="email" wire:model.lazy="email" class="form-control @error('email') is-invalid @enderror" placeholder="Enter your email address">
                     @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Password</label>
                     <div class="form-group mb-3">
-                        <input type="password" wire:model="password" class="form-control @error('password') is-invalid @enderror" autocomplete="off" placeholder="Your password">
+                        <input type="password" wire:model.lazy="password" class="form-control @error('password') is-invalid @enderror" autocomplete="off" placeholder="Your password">
                         @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Confirm Password</label>
                     <div class="input-group input-group-flat">
-                        <input type="password" wire:model="password_confirmation" class="form-control" autocomplete="off" placeholder="Re-enter your password">
+                        <input type="password" wire:model.lazy="password_confirmation" class="form-control" autocomplete="off" placeholder="Re-enter your password">
                     </div>
                 </div>
                 <div class="form-footer">
