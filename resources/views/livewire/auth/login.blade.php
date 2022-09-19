@@ -30,7 +30,7 @@
                 <h2 class="card-title text-center mb-4">Login</h2>
                 <div class="mb-3">
                     <label class="form-label">Email address</label>
-                    <input type="email" wire:model.lazy="email" class="form-control @error('email') is-invalid @enderror" placeholder="Enter email">
+                    <input type="email" wire:model.defer="email" class="form-control @error('email') is-invalid @enderror" placeholder="Enter email">
                     @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="mb-2">
@@ -41,7 +41,7 @@
                         </span>
                     </label>
                     <div class="mb-3">
-                        <input type="password" wire:model.lazy="password" class="form-control @error('password') is-invalid @enderror" placeholder="Password" autocomplete="off">
+                        <input type="password" wire:model.defer="password" class="form-control @error('password') is-invalid @enderror" placeholder="Password" autocomplete="off">
                         @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                 </div>
