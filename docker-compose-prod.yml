@@ -1,12 +1,12 @@
 version: '3.8'
 
 services:
-  archiveium_app:
+  app:
     image: archiveium/archiveium:latest
     ports:
       - '5292:80'
     volumes:
-      - archiveium_app_storage:/var/www/html/storage
+      - app_storage:/var/www/html/storage
     env_file:
       - .env
     healthcheck:
@@ -17,10 +17,51 @@ services:
     networks:
       - archiveium_prod
     depends_on:
-      - archiveium_db
+      - db
 
-  archiveium_db:
-    container_name: archiveium_db
+  queue_default:
+    image: archiveium/archiveium:latest
+    volumes:
+      - app_storage:/var/www/html/storage
+      - ./docker/prod/conf.d/docker-php-memory-limit.ini:/usr/local/etc/php/conf.d/docker-php-memory-limit.ini
+    environment:
+      - CONTAINER_ROLE=queue
+      - QUEUE_NAME=default
+    env_file:
+      - .env
+    networks:
+      - archiveium_prod
+    depends_on:
+      - db
+
+  queue_listeners:
+    image: archiveium/archiveium:latest
+    volumes:
+      - app_storage:/var/www/html/storage
+    environment:
+      - CONTAINER_ROLE=queue
+      - QUEUE_NAME=listeners
+    env_file:
+      - .env
+    networks:
+      - archiveium_prod
+    depends_on:
+      - db
+
+  scheduler:
+    image: archiveium/archiveium:latest
+    volumes:
+      - app_storage:/var/www/html/storage
+    environment:
+      - CONTAINER_ROLE=scheduler
+    env_file:
+      - .env
+    networks:
+      - archiveium_prod
+    depends_on:
+      - db
+
+  db:
     image: 'postgres:13'
     ports:
       - '5432:5432'
@@ -30,7 +71,7 @@ services:
       POSTGRES_USER: "$DB_USERNAME"
       POSTGRES_PASSWORD: "$DB_PASSWORD"
     volumes:
-      - 'archiveium_db_data:/var/lib/postgresql/data'
+      - db_data:/var/lib/postgresql/data
     networks:
       - archiveium_prod
     healthcheck:
@@ -39,10 +80,8 @@ services:
       timeout: 5s
 
 volumes:
-  archiveium_db_data:
-    name: archiveium_db_data
-  archiveium_app_storage:
-    name: archiveium_app_storage
+  db_data:
+  app_storage:
 
 networks:
   archiveium_prod:
