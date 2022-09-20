@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Exceptions\AccountSyncingPausedException;
 use App\Exceptions\FolderDeletedOnRemoteException;
 use App\Models\Folder;
 use Illuminate\Database\Eloquent\Collection;
@@ -27,18 +28,19 @@ class FolderService
     /**
      * @param int $folderId
      * @return Folder
-     * @throws ModelNotFoundException|FolderDeletedOnRemoteException
+     * @throws ModelNotFoundException|FolderDeletedOnRemoteException|AccountSyncingPausedException
      */
     public static function getByFolderId(int $folderId): Folder
     {
         $folder = Folder::whereId($folderId)
-//            ->where('status_messages', '>', 0)
             ->first();
 
         if (is_null($folder)) {
             throw new ModelNotFoundException();
         } elseif ($folder->deleted_remote) {
             throw new FolderDeletedOnRemoteException();
+        } elseif (!$folder->account->syncing) {
+            throw new AccountSyncingPausedException();
         }
 
         return $folder;

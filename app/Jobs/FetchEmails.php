@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\EmailProvider\EmailProviderFactory;
 use App\Events\AuthenticationFailedEvent;
+use App\Exceptions\AccountSyncingPausedException;
 use App\Exceptions\EmailBulkSaveFailedException;
 use App\Exceptions\EmailBulkUpdateFailedException;
 use App\Exceptions\FolderDeletedOnRemoteException;
@@ -104,6 +105,11 @@ class FetchEmails implements ShouldQueue
                     $this->folderId
                 )
             );
+
+            $this->delete();
+            return;
+        } catch (AccountSyncingPausedException $g) {
+            Log::warning("Account syncing has been paused. Deleting job.");
 
             $this->delete();
             return;
