@@ -12,6 +12,7 @@ use Auth;
 use Ddeboer\Imap\Exception\AuthenticationFailedException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Livewire\Redirector;
 use Throwable;
 
@@ -33,7 +34,7 @@ class AddAccount extends Base
     public $selectedSyncCandidates;
 
     protected $messages = [
-        'email.not_in' => 'Email Address has already been added.',
+        'email.unique' => 'Email Address has already been added.',
     ];
 
     /**
@@ -48,7 +49,7 @@ class AddAccount extends Base
             'email'             => [
                 'required',
                 'email',
-                'not_in:' . auth()->user()->email
+                Rule::unique('accounts', 'username')->where('deleted', 'false')
             ],
             'selectedProvider'  => 'required|exists:providers,id'
         ];
