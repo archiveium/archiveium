@@ -18,8 +18,8 @@ use Throwable;
 
 class AddAccount extends Base
 {
-    private const ERROR_FAILED_INSERT = 'Failed to save account/folders';
-    private const SUCCESS_INSERT      = 'Account & folders saved successfully';
+    private const ERROR_FAILED_INSERT = 'Failed to save account.';
+    private const SUCCESS_INSERT      = 'Account saved successfully. Please verify most recent email shows up in dashboard before deleting from email account';
     private const ERROR_KEY           = 'addAccountError';
     private const SUCCESS_KEY         = 'addAccountSuccess';
 
@@ -95,7 +95,6 @@ class AddAccount extends Base
         $account = Account::create([
             'name'          => $this->name,
             'username'      => $this->email,
-            // TODO Save hashed password
             'password'      => $this->password,
             'user_id'       => $userId,
             'provider_id'   => $this->selectedProvider,
