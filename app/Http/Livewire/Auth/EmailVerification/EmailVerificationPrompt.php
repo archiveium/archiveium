@@ -8,6 +8,16 @@ use Illuminate\Support\Facades\RateLimiter;
 
 class EmailVerificationPrompt extends Base
 {
+    public function mount()
+    {
+        $user = $this->getUser();
+        if ($user->hasVerifiedEmail()) {
+            return redirect()
+                ->intended(RouteServiceProvider::HOME)
+                ->with('success', 'Your email has already been verified.');
+        }
+    }
+
     public function sendVerification()
     {
         $user = $this->getUser();
