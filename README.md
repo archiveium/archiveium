@@ -24,6 +24,7 @@
 
 ## Roadmap
 - [ ] Create wiki and add instructions for self deployment
+- [ ] Use Minio for saving email data (instead of database)
 - [ ] Integrate searching functionality
 - [ ] Migrate to version v0.29 of meilisearch
 - [x] Disable search indexing by default
@@ -33,7 +34,6 @@
     - [ ] When user changes `searchable` to `false` trigger an event that removes account related data from index
 - [ ] Rewrite ProcessDeleteAccounts command to delete values from index before purging db entries
 - [ ] Upgrade to Laravel 9.x
-- [ ] Use Minio for saving email data (instead of database)
 - [ ] Save size of message in `emails` table in database
 - [ ] User's account change password functionality (when logged in)
 - [ ] Enforce quota on accounts
@@ -52,6 +52,8 @@
 - [ ] Add ability to export archived emails
 - [ ] Look into integrating Project Honeypot for spam detection (if current protection isn't enough)
 - [ ] Remember me checkbox functionality
+- [ ] Allow user to define trusted proxies instead of allowing all (the case currently)
+- [ ] Populate providers table on first run
 
 ## Folder/Label Change (Possible) Scenarios
 ### Gmail
