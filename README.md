@@ -56,6 +56,10 @@ Please note that,
 - [x] Create wiki and add instructions for self deployment
 - [ ] Upgrade to Laravel 9.x
 - [ ] Migrate to version v0.29 of meilisearch
+- [ ] Log email retrieval failures
+  - [ ] Display to user
+  - [ ] Give an option to re-import
+  - [ ] Give an option to let user accept that error (and hide from view by default)
 - [ ] Use Minio for saving email data (instead of database)
 - [ ] Integrate searching functionality
 - [x] Disable search indexing by default
@@ -84,6 +88,8 @@ Please note that,
 - [ ] Remember me checkbox functionality
 - [ ] Allow user to define trusted proxies instead of allowing all (the case currently)
 - [ ] Populate providers table on first run
+- [ ] Based on email address entered on edit account page, try to determine the provider
+- [ ] Add select all checkbox on fetched folders on edit account page
 
 ## Folder/Label Change (Possible) Scenarios
 ### Gmail
