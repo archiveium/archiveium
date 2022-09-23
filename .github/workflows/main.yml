@@ -38,4 +38,4 @@ jobs:
               linux/arm64
           file: ./docker/prod/Dockerfile
           push: true
-          tags: archiveium/archiveium:$APP_VERSION,archiveium/archiveium:latest
+          tags: archiveium/archiveium:${{ APP_VERSION }},archiveium/archiveium:latest
