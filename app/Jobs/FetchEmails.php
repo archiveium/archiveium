@@ -227,8 +227,8 @@ class FetchEmails implements ShouldQueue
                 $email->has_attachments = $message->hasAttachments();
                 $email->imported = true;
             } catch (MessageDoesNotExistException|ReopenMailboxException $e) {
-                Log::error($messageNumber . ' unable to get further info. - ' . $e->getMessage());
-                Log::error(imap_last_error());
+                Log::warning($messageNumber . ' unable to get further info. - ' . $e->getMessage());
+                Log::warning(imap_last_error());
 
                 $email->udate = 0;
                 $email->raw_message = '';
