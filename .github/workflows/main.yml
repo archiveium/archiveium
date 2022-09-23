@@ -28,7 +28,7 @@ jobs:
       - name: Import App Version
         id: import-app-version
         shell: bash
-        run: cat ./VERSION >> $APP_VERSION
+        run: APP_VERSION=`cat VERSION`
       - name: Build
         uses: docker/build-push-action@v3
         with:
