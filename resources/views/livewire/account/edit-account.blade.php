@@ -50,7 +50,7 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Credentials</h3>
+                            <h3 class="card-title">Account Details</h3>
                         </div>
                         <div class="card-body">
                             <form wire:submit.prevent="updateEmailProvider">
@@ -78,7 +78,7 @@
                                     </div>
                                 </div>
                                 <div class="form-footer">
-                                    <button type="submit" class="btn btn-primary">Update Credentials</button>
+                                    <button type="submit" class="btn btn-primary">Update</button>
                                 </div>
                             </form>
                         </div>
