@@ -25,6 +25,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Import App Version
+        id: import-app-version
+        shell: bash
+        run: cat VERSION >> $APP_VERSION
       - name: Build
         uses: docker/build-push-action@v3
         with:
@@ -34,4 +38,4 @@ jobs:
               linux/arm64
           file: ./docker/prod/Dockerfile
           push: true
-          tags: archiveium/archiveium:latest
+          tags: archiveium/archiveium:$APP_VERSION,archiveium/archiveium:latest
