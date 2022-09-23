@@ -28,9 +28,7 @@ jobs:
       - name: Import App Version
         id: import-app-version
         shell: bash
-        run: |
-          export APP_VERSION=`cat VERSION`
-          echo "::set-env name=APP_VERSION::$APP_VERSION"
+        run: echo "APP_VERSION=`cat VERSION`" >> $GITHUB_ENV
       - name: Build
         uses: docker/build-push-action@v3
         with:
@@ -40,4 +38,4 @@ jobs:
               linux/arm64
           file: ./docker/prod/Dockerfile
           push: true
-          tags: archiveium/archiveium:$APP_VERSION,archiveium/archiveium:latest
+          tags: archiveium/archiveium:${{ env.APP_VERSION }},archiveium/archiveium:latest
