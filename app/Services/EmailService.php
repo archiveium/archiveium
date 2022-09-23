@@ -18,7 +18,7 @@ class EmailService
         return Email::whereUserId($userId)
             ->where('folder_id', $folderId)
             ->select(['id', 'raw_message', 'has_attachments', 'imported', 'created_at'])
-            ->orderBy('message_number', 'DESC')
+            ->orderBy('udate', 'DESC')
             ->paginate(self::RESULTS_PER_PAGE);
     }
 
