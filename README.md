@@ -1,39 +1,69 @@
-## TODO
-- [x] Cover scenario when new folder is added
-- [x] Cover scenario when existing folder is deleted
-- [x] Cover scenario when password is changed
-  - [x] Pause account syncing
-  - [x] Send notification to user via email
-  - [x] Allow user to change password
-- [x] Registration flow (including sending email for verification)
-  - [x] Create table `user_invitations` with fields username, accepted (by admin) (bool), email_sent (bool)
-  - [x] Create new view for accepting user's interest in using service
-    - [x] this page populates entries in `user_invitations`
-    - [x] accepted will be false and email_sent will be false
-  - [x] A new command will send an email if accepted = true stating user can now register
-  - [x] On registration page, a check will be done against `user_invitations` to see if registering user is allowed
-- [x] Integrate captcha on all form pages
-  - [x] login
-  - [x] registration
-  - [x] Request invitation
-  - [x] Password reset
-- [x] User's account password reset functionality
-- [x] Add landing page
-- [x] Update progress bar (in dashboard) based on no. of emails instead of disk usage
-- [x] Streamline add account flow
+## Getting Started
+
+1. Clone this repository `git clone https://github.com/archiveium/archiveium.git`
+2. Navigate to newly created directory `cd archiveium`
+3. Create a `.env` file with following contents (replace `YOUR_*` with custom values),
+    ```dotenv
+    APP_NAME=Archiveium
+    APP_ENV=production
+    APP_KEY=YOUR_APP_KEY
+    APP_DEBUG=false
+    APP_URL=YOUR_APP_URL
+    # Boolean value - true/false
+    APP_FORCE_HTTPS=YOUR_SSL_STATUS
+    
+    LOG_CHANNEL=daily
+    LOG_DEPRECATIONS_CHANNEL=null
+    LOG_LEVEL=debug
+    
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=YOUR_DB_NAME
+    DB_USERNAME=YOUR_DB_USERNAME
+    DB_PASSWORD=YOUR_DB_PASSWORD
+    
+    BROADCAST_DRIVER=log
+    CACHE_DRIVER=file
+    FILESYSTEM_DRIVER=local
+    QUEUE_CONNECTION=sync
+    SESSION_DRIVER=file
+    SESSION_LIFETIME=120
+    
+    MAIL_MAILER=smtp
+    MAIL_HOST=YOUR_MAIL_HOST
+    MAIL_PORT=YOUR_MAIL_PORT
+    MAIL_USERNAME=YOUR_MAIL_USERNAME
+    MAIL_PASSWORD=YOUR_MAIL_PASSWORD
+    MAIL_ENCRYPTION=YOUR_MAIL_ENCRYPTION
+    MAIL_FROM_ADDRESS=YOUR_MAIL_EMAIL_ADDRESS
+    MAIL_FROM_NAME=Archiveium
+    
+    # Boolean value - true/false
+    HONEYPOT_ENABLED=YOUR_HONEYPOT_STATUS
+    ```
+4. Bring up the stack - `docker-compose -f docker-compose-prod.yml up -d`
+
+Please note that,
+1. The docker image being used has no version as of now i.e. you'll have to re-pull the image with `latest` tag anytime there's an update.
+2. There's no account that's created by default, meaning, you'll have to perform following actions to have a working account,
+   1. Provide valid credentials for `MAIL_*` in `.env` file - this is required for app to send registration email
+   2. Visit `/preview-registration`, enter your email address
+   3. Open `user_invitations` table in database and update `accepted` field to `true`
+   4. Finally, create account by navigating to `/register`
 
 ## Roadmap
-- [ ] Create wiki and add instructions for self deployment
+- [x] Create wiki and add instructions for self deployment
+- [ ] Upgrade to Laravel 9.x
+- [ ] Migrate to version v0.29 of meilisearch
 - [ ] Use Minio for saving email data (instead of database)
 - [ ] Integrate searching functionality
-- [ ] Migrate to version v0.29 of meilisearch
 - [x] Disable search indexing by default
     - [x] Add columns in accounts table `searchable`
     - [ ] Update add account view to show checkbox
     - [ ] Update BuildEmailSearchIndex command to only build index for accounts that have `searchable = true`
     - [ ] When user changes `searchable` to `false` trigger an event that removes account related data from index
 - [ ] Rewrite ProcessDeleteAccounts command to delete values from index before purging db entries
-- [ ] Upgrade to Laravel 9.x
 - [ ] Save size of message in `emails` table in database
 - [ ] User's account change password functionality (when logged in)
 - [ ] Enforce quota on accounts
@@ -96,6 +126,3 @@
 - [x] Delete folder
   - [x] Flag folder as deleted from remote (`deleted_remote = true`)
   - [x] Ignore this folder from future sync jobs
-
-## Monitoring
-- [ ] Monitor slow queries - Look into using [pgMetrics](https://pgmetrics.io/), postgres `auto_explain` [module](https://www.postgresql.org/docs/current/auto-explain.html) (and [changing log level](https://stackoverflow.com/questions/60186882/how-to-turn-on-the-module-auto-explain))
