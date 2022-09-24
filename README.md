@@ -54,7 +54,7 @@ Please note that,
 
 ## Roadmap
 - [x] Create wiki and add instructions for self deployment
-- [ ] Upgrade to Laravel 9.x
+- [x] Upgrade to Laravel 9.x
 - [ ] Migrate to version v0.29 of meilisearch
 - [ ] Log email retrieval failures
   - [ ] Display to user
@@ -71,7 +71,7 @@ Please note that,
 - [ ] Save size of message in `emails` table in database
 - [ ] User's account change password functionality (when logged in)
 - [ ] Enforce quota on accounts
-- [ ] Meta data for different views
+- [ ] Meta data for different viewsi
 - [ ] Check for credentials validity before (re)enabling sync
 - [ ] User's account deletion option (use Jetstream's password confirmation)
 - [ ] Do not pause mailbox sync on first auth failure. Attempt 3 times before triggering email
