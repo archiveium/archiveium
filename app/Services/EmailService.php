@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\Models\Email;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Query\JoinClause;
 
 class EmailService
 {
@@ -37,15 +38,23 @@ class EmailService
 
     public static function getSavedEmailCount(int $userId): int
     {
-        return Email::whereUserId($userId)
-            ->count('id');
+        return Email::where('emails.user_id', '=', $userId)
+            ->join('folders', function (JoinClause $join) {
+                $join->on('folders.id', '=', 'emails.folder_id')
+                    ->where('folders.deleted', '=', false);
+            })
+            ->count('emails.id');
     }
 
     public static function getFailedEmailCount(int $userId): int
     {
-        return Email::whereUserId($userId)
-            ->where('imported', '=', false)
-            ->count('id');
+        return Email::where('emails.user_id', '=', $userId)
+            ->where('emails.imported', '=', false)
+            ->join('folders', function (JoinClause $join) {
+                $join->on('folders.id', '=', 'emails.folder_id')
+                    ->where('folders.deleted', '=', false);
+            })
+            ->count('emails.id');
     }
 
     /**
