@@ -48,6 +48,8 @@ use PhpMimeMailParser\Parser;
  * @property-read string $parsed_body_type
  * @property-read string $parsed_from_address
  * @property-read string $parsed_subject
+ * @property string|null $import_fail_reason
+ * @method static \Illuminate\Database\Eloquent\Builder|Email whereImportFailReason($value)
  */
 class Email extends Model
 {

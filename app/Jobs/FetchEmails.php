@@ -15,7 +15,7 @@ use Carbon\Carbon;
 use Ddeboer\Imap\Exception\AuthenticationFailedException;
 use Ddeboer\Imap\Exception\MessageDoesNotExistException;
 use Ddeboer\Imap\Exception\ReopenMailboxException;
-use Ddeboer\Imap\Message;
+use Ddeboer\Imap\MailboxInterface;
 use Exception;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
@@ -82,7 +82,7 @@ class FetchEmails implements ShouldQueue
      * @throws Exception
      * @throws Throwable
      */
-    public function handle()
+    public function handle(): void
     {
         Log::info("Processing folder id " . $this->folderId);
 
@@ -153,14 +153,7 @@ class FetchEmails implements ShouldQueue
                 $bulkCount = 0;
             }
 
-            try {
-                $message = $mailbox->getMessage($messageNumber);
-            } catch (MessageDoesNotExistException $e) {
-                $message = null;
-                Log::error($messageNumber . ' does not exist - ' . $e->getMessage());
-            }
-
-            $emails[] = $this->buildEmail($message, $messageNumber, $folder->id, $folder->user_id);
+            $emails[] = $this->buildEmailObject($mailbox, $messageNumber, $folder->id, $folder->user_id);
             $bulkCount++;
         }
 
@@ -205,36 +198,39 @@ class FetchEmails implements ShouldQueue
     }
 
     /**
-     * @param Message|null $message
+     * @param MailboxInterface $mailbox
      * @param int $messageNumber
      * @param int $folderId
      * @param int $userId
      * @return array
      */
-    private function buildEmail(?Message $message, int $messageNumber, int $folderId, int $userId): array
+    private function buildEmailObject(MailboxInterface $mailbox, int $messageNumber, int $folderId, int $userId): array
     {
         $email = new Email();
         $email->makeVisible('raw_message');
 
-        if (is_null($message)) {
+        try {
+            $message = $mailbox->getMessage($messageNumber);
+
+            $email->udate = $message->getHeaders()->get('udate');
+            $email->raw_message = Crypt::encryptString($message->getRawMessage());
+            $email->has_attachments = $message->hasAttachments();
+            $email->imported = true;
+        } catch (MessageDoesNotExistException $e) {
+            Log::warning($messageNumber . ' does not exist - ' . $e->getMessage());
+
             $email->udate = 0;
             $email->raw_message = '';
             $email->imported = false;
-        } else {
-            try {
-                $email->udate = $message->getHeaders()->get('udate');
-                $email->raw_message = Crypt::encryptString($message->getRawMessage());
-                $email->has_attachments = $message->hasAttachments();
-                $email->imported = true;
-            } catch (MessageDoesNotExistException|ReopenMailboxException $e) {
-                Log::warning($messageNumber . ' unable to get further info. - ' . $e->getMessage());
-                Log::warning(imap_last_error());
+            $email->import_fail_reason = $e->getMessage();
+        } catch (ReopenMailboxException $e) {
+            Log::warning($messageNumber . ' unable to get further info. - ' . $e->getMessage());
 
-                $email->udate = 0;
-                $email->raw_message = '';
-                $email->has_attachments = false;
-                $email->imported = false;
-            }
+            $email->udate = 0;
+            $email->raw_message = '';
+            $email->has_attachments = false;
+            $email->imported = false;
+            $email->import_fail_reason = $e->getMessage();
         }
 
         $email->user_id = $userId;
