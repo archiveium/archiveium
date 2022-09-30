@@ -55,11 +55,12 @@ Please note that,
 ## Roadmap
 - [x] Create wiki and add instructions for self deployment
 - [x] Upgrade to Laravel 9.x
+- [ ] Log email retrieval failures (in progress)
+    - [x] Save reason to database
+    - [ ] Display to user
+    - [ ] Give an option to re-import
+    - [ ] Give an option to let user accept that error (and hide from view by default)
 - [ ] Migrate to version v0.29 of meilisearch
-- [ ] Log email retrieval failures
-  - [ ] Display to user
-  - [ ] Give an option to re-import
-  - [ ] Give an option to let user accept that error (and hide from view by default)
 - [ ] Use Minio for saving email data (instead of database)
 - [ ] Integrate searching functionality
 - [x] Disable search indexing by default
