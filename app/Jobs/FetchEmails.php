@@ -34,8 +34,6 @@ class FetchEmails implements ShouldQueue
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private const MAX_PULL_COUNT = 200;
-
     /**
      * The number of seconds the job can run before timing out.
      *
@@ -63,6 +61,8 @@ class FetchEmails implements ShouldQueue
      */
     private $reProcessing;
 
+    private readonly int $emailPullPerRun;
+
     /**
      * Create a new job instance.
      *
@@ -73,6 +73,7 @@ class FetchEmails implements ShouldQueue
         $this->folderId = $folderId;
         $this->messageNumbers = $messageNumbers;
         $this->reProcessing = $reProcessing;
+        $this->emailPullPerRun = config('app.email_pull_per_run');
     }
 
     /**
@@ -136,7 +137,7 @@ class FetchEmails implements ShouldQueue
         $emails = [];
         $bulkCount = 0;
         foreach ($this->messageNumbers as $messageNumber) {
-            if ($bulkCount === self::MAX_PULL_COUNT) {
+            if ($bulkCount === $this->emailPullPerRun) {
                 try {
                     $this->processBulk($emails);
                 } catch (ForeignKeyViolationException $e) {
