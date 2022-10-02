@@ -61,7 +61,7 @@ class FetchEmails implements ShouldQueue
      */
     private $reProcessing;
 
-    private readonly int $emailPullPerRun;
+    private int $emailPullPerRun;
 
     /**
      * Create a new job instance.
