@@ -4,9 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Crypt;
-use PhpMimeMailParser\Attachment;
 use PhpMimeMailParser\Parser;
 
 /**
@@ -48,6 +45,8 @@ use PhpMimeMailParser\Parser;
  * @property-read string $parsed_body_type
  * @property-read string $parsed_from_address
  * @property-read string $parsed_subject
+ * @property string|null $import_fail_reason
+ * @method static \Illuminate\Database\Eloquent\Builder|Email whereImportFailReason($value)
  */
 class Email extends Model
 {
@@ -56,10 +55,10 @@ class Email extends Model
     public const TYPE_TEXT = 'text';
     public const TYPE_HTML = 'html';
 
-    /**
-     * @var Parser
-     */
-    private $parser;
+    private string $fromAddress;
+    private string $subject;
+    private string $contentType;
+    private string $messageBody;
 
     /**
      * The attributes that are mass assignable.
@@ -80,59 +79,46 @@ class Email extends Model
     ];
 
     /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
+     * @param string $messageBody
+     * @return void
      */
-    protected $hidden = [
-        'raw_message'
-    ];
-
-    /**
-     * @param string $rawMessage
-     * @return Parser
-     */
-    private function getParser(string $rawMessage): Parser
+    public function setMessageBody(string $messageBody): void
     {
-        if (isset($this->parser)) {
-            return $this->parser;
-        }
-
-        $decryptedRawMessage = Crypt::decryptString($rawMessage);
-
-        $parser = new Parser();
-        $parser->setText($decryptedRawMessage);
-
-        return $parser;
-    }
-
-    /**
-     * @return Attachment|string
-     */
-    public function getParsedBodyAttribute()
-    {
-        $parser = $this->getParser($this->raw_message);
-
-        $parsedBody = $parser->getMessageBody(self::TYPE_HTML);
-        if (empty($parsedBody)) {
-            $parsedBody = $parser->getMessageBody();
-        }
-
-        return $parsedBody;
+        $this->messageBody = $messageBody;
     }
 
     /**
      * @return string
      */
-    public function getParsedBodyTypeAttribute(): string
+    public function getMessageBody(): string
     {
-        $parser = $this->getParser($this->raw_message);
+        return $this->messageBody ?? '';
+    }
 
-        if (str_contains($parser->getHeader('content-type'), 'text/plain')) {
+    /**
+     * @param string $contentType
+     * @return void
+     */
+    public function setContentTypeAttribute(string $contentType): void
+    {
+        $this->contentType = $contentType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContentTypeAttribute(): string
+    {
+        if (str_contains($this->contentType, 'text/plain')) {
             return self::TYPE_TEXT;
         }
 
         return self::TYPE_HTML;
+    }
+
+    public function setParsedSubjectAttribute(string $subject): void
+    {
+        $this->subject = $subject;
     }
 
     /**
@@ -140,9 +126,16 @@ class Email extends Model
      */
     public function getParsedSubjectAttribute(): string
     {
-        return $this
-            ->getParser($this->raw_message)
-            ->getHeader('subject');
+        return $this->subject;
+    }
+
+    /**
+     * @param string $fromAddress
+     * @return void
+     */
+    public function setParsedFromAddressAttribute(string $fromAddress): void
+    {
+        $this->fromAddress = $fromAddress;
     }
 
     /**
@@ -150,14 +143,6 @@ class Email extends Model
      */
     public function getParsedFromAddressAttribute(): string
     {
-        $parser = $this->getParser($this->raw_message);
-
-        return implode(
-            '',
-            Arr::pluck(
-                $parser->getAddresses('from'),
-                'address'
-            )
-        );
+        return $this->fromAddress;
     }
 }

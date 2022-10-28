@@ -6,7 +6,6 @@ use App\EmailProvider\EmailProviderFactory;
 use App\Http\Livewire\Base;
 use App\Models\Account;
 use App\Models\Folder;
-use App\Services\BackupService;
 use App\Services\ProviderService;
 use Auth;
 use Ddeboer\Imap\Exception\AuthenticationFailedException;
@@ -114,7 +113,6 @@ class AddAccount extends Base
         try {
             if (Folder::insert($folders)) {
                 DB::commit();
-                BackupService::start($userId, $account->id);
 
                 return redirect()
                     ->to(route('add-account'))

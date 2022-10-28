@@ -2,36 +2,24 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\ScheduleBackup;
 use App\Models\Account;
 use App\Services\AccountService;
-use App\Services\BackupService;
 use Illuminate\Console\Command;
 
 class FetchNewEmail extends Command
 {
     /**
-     * The name and signature of the console command.
-     *
      * @var string
      */
     protected $signature = 'fetch:new-email';
 
     /**
-     * The console command description.
-     *
      * @var string
      */
     protected $description = 'Fetches new email(s) available for each account';
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    private const DELAY_IN_SECONDS = 5;
 
     /**
      * Execute the console command.
@@ -41,15 +29,22 @@ class FetchNewEmail extends Command
     public function handle(): int
     {
         $allAccounts = AccountService::getAllSyncing();
+        $now = now();
+        $delayInSeconds = self::DELAY_IN_SECONDS;
 
         /**
          * @var $account Account
          */
         foreach ($allAccounts as $account) {
-            BackupService::start(
-                $account->user_id,
-                $account->id
-            );
+            foreach ($account->folders as $folder) {
+                ScheduleBackup::dispatch(
+                    $account->user_id,
+                    $account->id,
+                    $folder
+                )->delay($now->addSeconds($delayInSeconds));
+
+                $delayInSeconds += self::DELAY_IN_SECONDS;
+            }
         }
 
         return self::SUCCESS;

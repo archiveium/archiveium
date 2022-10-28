@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\EmailProvider\EmailProvider;
 use App\EmailProvider\EmailProviderFactory;
 use App\Events\AuthenticationFailedEvent;
+use App\Exceptions\MailboxUpdatedFailedException;
 use App\Models\Folder;
 use App\Services\AccountService;
 use Ddeboer\Imap\Connection;
@@ -19,42 +20,38 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ScheduleBackup implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private const BATCH_SIZE = 1000;
-    private const DELAY_IN_SECONDS = 5;
-
     /**
-     * @var int
+     * Delete the job if its models no longer exist.
      */
-    private $userId;
+    public bool $deleteWhenMissingModels = true;
 
-    /**
-     * @var int
-     */
-    private $accountId;
-
-    /**
-     * The number of seconds the job can run before timing out.
-     *
-     * @var int
-     */
-    public $timeout = 90;
+    private readonly int $batchSize;
+    private int $userId;
+    private int $accountId;
+    private Folder $folder;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(int $userId, int $accountId)
+    public function __construct(int $userId, int $accountId, Folder $folder)
     {
-        Log::info("Job created for user id $userId and account id $accountId");
+        Log::info("Job created", [
+            'User ID' => $userId,
+            'Account ID' => $accountId,
+            'Folder ID' => $folder->id
+        ]);
 
         $this->userId = $userId;
         $this->accountId = $accountId;
+        $this->folder = $folder;
     }
 
     /**
@@ -63,14 +60,17 @@ class ScheduleBackup implements ShouldQueue
      * @return void
      * @throws Exception
      */
-    public function handle()
+    public function handle(): void
     {
+        $this->batchSize = config('app.batch_size');
         Log::info(
-            sprintf(
-                "Preparing backup schedule for user id %d and account id %d",
-                $this->userId,
-                $this->accountId
-            )
+            "Preparing backup schedule",
+            [
+                'User ID' => $this->userId,
+                'Account ID' => $this->accountId,
+                'Folder ID' => $this->folder->id,
+                'Batch Size' => $this->batchSize
+            ]
         );
 
         try {
@@ -103,27 +103,19 @@ class ScheduleBackup implements ShouldQueue
         }
 
         $folderUpdateCandidates = [];
-        $folders = $account->folders;
-        foreach ($folders as $folder) {
-            try {
-                list($savedFolder, $messageNumbers) = $this->processMailbox($emailProvider, $connection, $folder);
-                if (!is_null($savedFolder)) {
-                    $folderUpdateCandidates[] = [
-                        'entity'          => $savedFolder,
-                        'message_numbers' => $messageNumbers
-                    ];
-                } else {
-//                Log::info("Nothing to update for mailbox -> " . $folder->name);
-                }
-            } catch (ReopenMailboxException $e) {
-                Log::warning(
-                    sprintf(
-                        "Skipping folder '%s'. Exception occurred: %s",
-                        $folder->name,
-                        $e->getMessage()
-                    )
-                );
+        try {
+            list($savedFolder, $messageNumbers) = $this->processMailbox($emailProvider, $connection, $this->folder);
+            if (!is_null($savedFolder)) {
+                $folderUpdateCandidates[] = [
+                    'entity'          => $savedFolder,
+                    'message_numbers' => $messageNumbers
+                ];
             }
+        } catch (ReopenMailboxException $e) {
+            Log::warning('Skipping folder', [
+                'Folder ID' => $this->folder->id,
+                'Exception Message' => $e->getMessage()
+            ]);
         }
 
         $this->buildAndDispatchBatches($folderUpdateCandidates);
@@ -137,31 +129,17 @@ class ScheduleBackup implements ShouldQueue
      */
     private function buildAndDispatchBatches(array $mailboxes): void
     {
-        $now = now();
-        $delayInSeconds = self::DELAY_IN_SECONDS;
-
-        /**
-         * @var $mailbox array
-         * @var $messageNumbers array
-         */
         foreach ($mailboxes as $mailbox) {
             if ($mailbox['entity']->status_messages > 0) {
-                $batches = array_chunk($mailbox['message_numbers'], self::BATCH_SIZE);
+                $batches = array_chunk($mailbox['message_numbers'], $this->batchSize);
                 foreach ($batches as $i => $batch) {
-                    FetchEmails::dispatch($mailbox['entity']->id, $batch, false)
-                        ->delay($now->addSeconds($delayInSeconds));
+                    FetchEmails::dispatch($mailbox['entity']->id, $batch, false);
 
-                    Log::info(sprintf(
-                        "Added job no %s for %s with %d seconds delay",
-                        $i + 1,
-                        $mailbox['entity']->name,
-                        $delayInSeconds
-                    ));
-
-                    $delayInSeconds += self::DELAY_IN_SECONDS;
+                    Log::info('Added job', [
+                        'Job No.' => $i + 1,
+                        'Folder ID' => $mailbox['entity']->id
+                    ]);
                 }
-            } else {
-                Log::warning('Skipping, mailbox has no message');
             }
         }
     }
@@ -210,7 +188,7 @@ class ScheduleBackup implements ShouldQueue
         }
 
         if ($savedMailbox->status_uidvalidity !== $status['uidvalidity']) {
-            throw new Exception("uidvalidity changed. This error should fix itself after 'scan:provider-folder-changes' job runs");
+            throw new Exception('uidvalidity changed. This error should fix itself after scan:provider-folder-changes job runs');
         }
 
         if ($mailbox->count() === 0) {
@@ -244,6 +222,8 @@ class ScheduleBackup implements ShouldQueue
      * @param array $status
      * @param Folder $savedMailbox
      * @return Folder|null
+     * @throws MailboxUpdatedFailedException
+     * @throws Throwable
      */
     private function updateMailbox(MailboxInterface $mailbox, array $messageNumbers, array $status, Folder $savedMailbox): ?Folder
     {
@@ -255,10 +235,10 @@ class ScheduleBackup implements ShouldQueue
         $savedMailbox->status_uidvalidity = $status['uidvalidity'];
         $savedMailbox->last_updated_msgno = current($messageNumbers);
 
-        if ($savedMailbox->save()) {
+        if ($savedMailbox->saveOrFail()) {
             return $savedMailbox;
         }
 
-        return null;
+        throw new MailboxUpdatedFailedException('Failed to update mailbox in database table');
     }
 }

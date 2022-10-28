@@ -2,14 +2,15 @@
 
 namespace App\Notifications;
 
-use App\Traits\Email;
+use App\Traits\Email as EmailTrait;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Symfony\Component\Mime\Email;
 
 class InviteUserForPreview extends Notification
 {
-    use Queueable, Email;
+    use Queueable, EmailTrait;
 
     /**
      * Create a new notification instance.
@@ -47,7 +48,7 @@ class InviteUserForPreview extends Notification
             ->line('Your email address has been selected for closed preview. Please go ahead and register your account.')
             ->action('Register Account', route('register'))
             ->line('Thank you for your patience!')
-            ->withSwiftMessage(function ($message) use ($header) {
+            ->withSymfonyMessage(function (Email $message) use ($header) {
                 $message->getHeaders()
                     ->addTextHeader('X-SMTPAPI', $header);
             });

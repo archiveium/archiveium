@@ -12,10 +12,8 @@ class DisableAccountSync implements ShouldQueue
 {
     /**
      * The name of the queue the job should be sent to.
-     *
-     * @var string|null
      */
-    public $queue = 'listeners';
+    public string $queue = 'listeners';
 
     /**
      * Handle the event.

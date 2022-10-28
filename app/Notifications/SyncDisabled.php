@@ -2,14 +2,15 @@
 
 namespace App\Notifications;
 
-use App\Traits\Email;
+use App\Traits\Email as EmailTrait;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Symfony\Component\Mime\Email;
 
 class SyncDisabled extends Notification
 {
-    use Queueable, Email;
+    use Queueable, EmailTrait;
 
     /**
      * @var string
@@ -53,7 +54,7 @@ class SyncDisabled extends Notification
             ->line("It appears that the password provided for syncing $this->username has changed. This has resulted in your account being paused from syncing.")
             ->line('Please take a moment to double-check and change your password. Once done, you can then re-enable syncing.')
             ->action("Update Password", route('edit-account', ['accountId' => $this->accountId]))
-            ->withSwiftMessage(function ($message) use ($header) {
+            ->withSymfonyMessage(function (Email $message) use ($header) {
                 $message->getHeaders()
                     ->addTextHeader('X-SMTPAPI', $header);
             });
