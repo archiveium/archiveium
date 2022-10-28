@@ -237,7 +237,6 @@ class FetchEmails implements ShouldQueue
         $email->folder_id = $folderId;
         $email->message_number = $message->getNumber();
         $email->created_at = now();
-        $email->raw_message = '';
 
 //        try {
             $email->udate = $message->getHeaders()->get('udate');
@@ -276,9 +275,8 @@ class FetchEmails implements ShouldQueue
                         ->where('folder_id', '=', $email['folder_id'])
                         ->update(
                             [
-                                'udate'         => $email['udate'],
-                                'raw_message'   => $email['raw_message'],
-                                'imported'      => $email['imported']
+                                'udate'     => $email['udate'],
+                                'imported'  => $email['imported']
                             ]
                         );
                 }

@@ -53,15 +53,15 @@ Please note that,
    4. Finally, create account by navigating to `/register`
 
 ## Roadmap
-- [x] Create wiki and add instructions for self deployment
-- [x] Upgrade to Laravel 9.x
+- [ ] Add ability to create default user & update self-host documentation
+- [ ] Add banner for dockerhub
+- [ ] Bring your own S3 bucket (for saving email data)
 - [ ] Log email retrieval failures (in progress)
     - [x] Save reason to database
     - [ ] Display to user
     - [ ] Give an option to re-import
     - [ ] Give an option to let user accept that error (and hide from view by default)
 - [ ] Migrate to version v0.29 of meilisearch
-- [x] Use Minio for saving email data (instead of database)
 - [ ] Integrate searching functionality
 - [x] Disable search indexing by default
     - [x] Add columns in accounts table `searchable`
@@ -72,7 +72,7 @@ Please note that,
 - [ ] Save size of message in `emails` table in database
 - [ ] User's account change password functionality (when logged in)
 - [ ] Enforce quota on accounts
-- [ ] Meta data for different viewsi
+- [ ] Meta data for different views
 - [ ] Check for credentials validity before (re)enabling sync
 - [ ] User's account deletion option (use Jetstream's password confirmation)
 - [ ] Do not pause mailbox sync on first auth failure. Attempt 3 times before triggering email
@@ -83,6 +83,7 @@ Please note that,
 - [ ] Log every action (basis for in-app notifications) - look into using Laravel Notifications
 - [ ] Compress string in PHP and/or database (or both) to save space. Hint COMPRESS() (mysql), gzcompress() (php)
 - [ ] Two-Factor Authentication (2FA)
+- [ ] Add coverage report
 - [ ] Write test cases (unit, functional, etc.)
 - [ ] Add ability to export archived emails
 - [ ] Look into integrating Project Honeypot for spam detection (if current protection isn't enough)

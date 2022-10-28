@@ -16,7 +16,6 @@ use PhpMimeMailParser\Parser;
  * @property int $udate
  * @property string $subject
  * @property string $raw_headers
- * @property string $raw_message
  * @property string $raw_structure
  * @property bool $imported
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -71,7 +70,6 @@ class Email extends Model
         'folder_id',
         'message_number',
         'udate',
-        'raw_message',
         'has_attachments',
         'imported',
         'created_at',

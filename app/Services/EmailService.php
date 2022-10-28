@@ -65,7 +65,7 @@ class EmailService
     public static function getByEmailIdAndUserId(int $emailId, int $userId): Email
     {
         return Email::whereId($emailId)
-            ->select(['raw_message', 'user_id', 'folder_id', 'message_number', 'imported'])
+            ->select(['user_id', 'folder_id', 'message_number', 'imported'])
             ->where('user_id', '=', $userId)
             ->first();
     }
