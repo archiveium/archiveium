@@ -233,5 +233,5 @@ return [
 
     'force_https' => env('APP_FORCE_HTTPS', false),
 
-    'email_pull_per_run' => env('EMAIL_PULL_PER_RUN', 100),
+    'batch_size' => env('BATCH_SIZE', 100),
 ];

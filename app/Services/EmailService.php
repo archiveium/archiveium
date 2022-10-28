@@ -18,7 +18,7 @@ class EmailService
     {
         return Email::whereUserId($userId)
             ->where('folder_id', $folderId)
-            ->select(['id', 'raw_message', 'has_attachments', 'imported', 'created_at'])
+            ->select(['id', 'user_id', 'folder_id', 'message_number', 'has_attachments', 'imported', 'created_at'])
             ->orderBy('udate', 'DESC')
             ->paginate(self::RESULTS_PER_PAGE);
     }
@@ -65,7 +65,7 @@ class EmailService
     public static function getByEmailIdAndUserId(int $emailId, int $userId): Email
     {
         return Email::whereId($emailId)
-            ->select(['raw_message', 'imported'])
+            ->select(['raw_message', 'user_id', 'folder_id', 'message_number', 'imported'])
             ->where('user_id', '=', $userId)
             ->first();
     }

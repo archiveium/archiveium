@@ -61,7 +61,7 @@ Please note that,
     - [ ] Give an option to re-import
     - [ ] Give an option to let user accept that error (and hide from view by default)
 - [ ] Migrate to version v0.29 of meilisearch
-- [ ] Use Minio for saving email data (instead of database)
+- [x] Use Minio for saving email data (instead of database)
 - [ ] Integrate searching functionality
 - [x] Disable search indexing by default
     - [x] Add columns in accounts table `searchable`
@@ -93,9 +93,10 @@ Please note that,
 - [ ] Add select all checkbox on fetched folders on edit account page
 
 ## Folder/Label Change (Possible) Scenarios
+
+`Note: In any of the cases mentioned below, no handling is required in terms of S3 objects.`
+
 ### Gmail
-- [x] Add new folder with same name - uidvalidity changes
-  - [x] Add new folder to folders table
 - [x] Add new folder with new name - uidvalidity changes
   - [x] Add new folder to folders table
 - [x] Rename folder - uidvalidity same
@@ -105,6 +106,8 @@ Please note that,
 - [x] Delete folder
   - [x] Flag folder as deleted from remote (`deleted_remote = true`)
   - [x] Ignore this folder from future sync jobs
+- [x] Add new folder with same name - uidvalidity changes
+  - [x] Add new folder to folders table
 
 ### Outlook
 - [x] Add new folder with same name - uidvalidity same

@@ -14,6 +14,7 @@
         "laravel/framework": "^9.0",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
+        "league/flysystem-aws-s3-v3": "^3.0",
         "livewire/livewire": "^2.10",
         "meilisearch/meilisearch-php": "^0.23.2",
         "php-imap/php-imap": "^4.5",
