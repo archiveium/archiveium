@@ -92,6 +92,7 @@ Please note that,
 - [ ] Populate providers table on first run
 - [ ] Based on email address entered on edit account page, try to determine the provider
 - [ ] Add select all checkbox on fetched folders on edit account page
+- [ ] Look into using job_batches feature of laravel queue for reporting user with completion %age for imports, etc.
 
 ## Folder/Label Change (Possible) Scenarios
 
