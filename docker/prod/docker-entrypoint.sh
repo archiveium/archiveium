@@ -21,6 +21,7 @@ chown -R unit:unit /var/www/html/storage
 chown -R unit:unit /var/www/html/bootstrap
 php artisan config:cache
 php artisan route:cache
+php artisan db:seed --force
 
 echo "Running container under '$role' role"
 

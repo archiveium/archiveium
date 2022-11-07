@@ -139,7 +139,14 @@ class FetchEmails implements ShouldQueue
 
         Log::debug('Processing bulk operations');
         try {
-            $this->processBulk($s3Client, $emails);
+            if (!$this->processBulk($s3Client, $emails)) {
+                Log::error('Failed to process bulk');
+                $emailProvider->closeConnection();
+                unset($s3Client);
+                gc_collect_cycles();
+                $this->fail();
+                return;
+            }
         } catch (ForeignKeyViolationException $e) {
             Log::debug('Failed to process bulk', ['Exception' => $e->getMessage()]);
             $this->delete();
@@ -190,7 +197,6 @@ class FetchEmails implements ShouldQueue
             'userId' => $userId
         ]);
 
-        // TODO Handle scenario where mail no longer exists
         $messages = $mailbox->getMessageSequence("$seqStart:$seqEnd");
         foreach ($messages as $message) {
             $emails->push($this->buildEmailObject($message, $folderId, $userId));
@@ -204,19 +210,17 @@ class FetchEmails implements ShouldQueue
     /**
      * @param S3Client $s3Client
      * @param Collection $emails
-     * @return void
+     * @return bool
      * @throws EmailBulkSaveFailedException
      * @throws EmailBulkUpdateFailedException
      * @throws ForeignKeyViolationException
      */
-    private function processBulk(S3Client $s3Client, Collection $emails): void
+    private function processBulk(S3Client $s3Client, Collection $emails): bool
     {
         if ($this->reProcessing) {
-            Log::debug('Updating bulk');
-            $this->updateBulk($s3Client, $emails);
+            return $this->updateBulk($s3Client, $emails);
         } else {
-            Log::debug('Saving bulk');
-            $this->saveBulk($s3Client, $emails);
+            return $this->saveBulk($s3Client, $emails);
         }
     }
 
@@ -235,21 +239,21 @@ class FetchEmails implements ShouldQueue
         $email->has_attachments = false;
         $email->user_id = $userId;
         $email->folder_id = $folderId;
-        $email->message_number = $message->getNumber();
         $email->created_at = now();
 
-//        try {
+        try {
+            $email->message_number = $message->getNumber();
             $email->udate = $message->getHeaders()->get('udate');
             $email->setMessageBody($message->getRawMessage());
             $email->has_attachments = $message->hasAttachments();
             $email->imported = true;
-//        } catch (MessageDoesNotExistException $e) {
-//            Log::warning($messageNumber . ' does not exist - ' . $e->getMessage());
-//            $email->import_fail_reason = $e->getMessage();
-//        } catch (ReopenMailboxException $e) {
-//            Log::warning($messageNumber . ' unable to get further info. - ' . $e->getMessage());
-//            $email->import_fail_reason = $e->getMessage();
-//        }
+        } catch (MessageDoesNotExistException $e) {
+            Log::warning('Message does not exist', ['error' => $e->getMessage()]);
+            $email->import_fail_reason = $e->getMessage();
+        } catch (ReopenMailboxException $e) {
+            Log::warning('Failed to reopen mailbox', ['error' => $e->getMessage()]);
+            $email->import_fail_reason = $e->getMessage();
+        }
 
         return $email;
     }
@@ -263,7 +267,6 @@ class FetchEmails implements ShouldQueue
      */
     private function updateBulk(S3Client $s3Client, Collection $emails): bool
     {
-        Log::info('Updating bulk');
         $rollback = false;
 
         foreach ($emails as $email) {
