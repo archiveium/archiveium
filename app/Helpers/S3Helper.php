@@ -1,6 +1,7 @@
 <?php
 namespace App\Helpers;
 
+use App\Exceptions\MissingConfigException;
 use App\Models\Email;
 use Aws\CommandPool;
 use Aws\Exception\AwsException;
@@ -15,16 +16,17 @@ use PhpMimeMailParser\Parser;
 
 class S3Helper
 {
-    private const BUCKET = 'emails';
     private const OBJECT_EXTENSION = '.eml';
 
     /**
      * @param S3Client $client
      * @param Collection $emails
      * @return bool
+     * @throws MissingConfigException
      */
     public static function bulkInsert(S3Client $client, Collection $emails): bool
     {
+        $bucket = self::getBucketName();
         $commands = [];
 
         /**
@@ -34,7 +36,7 @@ class S3Helper
             $commands[] = $client->getCommand(
                 'PutObject',
                 [
-                    'Bucket' => self::BUCKET,
+                    'Bucket' => $bucket,
                     'Key' => self::buildObjectPath($email->user_id, $email->folder_id, $email->message_number),
                     'Body' => $email->getMessageBody()
                 ]
@@ -67,9 +69,11 @@ class S3Helper
      * @param array $emails
      * @param bool $parseBody
      * @return array
+     * @throws MissingConfigException
      */
     public static function bulkGet(S3Client $client, array $emails, bool $parseBody = false): array
     {
+        $bucket = self::getBucketName();
         $commands = [];
 
         /**
@@ -79,7 +83,7 @@ class S3Helper
             $commands[] = $client->getCommand(
                 'GetObject',
                 [
-                    'Bucket' => self::BUCKET,
+                    'Bucket' => $bucket,
                     'Key' => self::buildObjectPath($email->user_id, $email->folder_id, $email->message_number),
                 ]
             );
@@ -137,17 +141,16 @@ class S3Helper
      * @param int $userId
      * @param int $folderId
      * @return bool
+     * @throws MissingConfigException
      */
     public static function deletePath(S3Client $s3Client, int $userId, int $folderId): bool
     {
+        $bucket = self::getBucketName();
         $objectPath = self::buildObjectPath($userId, $folderId, 0, true);
 
         Log::info('Deleting object', ['path' => $objectPath]);
 
-        $promise = $s3Client->deleteMatchingObjectsAsync(
-            self::BUCKET,
-            $objectPath
-        );
+        $promise = $s3Client->deleteMatchingObjectsAsync($bucket, $objectPath);
 
         try {
             $promise->wait();
@@ -196,5 +199,21 @@ class S3Helper
         }
 
         return $objectName;
+    }
+
+    /**
+     * @return string
+     * @throws MissingConfigException
+     */
+    public static function getBucketName(): string
+    {
+        $path = 'filesystems.disks.s3.bucket';
+        $bucket = config($path);
+
+        if (empty($bucket)) {
+            throw new MissingConfigException($path);
+        }
+
+        return $bucket;
     }
 }
