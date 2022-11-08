@@ -13,14 +13,14 @@
             "action": {
                 "share": "/var/www/html/public$uri",
                 "fallback": {
-                    "pass": "applications/laravel"
+                    "pass": "applications/archiveium"
                 }
             }
         }
     ],
 
     "applications": {
-        "laravel": {
+        "archiveium": {
             "type": "php",
             "root": "/var/www/html/public",
             "script": "index.php"

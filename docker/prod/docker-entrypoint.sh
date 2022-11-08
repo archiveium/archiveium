@@ -13,7 +13,6 @@ until PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -d "$DB_DATABASE" -U "$DB_USE
 done
 echo "Postgres is up, executing commands"
 
-php artisan migrate --force
 mkdir -p /var/www/html/storage/app/attachments /var/www/html/storage/app/public
 mkdir -p /var/www/html/storage/framework/cache /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views
 mkdir -p /var/www/html/storage/logs
@@ -21,7 +20,6 @@ chown -R unit:unit /var/www/html/storage
 chown -R unit:unit /var/www/html/bootstrap
 php artisan config:cache
 php artisan route:cache
-php artisan db:seed --force
 
 echo "Running container under '$role' role"
 
@@ -37,6 +35,10 @@ elif [ "$role" = "scheduler" ]; then
     done
     exit 1
 fi
+
+php artisan key:generate
+php artisan migrate --force
+php artisan db:seed --force
 # END - App related checks
 
 curl_put()

@@ -17,7 +17,7 @@ class UsersTableSeeder extends Seeder
     public function run(): void
     {
         // TODO Ensure value is an email
-        $email = config('admin.admin_name');
+        $email = config('admin.admin_email');
         $username = config('admin.admin_name');
         $password = config('admin.admin_password');
 

@@ -7,6 +7,7 @@ services:
       - '5292:80'
     volumes:
       - app_storage:/var/www/html/storage
+      - .env:/var/www/html/.env
     env_file:
       - .env
     healthcheck:
@@ -23,6 +24,7 @@ services:
     image: archiveium/archiveium:latest
     volumes:
       - app_storage:/var/www/html/storage
+      - .env:/var/www/html/.env
       - ./docker/prod/conf.d/docker-php-memory-limit.ini:/usr/local/etc/php/conf.d/docker-php-memory-limit.ini
     environment:
       - CONTAINER_ROLE=queue
@@ -33,11 +35,13 @@ services:
     networks:
       - archiveium_prod
     depends_on:
+      - app
       - db
 
   queue_listeners:
     image: archiveium/archiveium:latest
     volumes:
+      - .env:/var/www/html/.env
       - app_storage:/var/www/html/storage
     environment:
       - CONTAINER_ROLE=queue
@@ -48,11 +52,13 @@ services:
     networks:
       - archiveium_prod
     depends_on:
+      - app
       - db
 
   scheduler:
     image: archiveium/archiveium:latest
     volumes:
+      - .env:/var/www/html/.env
       - app_storage:/var/www/html/storage
     environment:
       - CONTAINER_ROLE=scheduler
@@ -61,6 +67,7 @@ services:
     networks:
       - archiveium_prod
     depends_on:
+      - app
       - db
 
   db:
@@ -94,7 +101,7 @@ services:
     volumes:
       - minio_data:/data/minio
     networks:
-      - sail
+      - archiveium_prod
     command: minio server /data/minio
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
