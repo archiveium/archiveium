@@ -2,10 +2,12 @@
 
 namespace App\Http\Livewire\Account;
 
+use App\Helpers\S3Helper;
 use App\Http\Livewire\Base;
 use App\Services\AccountService;
 use App\Services\EmailService;
 use App\Services\FolderService;
+use Illuminate\Support\Facades\Storage;
 use Livewire\WithPagination;
 
 class AllAccounts extends Base
@@ -65,10 +67,13 @@ class AllAccounts extends Base
     public function getViewData(): array
     {
         $userId = $this->getUser()->id;
+        $s3Client = Storage::disk('s3')->getClient();
 
-        $emails = EmailService::getAllWithPagination($userId, $this->selectedFolder->id);
-        $this->selectedFolderData['emails'] = $emails->items();
-        $this->selectedFolderData['pagination'] = $emails;
+        $emailObjects = EmailService::getAllWithPagination($userId, $this->selectedFolder->id);
+        $emails = S3Helper::bulkGet($s3Client, $emailObjects->items());
+
+        $this->selectedFolderData['emails'] = $emails;
+        $this->selectedFolderData['pagination'] = $emailObjects;
 
         return [];
     }

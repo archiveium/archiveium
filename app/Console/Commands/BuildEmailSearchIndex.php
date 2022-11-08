@@ -109,7 +109,7 @@ class BuildEmailSearchIndex extends Command
             ->join('folders', 'folders.id', '=', 'emails.folder_id')
             ->join('accounts', 'accounts.id', '=', 'folders.account_id')
             ->select(['emails.id', 'emails.user_id', 'emails.folder_id', 'emails.message_number', 'emails.udate',
-                'emails.raw_message', 'emails.has_attachments', 'emails.imported', 'emails.created_at',
+                'emails.has_attachments', 'emails.imported', 'emails.created_at',
                 'emails.updated_at', 'folders.account_id', 'accounts.name AS account_name'])
             ->where('emails.id', '>', $rowId);
         $paginator = $query->cursorPaginate(self::PAGINATION_LIMIT, ['*'], self::CURSOR_ID);
@@ -145,7 +145,8 @@ class BuildEmailSearchIndex extends Command
              * @var $email Email
              */
             try {
-                $parsedEmail = $this->parseEmail($email->raw_message);
+                // TODO Get message from S3
+                $parsedEmail = $this->parseEmail('');
             } catch (Exception $e) {
                 Log::error($e->getMessage());
                 $parsedEmail = [];

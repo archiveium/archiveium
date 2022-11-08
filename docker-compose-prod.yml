@@ -7,6 +7,7 @@ services:
       - '5292:80'
     volumes:
       - app_storage:/var/www/html/storage
+      - .env:/var/www/html/.env
     env_file:
       - .env
     healthcheck:
@@ -23,34 +24,41 @@ services:
     image: archiveium/archiveium:latest
     volumes:
       - app_storage:/var/www/html/storage
+      - .env:/var/www/html/.env
       - ./docker/prod/conf.d/docker-php-memory-limit.ini:/usr/local/etc/php/conf.d/docker-php-memory-limit.ini
     environment:
       - CONTAINER_ROLE=queue
       - QUEUE_NAME=default
+      - QUEUE_TIMEOUT=180
     env_file:
       - .env
     networks:
       - archiveium_prod
     depends_on:
+      - app
       - db
 
   queue_listeners:
     image: archiveium/archiveium:latest
     volumes:
+      - .env:/var/www/html/.env
       - app_storage:/var/www/html/storage
     environment:
       - CONTAINER_ROLE=queue
       - QUEUE_NAME=listeners
+      - QUEUE_TIMEOUT=180
     env_file:
       - .env
     networks:
       - archiveium_prod
     depends_on:
+      - app
       - db
 
   scheduler:
     image: archiveium/archiveium:latest
     volumes:
+      - .env:/var/www/html/.env
       - app_storage:/var/www/html/storage
     environment:
       - CONTAINER_ROLE=scheduler
@@ -59,6 +67,7 @@ services:
     networks:
       - archiveium_prod
     depends_on:
+      - app
       - db
 
   db:
@@ -79,9 +88,30 @@ services:
       retries: 3
       timeout: 5s
 
+  minio:
+    image: 'minio/minio:RELEASE.2022-09-25T15-44-53Z'
+    ports:
+      - '${FORWARD_MINIO_PORT:-9000}:9000'
+    environment:
+      MINIO_ROOT_USER: '$MINIO_USER'
+      MINIO_ROOT_PASSWORD: '$MINIO_PASSWORD'
+      MINIO_COMPRESSION_ENABLE: 'on'
+      MINIO_COMPRESSION_EXTENSIONS: ''
+      MINIO_COMPRESSION_MIME_TYPES: ''
+    volumes:
+      - minio_data:/data/minio
+    networks:
+      - archiveium_prod
+    command: minio server /data/minio
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      retries: 3
+      timeout: 5s
+
 volumes:
   db_data:
   app_storage:
+  minio_data:
 
 networks:
   archiveium_prod:

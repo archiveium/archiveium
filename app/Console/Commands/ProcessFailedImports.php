@@ -7,12 +7,9 @@ use App\Models\Email;
 use App\Models\Folder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class ProcessFailedImports extends Command
 {
-    private const BATCH_SIZE = 500;
-
     /**
      * The name and signature of the console command.
      *
@@ -27,6 +24,8 @@ class ProcessFailedImports extends Command
      */
     protected $description = 'Re-process emails failed to import';
 
+    private readonly int $batchSize;
+
     /**
      * Execute the console command.
      *
@@ -34,6 +33,8 @@ class ProcessFailedImports extends Command
      */
     public function handle(): int
     {
+        $this->batchSize = config('app.batch_size');
+
         $unProcessedMailboxes = Folder::join('emails', 'folders.id', '=', 'emails.folder_id')
             ->where('emails.imported', '=', false)
             ->select(DB::raw('folders.id, count(folders.id)'))
@@ -41,22 +42,14 @@ class ProcessFailedImports extends Command
             ->get();
 
         foreach ($unProcessedMailboxes as $unProcessedMailbox) {
-            $batches = ceil($unProcessedMailbox->count / self::BATCH_SIZE);
+            $batches = ceil($unProcessedMailbox->count / $this->batchSize);
 
             for ($i = 0; $i < $batches; $i++) {
-                $offset = $i * self::BATCH_SIZE;
+                $offset = $i * $this->batchSize;
                 FetchEmails::dispatch(
-                    $unProcessedMailbox,
+                    $unProcessedMailbox->id,
                     $this->getUnprocessedMailboxMessages($unProcessedMailbox->id, $offset),
                     true
-                );
-
-                Log::info(
-                    sprintf(
-                        "Queued job for %s -> Batch no. %d",
-                        $unProcessedMailbox->name,
-                        $i + 1
-                    )
                 );
             }
         }
@@ -69,7 +62,7 @@ class ProcessFailedImports extends Command
         $unProcessedMessages = Email::where('folder_id', '=', $folderId)
             ->where('imported', '=', false)
             ->offset($offset)
-            ->limit(self::BATCH_SIZE)
+            ->limit($this->batchSize)
             ->orderByDesc('id')
             ->pluck('message_number');
 
