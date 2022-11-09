@@ -2,17 +2,20 @@
 
 1. Clone this repository `git clone https://github.com/archiveium/archiveium.git`
 2. Navigate to newly created directory `cd archiveium`
-3. Create `.env` by copy `.env.example` - `cp .env.example .env`
+3. Create `.env` by copying `.env.example` - `cp .env.example .env`
 4. Fill out the values in `.env` as per your requirements. Refer to comments in file for more information
 5. Bring up the stack - `docker-compose -f docker-compose-prod.yml up -d`
 
 ## Roadmap
+- [ ] Add coverage report
+- [ ] Add option in account drop down to add account (ux)
+- [ ] Add select all option in available folders when adding account
 - [ ] Log email retrieval failures (in progress)
     - [x] Save reason to database
     - [ ] Display to user
     - [ ] Give an option to re-import
     - [ ] Give an option to let user accept that error (and hide from view by default)
-- [ ] Migrate to version v0.29 of meilisearch
+- [ ] Migrate to typesense
 - [ ] Integrate searching functionality
 - [x] Disable search indexing by default
     - [x] Add columns in accounts table `searchable`
@@ -34,7 +37,6 @@
 - [ ] Log every action (basis for in-app notifications) - look into using Laravel Notifications
 - [ ] Compress string in PHP and/or database (or both) to save space. Hint COMPRESS() (mysql), gzcompress() (php)
 - [ ] Two-Factor Authentication (2FA)
-- [ ] Add coverage report
 - [ ] Write test cases (unit, functional, etc.)
 - [ ] Bring your own S3 bucket (for saving email data)
 - [ ] Add ability to export archived emails

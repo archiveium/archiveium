@@ -11,13 +11,16 @@ help:
 	@echo " - queue:work --queue=listeners"
 
 docker-artisan:
-	docker exec -it laravel php artisan $(CMD)
+	docker exec -it archiveium php artisan $(CMD)
 
 tail-app-logs:
 	tail -f storage/logs/laravel.log
 
 generate-ide-helper:
-	docker exec -it laravel php artisan ide-helper:eloquent
-	docker exec -it laravel php artisan ide-helper:generate
-	docker exec -it laravel php artisan ide-helper:meta
-	docker exec -it laravel php artisan ide-helper:models
+	docker exec -it archiveium php artisan ide-helper:eloquent
+	docker exec -it archiveium php artisan ide-helper:generate
+	docker exec -it archiveium php artisan ide-helper:meta
+	docker exec -it archiveium php artisan ide-helper:models
+
+test-coverage-report:
+	docker exec -it archiveium XDEBUG_MODE=coverage php artisan test --coverage

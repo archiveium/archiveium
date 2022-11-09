@@ -36,7 +36,6 @@ elif [ "$role" = "scheduler" ]; then
     exit 1
 fi
 
-php artisan key:generate
 php artisan migrate --force
 php artisan db:seed --force
 # END - App related checks

@@ -9,6 +9,7 @@ use App\Exceptions\EmailBulkSaveFailedException;
 use App\Exceptions\EmailBulkUpdateFailedException;
 use App\Exceptions\FolderDeletedOnRemoteException;
 use App\Exceptions\ForeignKeyViolationException;
+use App\Exceptions\MissingConfigException;
 use App\Helpers\S3Helper;
 use App\Models\Email;
 use App\Services\FolderService;
@@ -263,7 +264,7 @@ class FetchEmails implements ShouldQueue
      * @param Collection $emails
      * @return bool
      * @throws EmailBulkUpdateFailedException
-     * @throws ForeignKeyViolationException
+     * @throws ForeignKeyViolationException|MissingConfigException
      */
     private function updateBulk(S3Client $s3Client, Collection $emails): bool
     {
