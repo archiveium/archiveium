@@ -19,7 +19,7 @@ class FetchNewEmail extends Command
      */
     protected $description = 'Fetches new email(s) available for each account';
 
-    private const DELAY_IN_SECONDS = 5;
+    private const DELAY_IN_SECONDS = 30;
 
     /**
      * Execute the console command.
@@ -45,6 +45,8 @@ class FetchNewEmail extends Command
 
                 $delayInSeconds += self::DELAY_IN_SECONDS;
             }
+
+            $delayInSeconds = self::DELAY_IN_SECONDS;
         }
 
         return self::SUCCESS;
