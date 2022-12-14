@@ -232,6 +232,4 @@ return [
     ],
 
     'force_https' => env('APP_FORCE_HTTPS', false),
-
-    'batch_size' => env('BATCH_SIZE', 100),
 ];

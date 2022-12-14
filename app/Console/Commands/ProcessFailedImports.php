@@ -24,8 +24,6 @@ class ProcessFailedImports extends Command
      */
     protected $description = 'Re-process emails failed to import';
 
-    private readonly int $batchSize;
-
     /**
      * Execute the console command.
      *
@@ -33,8 +31,6 @@ class ProcessFailedImports extends Command
      */
     public function handle(): int
     {
-        $this->batchSize = config('app.batch_size');
-
         $unProcessedMailboxes = Folder::join('emails', 'folders.id', '=', 'emails.folder_id')
             ->where('emails.imported', '=', false)
             ->select(DB::raw('folders.id, count(folders.id)'))
