@@ -14,6 +14,7 @@ class ProvidersTableSeeder extends Seeder
      */
     public function run(): void
     {
+        // TODO Use values from EmailProviderFactory for name
         $providers = [
             ['name' => 'Gmail', 'default' => true],
             ['name' => 'Outlook (Free)', 'default' => false],
