@@ -2,8 +2,19 @@
 
 namespace App\EmailProvider;
 
+use Illuminate\Support\Facades\Log;
+
 abstract class EmailProviderAbstract implements EmailProvider
 {
+    private const IMAP_OPEN_TIMEOUT = 10;   // seconds
+    private const IMAP_READ_TIMEOUT = 10;   // seconds
+
+    public function __construct()
+    {
+        imap_timeout(IMAP_OPENTIMEOUT, self::IMAP_OPEN_TIMEOUT);
+        imap_timeout(IMAP_READTIMEOUT, self::IMAP_READ_TIMEOUT);
+    }
+
     /**
      * @inheritDoc
      */
@@ -37,5 +48,10 @@ abstract class EmailProviderAbstract implements EmailProvider
         }
 
         return $folders;
+    }
+
+    public function closeConnection(): void
+    {
+        Log::debug('Disconnected from ' . $this->getHostname());
     }
 }

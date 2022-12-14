@@ -7,6 +7,7 @@ use App\SyncHelper\SyncHelper;
 use Ddeboer\Imap\Connection;
 use Ddeboer\Imap\Exception\ReopenMailboxException;
 use Ddeboer\Imap\Server;
+use Illuminate\Support\Facades\Log;
 use Webklex\PHPIMAP\Client;
 use Webklex\PHPIMAP\ClientManager;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
@@ -16,28 +17,14 @@ use Webklex\PHPIMAP\Exceptions\RuntimeException;
 
 class OutlookFreeProvider extends EmailProviderAbstract
 {
-    /**
-     * @var Server
-     */
-    private $server;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
-     * @var ClientManager
-     */
-    private $clientManager;
-
-    /**
-     * @var Client
-     */
-    private $client;
+    private Server $server;
+    private Connection $connection;
+    private ClientManager $clientManager;
+    private Client $client;
 
     public function __construct()
     {
+        parent::__construct();
         $this->server = new Server($this->getHostname(), 993, '/imap/ssl/novalidate-cert');
 
         /**
@@ -56,6 +43,7 @@ class OutlookFreeProvider extends EmailProviderAbstract
      */
     public function authenticate($username, $password): void
     {
+        $startTime = microtime(true);
         $this->connection = $this->server->authenticate($username, $password);
 
         $this->client = $this->clientManager->make([
@@ -68,6 +56,9 @@ class OutlookFreeProvider extends EmailProviderAbstract
             'protocol'      => 'imap'
         ]);
         $this->client->connect();
+        Log::debug('Connected to ' . $this->getHostname(), [
+            'took (seconds)' => round(microtime(true) - $startTime)
+        ]);
     }
 
     /**

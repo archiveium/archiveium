@@ -7,21 +7,16 @@ use App\SyncHelper\SyncHelper;
 use Ddeboer\Imap\Connection;
 use Ddeboer\Imap\Exception\AuthenticationFailedException;
 use Ddeboer\Imap\Server;
+use Illuminate\Support\Facades\Log;
 
 class GmailProvider extends EmailProviderAbstract
 {
-    /**
-     * @var Server
-     */
-    private $server;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Server $server;
+    private Connection $connection;
 
     public function __construct()
     {
+        parent::__construct();
         $this->server = new Server($this->getHostname());
     }
 
@@ -31,7 +26,11 @@ class GmailProvider extends EmailProviderAbstract
      */
     public function authenticate($username, $password): void
     {
+        $startTime = microtime(true);
         $this->connection = $this->server->authenticate($username, $password);
+        Log::debug('Connected to ' . $this->getHostname(), [
+            'took (seconds)' => round(microtime(true) - $startTime)
+        ]);
     }
 
     /**
@@ -74,6 +73,7 @@ class GmailProvider extends EmailProviderAbstract
     public function closeConnection(): void
     {
         $this->getConnection()->close();
+        parent::closeConnection();
     }
 
     /**
