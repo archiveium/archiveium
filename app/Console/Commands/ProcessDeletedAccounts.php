@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Exceptions\MissingConfigException;
 use App\Helpers\S3Helper;
 use App\Models\Account;
 use App\Models\Folder;
@@ -54,7 +55,7 @@ class ProcessDeletedAccounts extends Command
                      Log::error('Failed to delete database entries for account id ' . $account->id);
                  }
 
-                 $this->deletedSearchIndexEntries($account->folders, $account->user_id);
+//                 $this->deletedSearchIndexEntries($account->folders, $account->user_id);
              } else {
                  Log::error('Failed to delete objects from S3 for account id ' . $account->id);
              }
@@ -67,6 +68,7 @@ class ProcessDeletedAccounts extends Command
      * @param int $userId
      * @param Collection $folders
      * @return bool
+     * @throws MissingConfigException
      */
     private function deleteS3Objects(int $userId, Collection $folders): bool
     {
