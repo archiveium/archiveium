@@ -17,6 +17,8 @@ services:
         ports:
             - '${APP_PORT:-80}:80'
         environment:
+            CONTAINER_ROLE: 'dev-app'
+            QUEUE_TIMEOUT: 240
             WWWUSER: '${WWWUSER}'
             LARAVEL_SAIL: 1
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
