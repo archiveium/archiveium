@@ -1,0 +1,37 @@
+{
+	"name": "Archiveium Frontend",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"todo-tree.general.tags": [
+					"BUG",
+					"HACK",
+					"FIXME",
+					"TODO",
+					"XXX",
+					"[ ]",
+					"[x]",
+					"TEST"
+				]
+			},
+			"extensions": [
+				"dbaeumer.vscode-eslint",
+				"christian-kohler.npm-intellisense",
+				"Gruntfuggly.todo-tree",
+				"mtxr.sqltools",
+				"mtxr.sqltools-driver-pg",
+				"donjayamanne.githistory"
+			]
+		}
+	},
+	"forwardPorts": [
+		3000,	// for application
+		8002	// for livereload to work
+	],
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "npm install",
+	"remoteUser": "node"
+}
