@@ -5,3 +5,7 @@ export interface DatabaseConfig {
     user: string;
     password: string;
 }
+
+export interface SessionConfig {
+    secrets: Array<string>;
+}
