@@ -1,8 +1,8 @@
 {
 	"name": "Archiveium Frontend",
-	"build": {
-		"dockerfile": "Dockerfile"
-	},
+	"dockerComposeFile": "docker-compose.yml",
+    "service": "frontend",
+    "workspaceFolder": "/workspace",
 	"customizations": {
 		"vscode": {
 			"settings": {

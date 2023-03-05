@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: 'node:16.17.1'
+    command: sleep infinity
+    volumes:
+      - ..:/workspace:cached
+    networks:
+      - frontend
+  db:
+    image: 'postgres:13'
+    ports:
+      - '5432:5432'
+    environment:
+      PGPASSWORD: 'archiveiumPassword'
+      POSTGRES_DB: 'archiveium'
+      POSTGRES_USER: 'archiveium'
+      POSTGRES_PASSWORD: 'archiveiumPassword'
+    volumes:
+      - 'db:/var/lib/postgresql/data'
+    networks:
+      - frontend
+
+networks:
+  frontend:
+
+volumes:
+  db:
