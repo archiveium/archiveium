@@ -25,6 +25,10 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
             type: 'timestamp(0)',
             notNull: false,
         },
+        email_notified_at: {
+            type: 'timestamp(0)',
+            notNull: false,
+        },
         created_at: {
             type: 'timestamp(0)',
             default: pgm.func('NOW()'),
