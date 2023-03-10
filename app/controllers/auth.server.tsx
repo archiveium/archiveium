@@ -1,6 +1,9 @@
 import { z } from 'zod';
-import { createUser } from '~/models/users';
+import { createUser, getUserByEmail } from '~/models/users';
 import type { FormData } from '~/types/form';
+import crypto from 'crypto';
+import { InvalidPasswordException } from '~/exceptions/auth';
+import type { User } from '~/types/user';
 
 const registerFormSchema = z.object({
     name: z.string().trim().min(4, 'Must be of at-least 4 characters'),
@@ -12,10 +15,27 @@ const registerFormSchema = z.object({
     message: 'Passwords do not match',
     path: [ 'passwordConfirm' ]
 });
+const loginFormSchema = z.object({
+    email: z.string().trim().email('Must be a valid email address'),
+    password: z.string().trim().min(8, 'Must be of at-least 8 characters'),
+});
 
-export function LoginUser(credentials: FormData) {
-    // console.log(credentials);
-    // console.log(compareSync(credentials.password.toString(), hashedPassword));
+function verifyUserPassword(hashedPassword: string, password: string) {
+    const [salt, key] = hashedPassword.split(":");
+    const keyBuffer = Buffer.from(key, 'hex');
+    const derivedKey = crypto.scryptSync(password, salt, 64);
+    const isValid = crypto.timingSafeEqual(keyBuffer, derivedKey);
+
+    if (!isValid) {
+        throw new InvalidPasswordException('Invalid password');
+    }
+}
+
+export async function LoginUser(credentials: FormData): Promise<User> {
+    const validatedData = loginFormSchema.parse(credentials);
+    const user = await getUserByEmail(validatedData.email);
+    verifyUserPassword(user.password, validatedData.password);
+    return user;
 }
 
 export async function RegisterUser(formData: FormData) {

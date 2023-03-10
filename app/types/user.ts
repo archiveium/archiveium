@@ -1,7 +1,11 @@
-export interface User {
+export interface CreateUser {
     name: string;
     email: string;
     password: string;
-    email_notified_at?: Date;
-    email_verified_at?: Date;
+}
+
+export interface User extends CreateUser {
+    id: number;
+    email_notified_at: Date;
+    email_verified_at: Date;
 }
