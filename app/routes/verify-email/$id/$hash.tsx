@@ -4,7 +4,7 @@ import type { ActionArgs, LoaderArgs} from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { VerifyRegistrationUrl } from "~/controllers/register.server";
-import { commitSession, getSession } from "~/sessions";
+import { commitSession, getSession } from "~/utils/session";
 import { getUserById, resetUserNotificationDate, verifyUser } from "~/models/users";
 
 export const loader = async ({ params, request }: LoaderArgs) => {

@@ -3,10 +3,10 @@ import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import type { ActionArgs, LoaderArgs} from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { commitSession, getSession } from "~/sessions";
+import { commitSession, getSession } from "~/utils/session";
 import { RegisterUser } from "~/controllers/auth.server";
 import { ZodError } from "zod";
-import { badRequest } from "~/utils/request.server";
+import { badRequest } from "~/utils/request";
 
 export const action = async ({ request }: ActionArgs) => {
     const session = await getSession(

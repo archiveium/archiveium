@@ -3,10 +3,11 @@ import { Link, useActionData, Form } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
 import type { ActionArgs } from "@remix-run/node";
 import { RegisterForPreview } from "~/controllers/register.server";
-import { badRequest } from "~/utils/request.server";
+import { badRequest } from "~/utils/request";
 import { ZodError } from "zod";
-import { commitSession, getSession } from "../sessions";
+import { commitSession, getSession } from "../utils/session";
 
+// TODO Handle only POST requests
 export const action = async ({ request }: ActionArgs) => {
     const session = await getSession(
         request.headers.get("Cookie")
