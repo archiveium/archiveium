@@ -1,6 +1,7 @@
 import LogoSmall from "~/components/logo_small";
 import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
-import { ActionArgs, LoaderArgs, redirect } from "@remix-run/node";
+import type { ActionArgs, LoaderArgs} from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { commitSession, getSession } from "~/sessions";
 import { RegisterUser } from "~/controllers/auth.server";
@@ -33,7 +34,7 @@ export const action = async ({ request }: ActionArgs) => {
     return redirect('/login', {
         headers: {
             'Set-Cookie': await commitSession(session),
-        }        
+        }
     });
 };
 

@@ -1,7 +1,6 @@
-import { compareSync } from 'bcrypt';
 import { z } from 'zod';
 import { createUser } from '~/models/users';
-import { FormData } from '~/types/form';
+import type { FormData } from '~/types/form';
 
 const registerFormSchema = z.object({
     name: z.string().trim().min(4, 'Must be of at-least 4 characters'),

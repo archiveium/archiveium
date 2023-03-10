@@ -2,7 +2,7 @@ import LogoSmall from "~/components/logo_small";
 import { Link, useActionData, Form } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
 import type { ActionArgs } from "@remix-run/node";
-import RegisterForPreview from "~/controllers/register.server";
+import { RegisterForPreview } from "~/controllers/register.server";
 import { badRequest } from "~/utils/request.server";
 import { ZodError } from "zod";
 import { commitSession, getSession } from "../sessions";
