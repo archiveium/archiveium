@@ -9,3 +9,7 @@ export interface DatabaseConfig {
 export interface SessionConfig {
     secrets: Array<string>;
 }
+
+export interface AppConfig {
+    url: string;
+}
