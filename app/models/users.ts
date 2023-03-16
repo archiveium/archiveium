@@ -14,8 +14,8 @@ export async function createUser(user: CreateUser): Promise<void> {
 
 export async function getUserById(id: string): Promise<User> {
     const result = await sql<User[]>`SELECT id, name, email, password, email_notified_at, email_verified_at
+    FROM users 
     WHERE id = ${id}
-    FROM users
     LIMIT 1`;
     if (result.count > 0) {
         return result[0];
