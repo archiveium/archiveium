@@ -1,11 +1,20 @@
 import LogoSmall from "~/components/logo_small";
 import { Link, useActionData, Form } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
-import type { ActionArgs } from "@remix-run/node";
+import type { ActionArgs , LoaderArgs} from "@remix-run/node";
 import { RegisterForPreview } from "~/controllers/register.server";
 import { badRequest } from "~/utils/request";
 import { ZodError } from "zod";
-import { commitSession, getSession } from "../utils/session";
+import { commitSession, getSession, getUserId } from "../utils/session";
+
+export async function loader({ request }: LoaderArgs) {
+    // TODO This needs to be in a middleware, whenever Remix implements that concept
+    const userId = await getUserId(request);
+    if (userId) {
+        return redirect('/dashboard');
+    }
+    return null;
+}
 
 // TODO Handle only POST requests
 export const action = async ({ request }: ActionArgs) => {

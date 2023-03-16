@@ -1,9 +1,19 @@
 import LogoSmall from "~/components/logo_small";
 import { Form, Link, useActionData } from "@remix-run/react";
-import type { ActionArgs } from "@remix-run/node";
-import { createUserSession } from "~/utils/session";
+import type { ActionArgs, LoaderArgs} from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+import { createUserSession, getUserId } from "~/utils/session";
 import { LoginUser } from "~/controllers/auth.server";
 import { badRequest } from "~/utils/request";
+
+export async function loader({ request }: LoaderArgs) {
+    // TODO This needs to be in a middleware, whenever Remix implements that concept
+    const userId = await getUserId(request);
+    if (userId) {
+        return redirect('/dashboard');
+    }
+    return null;
+}
 
 export const action = async ({ request }: ActionArgs) => {
     const body = await request.formData();

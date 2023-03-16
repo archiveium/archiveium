@@ -3,7 +3,7 @@ import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import type { ActionArgs, LoaderArgs} from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { commitSession, getSession } from "~/utils/session";
+import { commitSession, getSession, getUserId } from "~/utils/session";
 import { RegisterUser } from "~/controllers/auth.server";
 import { ZodError } from "zod";
 import { badRequest } from "~/utils/request";
@@ -39,6 +39,12 @@ export const action = async ({ request }: ActionArgs) => {
 };
 
 export async function loader({ request }: LoaderArgs) {
+    // TODO This needs to be in a middleware, whenever Remix implements that concept
+    const userId = await getUserId(request);
+    if (userId) {
+        return redirect('/dashboard');
+    }
+
     const session = await getSession(
         request.headers.get('Cookie')
     );
