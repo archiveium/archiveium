@@ -1,24 +1,58 @@
 import LogoNavbar from "./logo_navbar";
+import {
+    Box,
+    Flex,
+    Avatar,
+    HStack,
+    Button,
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    Text,
+} from '@chakra-ui/react';
+import { useLoaderData } from "@remix-run/react";
+import type { NavbarLoaderData } from "~/types/navbar";
 
 export default function Navbar() {
+    const data = useLoaderData<NavbarLoaderData>();
+
     return (
-        <header className="navbar navbar-expand-md navbar-light d-print-none">
-            <div className="container-xl">
-                <LogoNavbar/>
-                <div className="navbar-nav flex-row order-md-last">
-                    <div className="nav-item dropdown">
-                        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                        <a href="#" className="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown"
-                        aria-label="Open user menu" aria-expanded="false">
-                            <span className="avatar avatar-rounded">GI</span>
-                            <div className="d-none d-xl-block ps-2">
-                                <div>UserName</div>
-                            </div>
-                        </a>
-                        {/* @livewire('auth.logout') */}
-                    </div>
-                </div>
-            </div>
-        </header>
+        <Flex
+            as="header"
+            align="center"
+            justify="space-between"
+            w="full"
+            px="4"
+            bg="white"
+            borderBottomWidth="1px"
+            color="inherit"
+            h="14"
+        >
+            <HStack spacing={8} alignItems={'center'}>
+                <Box>
+                    <LogoNavbar />
+                </Box>
+            </HStack>
+            <Flex alignItems={'center'}>
+                <Menu>
+                    <MenuButton
+                        as={Button}
+                        rounded={'full'}
+                        variant={'link'}
+                        cursor={'pointer'}
+                        style={{ textDecoration: 'none' }}
+                        minW={0}>
+                        <HStack>
+                            <Avatar name={data.navbar.user.name} size={'sm'} bg="gray.100" />
+                            <Text fontSize={"sm"}>{data.navbar.user.name}</Text>
+                        </HStack>
+                    </MenuButton>
+                    <MenuList>
+                        <MenuItem>Logout</MenuItem>
+                    </MenuList>
+                </Menu>
+            </Flex>
+        </Flex>
     );
 }
