@@ -5,9 +5,33 @@ import {
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration,
+  ScrollRestoration
 } from "@remix-run/react";
-import tabler from '@tabler/core/dist/css/tabler.min.css';
+import { ChakraProvider } from "@chakra-ui/react";
+
+function Document({
+  children,
+  title = "Archiveium",
+}: {
+  children: React.ReactNode;
+  title?: string;
+}) {
+  return (
+    <html lang="en">
+      <head>
+        <Meta />
+        <title>{title}</title>
+        <Links />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration />
+        <Scripts />
+        <LiveReload />
+      </body>
+    </html>
+  );
+}
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -15,32 +39,12 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width, initial-scale=1",
 });
 
-export function links() {
-  return [
-    {
-      rel: "stylesheet",
-      href: tabler,
-    },
-  ];
-}
-
 export default function App() {
   return (
-    <html lang="en">
-      <head>
-        <Meta />
-        <Links />
-      </head>
-      <body className="theme-light">
-        <div className="page">
-          <div className="page-wrapper">
-            <Outlet />
-            <ScrollRestoration />
-          </div>
-          <Scripts />
-          <LiveReload />
-        </div>
-      </body>
-    </html>
+    <Document>
+      <ChakraProvider>
+        <Outlet />
+      </ChakraProvider>
+    </Document>
   );
 }
