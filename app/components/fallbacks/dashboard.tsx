@@ -1,11 +1,12 @@
+import { Skeleton, Stack } from "@chakra-ui/react";
+
 export default function DashboardFallback() {
     return (
-        <div className="card placeholder-glow">
-            <div className="card-body">
-                <div className="placeholder col-9 mb-3"></div>
-                <div className="placeholder placeholder-xs col-10"></div>
-                <div className="placeholder placeholder-xs col-11"></div>
-            </div>
-        </div>
+        <Stack>
+            <Skeleton height='20px' />
+            <Skeleton height='20px' />
+            <Skeleton height='20px' />
+            <Skeleton height='20px' />
+        </Stack>
     );
 }
