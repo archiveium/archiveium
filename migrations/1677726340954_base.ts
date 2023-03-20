@@ -60,7 +60,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
             type: 'boolean',
             notNull: true,
         },
-        default: {
+        is_default: {
             type: 'boolean',
             notNull: true,
         },
