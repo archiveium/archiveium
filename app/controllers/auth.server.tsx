@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { createUser, getUserByEmail } from '~/models/users';
 import type { FormData } from '~/types/form';
 import crypto from 'crypto';
-import { InvalidPasswordException, UserAlreadyRegisteredException, UserNotAcceptedException } from '~/exceptions/auth';
+import { InvalidPasswordException, UserAlreadyRegisteredException, UserNotAcceptedException, UserNotVerifiedException } from '~/exceptions/auth';
 import type { User } from '~/types/user';
 import { getInvitedUser } from '~/models/userInvitations';
 
@@ -35,8 +35,11 @@ function verifyUserPassword(hashedPassword: string, password: string) {
 export async function LoginUser(credentials: FormData): Promise<User> {
     const validatedData = loginFormSchema.parse(credentials);
     const user = await getUserByEmail(validatedData.email);
-    verifyUserPassword(user.password, validatedData.password);
-    return user;
+    if (user.email_verified_at) {
+        verifyUserPassword(user.password, validatedData.password);
+        return user;
+    }
+    throw new UserNotVerifiedException('Please verify your email address before logging in.');
 }
 
 export async function RegisterUser(formData: FormData) {

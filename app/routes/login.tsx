@@ -24,6 +24,7 @@ import {
 } from '@chakra-ui/react';
 import AlertError from "~/components/alert_error";
 import AlertSuccess from "~/components/alert_success";
+import { UserNotVerifiedException } from "~/exceptions/auth";
 
 export async function loader({ request }: LoaderArgs) {
     // TODO This needs to be in a middleware, whenever Remix implements that concept
@@ -54,7 +55,11 @@ export const action = async ({ request }: ActionArgs) => {
         const user = await LoginUser(credentials);
         return createUserSession(user.id, '/dashboard');
     } catch (error) {
-        // TODO Log error
+        if (error instanceof UserNotVerifiedException) {
+            return badRequest({
+                formError: error.message,
+            });
+        }
     }
 
     return badRequest({
@@ -87,7 +92,7 @@ export default function Login() {
                                     <Stack spacing="5">
                                         <FormControl isRequired>
                                             <FormLabel htmlFor="email">Email</FormLabel>
-                                            <Input id="email" type="email" />
+                                            <Input name="email" type="email" />
                                         </FormControl>
                                         <FormControl isRequired>
                                             <HStack justify="space-between">
@@ -96,7 +101,7 @@ export default function Login() {
                                                     I forgot password
                                                 </Link>
                                             </HStack>
-                                            <Input id="password" type="password" />
+                                            <Input name="password" type="password" />
                                         </FormControl>
                                     </Stack>
                                     <Stack spacing="6">
