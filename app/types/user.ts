@@ -9,3 +9,11 @@ export interface User extends CreateUser {
     email_notified_at: Date;
     email_verified_at: Date;
 }
+
+export interface InvitedUser {
+    id: number;
+    username: string;
+    accepted: boolean;
+    notification_sent_at: Date;
+    created_at: Date;
+}

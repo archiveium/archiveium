@@ -2,8 +2,9 @@ import { z } from 'zod';
 import { createUser, getUserByEmail } from '~/models/users';
 import type { FormData } from '~/types/form';
 import crypto from 'crypto';
-import { InvalidPasswordException } from '~/exceptions/auth';
+import { InvalidPasswordException, UserAlreadyRegisteredException, UserNotAcceptedException } from '~/exceptions/auth';
 import type { User } from '~/types/user';
+import { getInvitedUser } from '~/models/userInvitations';
 
 const registerFormSchema = z.object({
     name: z.string().trim().min(4, 'Must be of at-least 4 characters'),
@@ -40,5 +41,11 @@ export async function LoginUser(credentials: FormData): Promise<User> {
 
 export async function RegisterUser(formData: FormData) {
     const validatedData = registerFormSchema.parse(formData);
+    const invitedUser = await getInvitedUser(validatedData.email);
+    if (!invitedUser.accepted) {
+        throw new UserNotAcceptedException(`${validatedData.email} has not been chosen for registration yet.`);
+    } else if (invitedUser.notification_sent_at) {
+        throw new UserAlreadyRegisteredException(`${validatedData.email} has already been registered. Please check inbox.`);
+    }
     await createUser(validatedData);
 }

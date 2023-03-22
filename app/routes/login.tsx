@@ -85,11 +85,11 @@ export default function Login() {
                             <Form autoComplete="off" method="post">
                                 <Stack spacing="6">
                                     <Stack spacing="5">
-                                        <FormControl>
+                                        <FormControl isRequired>
                                             <FormLabel htmlFor="email">Email</FormLabel>
                                             <Input id="email" type="email" />
                                         </FormControl>
-                                        <FormControl>
+                                        <FormControl isRequired>
                                             <HStack justify="space-between">
                                                 <FormLabel htmlFor="password">Password</FormLabel>
                                                 <Link color={"blue.600"} size="md" href="/forgot-password">
