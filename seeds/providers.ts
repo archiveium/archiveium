@@ -4,6 +4,7 @@ import { sql } from "../app/models";
 
 const providers: Array<Provider> = [
     {
+        id: '1',
         name: 'gmail',
         host: 'imap.gmail.com',
         port: 993,
@@ -11,6 +12,7 @@ const providers: Array<Provider> = [
         is_default: true,
     },
     {
+        id: '2',
         name: 'zoho (free)',
         host: 'imappro.zoho.com',
         port: 993,
@@ -18,6 +20,7 @@ const providers: Array<Provider> = [
         is_default: false,
     },
     {
+        id: '3',
         name: 'outlook (free)',
         host: 'outlook.office365.com',
         port: 993,
