@@ -9,6 +9,10 @@
         "port": 5432,
         "database": ""
     },
+    "redis": {
+        "host": "redis",
+        "port": 6379
+    },
     "session": {
         "secrets": [ "" ]
     }
