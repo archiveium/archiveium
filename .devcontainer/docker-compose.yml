@@ -1,4 +1,4 @@
-version: '3.8'
+version: '2'
 
 services:
   frontend:
@@ -21,9 +21,20 @@ services:
       - 'db:/var/lib/postgresql/data'
     networks:
       - frontend
+  redis:
+    image: 'redis:7.0.10-alpine'
+    mem_limit: 128M
+    ports:
+      - '6379:6379'
+    command: redis-server --maxmemory-policy allkeys-lru --maxmemory 100M
+    volumes:
+      - 'cache:/data'
+    networks:
+      - frontend
 
 networks:
   frontend:
 
 volumes:
   db:
+  cache:
