@@ -83,7 +83,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
             type: 'varchar(255)',
             notNull: true,
         },
-        username: {
+        email: {
             type: 'varchar(255)',
             notNull: true,
         },
