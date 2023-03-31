@@ -21,6 +21,7 @@ export async function getUserById(id: string): Promise<User> {
         return result[0];
     }
 
+    // TODO Handle case when user is logged in and account is deleted
     throw new RecordNotFoundException(`User ${id} not found in database`);
 }
 

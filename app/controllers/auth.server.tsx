@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { createUser, getUserByEmail } from '~/models/users';
 import type { FormData } from '~/types/form';
 import crypto from 'crypto';
-import { InvalidPasswordException, UserAlreadyRegisteredException, UserNotAcceptedException, UserNotVerifiedException } from '~/exceptions/auth';
+import { InvalidPasswordException, UserNotAcceptedException, UserNotVerifiedException } from '~/exceptions/auth';
 import type { User } from '~/types/user';
 import { getInvitedUser } from '~/models/userInvitations';
 
@@ -47,8 +47,7 @@ export async function RegisterUser(formData: FormData) {
     const invitedUser = await getInvitedUser(validatedData.email);
     if (!invitedUser.accepted) {
         throw new UserNotAcceptedException(`${validatedData.email} has not been chosen for registration yet.`);
-    } else if (invitedUser.notification_sent_at) {
-        throw new UserAlreadyRegisteredException(`${validatedData.email} has already been registered. Please check inbox.`);
     }
+
     await createUser(validatedData);
 }

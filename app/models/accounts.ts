@@ -10,3 +10,10 @@ export async function getAllSyncingAccountsByUserIdCount(userId: string): Promis
     const result = await sql<Count[]>`SELECT COUNT(*) FROM accounts WHERE user_id = ${userId} AND syncing = true`;
     return result[0].count;
 }
+
+export async function isAccountUnique(email: string, userId: string): Promise<boolean> {
+    const result = await sql<Count[]>`SELECT COUNT(*) 
+    FROM accounts 
+    WHERE email = ${email} AND deleted = false AND user_id = ${userId}`;
+    return result[0].count == 0;
+}

@@ -7,7 +7,14 @@ import {
   Scripts,
   ScrollRestoration
 } from "@remix-run/react";
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { StepsTheme as Steps } from 'chakra-ui-steps';
+
+const theme = extendTheme({
+  components: {
+    Steps,
+  },
+});
 
 function Document({
   children,
@@ -42,7 +49,7 @@ export const meta: MetaFunction = () => ({
 export default function App() {
   return (
     <Document>
-      <ChakraProvider>
+      <ChakraProvider theme={theme}>
         <Outlet />
       </ChakraProvider>
     </Document>
