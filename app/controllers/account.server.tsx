@@ -4,10 +4,11 @@ import { CacheKeyNotFoundException } from '~/exceptions/cache';
 import { getAllIMAPFolders } from '~/imap';
 import { buildClient } from '~/imap/builder';
 import { redis } from '~/models';
-import { isAccountUnique } from '~/models/accounts';
+import { getAllAccountsByUserId, getAllFoldersByAccountAndUserId, isAccountUnique } from '~/models/accounts';
 import { insertFoldersAndAccount } from '~/models/folders';
 import { getProviderById } from '~/models/providers';
-import type { ValidatedAccount } from '~/types/account';
+import type { Account, ValidatedAccount } from '~/types/account';
+import type { Folder } from '~/types/folder';
 import type { FormData } from '~/types/form';
 
 const addAccountSchema = z.object({
@@ -73,4 +74,17 @@ export async function SaveAccount(
 
     await insertFoldersAndAccount(userId, cachedProvider, selectedRemoteFolders);
     //TODO Delete cachedProvider
+}
+
+export function GetAllAccountsByUserId(userId: string): Promise<Account[]> {
+    return getAllAccountsByUserId(userId);
+}
+
+export async function GetAllFoldersByUserIdAndAccountId(userId: string, accountId: string): Promise<Folder[]> {
+    const folders = await getAllFoldersByAccountAndUserId(userId, accountId);
+    return folders.map((folder) => {
+        const query = new URLSearchParams({ accountId, folderId: folder.id });
+        folder.href = `?${query.toString()}`;
+        return folder;
+    });
 }

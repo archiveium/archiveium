@@ -14,6 +14,7 @@ const sessionCookie = createCookie('__session', {
 });
 
 const { getSession, commitSession, destroySession } =
+  // TODO Save sessions in redis, blocker https://github.com/remix-run/remix/pull/5949
   createFileSessionStorage({
     dir: 'sessions',
     cookie: sessionCookie,

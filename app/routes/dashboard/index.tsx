@@ -47,9 +47,11 @@ export default function Index() {
                                     {(dashboard) => (
                                         <>
                                             <StatGroup p={4}>
-                                                <Stat>
+                                                <Stat as={Link} to="/accounts">
                                                     <StatLabel>Accounts Added</StatLabel>
-                                                    <StatNumber>{ dashboard.accounts.added }</StatNumber>
+                                                    <StatNumber>
+                                                        { dashboard.accounts.added }
+                                                    </StatNumber>
                                                 </Stat>
                                                 <Stat>
                                                     <StatLabel>Accounts Syncing</StatLabel>

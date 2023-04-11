@@ -3,7 +3,7 @@ import type { RemoteFolder } from "./folder";
 export interface Account {
     id: string;
     name: string;
-    username: string;
+    email: string;
     syncing: boolean;
     deleted: boolean;
     searchable: boolean;

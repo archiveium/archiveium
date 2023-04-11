@@ -18,3 +18,13 @@ export interface SessionConfig {
 export interface AppConfig {
     url: string;
 }
+
+export interface S3Config {
+    region: string;
+    endpoint: string;
+    credentials: {
+        accessKeyId: string;
+        secretAccessKey: string;
+    };
+    forcePathStyle: boolean;
+}

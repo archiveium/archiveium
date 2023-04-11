@@ -1,5 +1,5 @@
 import { sql } from ".";
-import type { Folder } from "~/types/folder";
+import type { Folder, FolderInsert } from "~/types/folder";
 import type { Account, NewAccount, ValidatedAccount } from "~/types/account";
 
 export async function insertFoldersAndAccount(
@@ -18,7 +18,7 @@ export async function insertFoldersAndAccount(
         };
         const [insertedAccount] = await sql<Account[]>`INSERT INTO accounts ${ sql(newAccount) } RETURNING *`;
 
-        let foldersToSave: Folder[] = [];
+        let foldersToSave: FolderInsert[] = [];
         selectedRemoteFolders.forEach((selectedFolder) => {
             const remoteFolder = validatedAccount.remoteFolders.find(({ name }) => name === selectedFolder);
             if (remoteFolder) {
@@ -33,4 +33,9 @@ export async function insertFoldersAndAccount(
         await sql`INSERT INTO folders 
         ${ sql(foldersToSave, 'user_id', 'account_id', 'name', 'status_messages', 'status_uidvalidity') }`;
       });
+}
+
+export async function getFoldersByUserIdAndAccountId(userId: string, accountId: string): Promise<Folder[]> {
+    return sql<Folder[]>`SELECT * FROM folders 
+        WHERE user_id = ${userId} AND account_id = ${accountId} AND deleted = false AND deleted_remote = false`;
 }
