@@ -11,6 +11,7 @@ function getUserSession(request: Request) {
 const sessionCookie = createCookie('__session', {
   secrets: sessionConfig.secrets,
   sameSite: true,
+  expires: new Date(Date.now() + 3 * 60 * 60 * 1000)
 });
 
 const { getSession, commitSession, destroySession } =
