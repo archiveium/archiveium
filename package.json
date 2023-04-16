@@ -24,6 +24,7 @@
     "chakra-ui-steps": "^2.0.4",
     "config": "^3.3.9",
     "framer-motion": "^6.5.1",
+    "html-react-parser": "^3.0.15",
     "imapflow": "1.0.119",
     "ioredis": "^5.3.1",
     "isbot": "^3.6.5",
