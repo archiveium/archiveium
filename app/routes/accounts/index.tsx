@@ -12,11 +12,15 @@ import { SlPencil } from 'react-icons/sl';
 import { CiPause1 } from 'react-icons/ci';
 import { GetAllAccountsByUserId, GetAllFoldersByUserIdAndAccountId } from "~/controllers/account.server";
 import { GetAllEmailsWithS3DataByFolderAndUserId } from "~/controllers/email.server";
+import Pagination from "~/components/pagination";
+import { GeneratePagination } from "~/utils/pagination";
+import { getAllEmailsCountByFolderAndUserId } from "~/models/emails";
 
 export async function loader({ request }: LoaderArgs) {
     const url = new URL(request.url);
     const folderId = url.searchParams.get('folderId');
     const accountId = url.searchParams.get('accountId');
+    const page = url.searchParams.get('page') ?? '1';
 
     const userId = await requireUserId(request, '/login');
 
@@ -26,7 +30,10 @@ export async function loader({ request }: LoaderArgs) {
     const folders = await GetAllFoldersByUserIdAndAccountId(userId, selectedAccount.id);
     const selectedFolder = folders.find((folder) => folder.id == folderId) ?? folders[0];
 
-    const emailsWithS3Data = await GetAllEmailsWithS3DataByFolderAndUserId(userId, selectedFolder.id);
+    const emailCount = await getAllEmailsCountByFolderAndUserId(userId, selectedFolder.id);
+    const emailsWithS3Data = await GetAllEmailsWithS3DataByFolderAndUserId(userId, selectedFolder.id, page);
+
+    const paginator = GeneratePagination(emailCount, 15, page, selectedFolder.id, selectedAccount.id);
 
     return {
         navbar: await buildNavbarData(userId),
@@ -34,7 +41,8 @@ export async function loader({ request }: LoaderArgs) {
         selectedAccount,
         folders,
         selectedFolder,
-        emailsWithS3Data
+        emailsWithS3Data,
+        paginator,
     };
 }
 
@@ -124,6 +132,7 @@ export default function Index() {
                                 </Tbody>
                             </Table>
                         </TableContainer>
+                        <Pagination {...data.paginator}/>
                     </Card>
                 </Box>
             </Box>

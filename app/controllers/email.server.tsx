@@ -8,8 +8,8 @@ import { parseEmail } from "~/utils/emailParser";
 
 const BUCKET_NAME = 'emails';
 
-export async function GetAllEmailsWithS3DataByFolderAndUserId(userId: string, folderId: string): Promise<Email[]> {
-    const emails = await getAllEmailsByFolderAndUserId(userId, folderId);
+export async function GetAllEmailsWithS3DataByFolderAndUserId(userId: string, folderId: string, currentPage: string): Promise<Email[]> {
+    const emails = await getAllEmailsByFolderAndUserId(userId, folderId, currentPage);
     const promises = emails.map(async (email) => {
         const params: GetObjectCommandInput = {
             Bucket: BUCKET_NAME,
