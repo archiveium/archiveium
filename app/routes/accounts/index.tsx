@@ -4,7 +4,7 @@ import Navbar from "~/components/navbar";
 import { buildNavbarData } from "~/controllers/dashboard.server";
 import { requireUserId } from "~/utils/session";
 import {
-    Box, Button, Card, Flex, HStack, IconButton, Link, Menu, MenuButton, MenuItemOption, MenuList,
+    Box, Button, Card, Flex, HStack, IconButton, Link, Menu, MenuButton, MenuDivider, MenuItemOption, MenuList,
     MenuOptionGroup, Spacer, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr
 } from "@chakra-ui/react";
 import { AttachmentIcon, ChevronDownIcon } from "@chakra-ui/icons";
@@ -29,6 +29,8 @@ export async function loader({ request }: LoaderArgs) {
 
     const folders = await GetAllFoldersByUserIdAndAccountId(userId, selectedAccount.id);
     const selectedFolder = folders.find((folder) => folder.id == folderId) ?? folders[0];
+    const syncingFolders = folders.filter((folder) => folder.syncing);
+    const notSyncingFolder = folders.filter((folder) => !folder.syncing);
 
     const emailCount = await getAllEmailsCountByFolderAndUserId(userId, selectedFolder.id);
     const emailsWithS3Data = await GetAllEmailsWithS3DataByFolderAndUserId(userId, selectedFolder.id, page);
@@ -39,7 +41,8 @@ export async function loader({ request }: LoaderArgs) {
         navbar: await buildNavbarData(userId),
         allAccounts,
         selectedAccount,
-        folders,
+        syncingFolders,
+        notSyncingFolder,
         selectedFolder,
         emailsWithS3Data,
         paginator,
@@ -63,8 +66,16 @@ export default function Index() {
                                         <Text maxW={"200"} isTruncated>{data.selectedFolder.name}</Text>
                                     </MenuButton>
                                     <MenuList>
-                                        <MenuOptionGroup defaultValue={data.selectedFolder.id} type='radio'>
-                                            {data.folders.map((folder) => (
+                                        <MenuOptionGroup value={data.selectedFolder.id} type='radio' title='Syncing'>
+                                            {data.syncingFolders.map((folder) => (
+                                                <MenuItemOption as={RemixLink} to={folder.href ?? '#'} key={folder.id} value={folder.id}>
+                                                    <Text maxW={"250"} isTruncated fontSize={"sm"}>{folder.name}</Text>
+                                                </MenuItemOption>
+                                            ))}
+                                        </MenuOptionGroup>
+                                        <MenuDivider />
+                                        <MenuOptionGroup value={data.selectedFolder.id} type='radio' title='Not Syncing'>
+                                            {data.notSyncingFolder.map((folder) => (
                                                 <MenuItemOption as={RemixLink} to={folder.href ?? '#'} key={folder.id} value={folder.id}>
                                                     <Text maxW={"250"} isTruncated fontSize={"sm"}>{folder.name}</Text>
                                                 </MenuItemOption>
