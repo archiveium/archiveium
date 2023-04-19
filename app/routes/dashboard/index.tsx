@@ -3,22 +3,31 @@ import { defer } from "@remix-run/node";
 import { Await, Link, useLoaderData } from "@remix-run/react";
 import Navbar from "~/components/navbar";
 import { buildDashboardData, buildNavbarData } from "~/controllers/dashboard.server";
-import { requireUserId } from "~/utils/session";
+import { getSession, requireUserId, commitSession } from "~/utils/session";
 import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Card, CardBody, Flex, Spacer, Stat, StatGroup, StatLabel, StatNumber, Text } from "@chakra-ui/react";
 import { AddIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { Suspense } from "react";
 import DashboardFallback from "~/components/fallbacks/dashboard";
+import AlertSuccess from "~/components/alert_success";
 
 export async function loader({ request }: LoaderArgs) {
     const userId = await requireUserId(request, '/login');
+    const session = await getSession(request.headers.get('Cookie'));
+    const flashMessage = (await session.get('globalMessage')) || null;
     return defer({
+        flashMessage,
         navbar: await buildNavbarData(userId),
         dashboard: buildDashboardData(userId)
+    },
+    {
+        headers: {
+            'Set-Cookie': await commitSession(session),
+        },
     });
 }
 
 export default function Index() {
-    const data = useLoaderData<typeof loader>();
+    const loaderData = useLoaderData<typeof loader>();
 
     return (
         <Box as="section" bg="gray.100" minH="100vh">
@@ -40,10 +49,13 @@ export default function Index() {
                             <Button leftIcon={<AddIcon />} colorScheme='blue' size={"sm"} as={Link} to="/accounts/add">Add Account</Button>
                         </Box>
                     </Flex>
+                    <Box pb={4}>
+                        <AlertSuccess {...loaderData} />
+                    </Box>
                     <Card>
                         <CardBody>
                             <Suspense fallback={<DashboardFallback />}>
-                                <Await resolve={data.dashboard}>
+                                <Await resolve={loaderData.dashboard}>
                                     {(dashboard) => (
                                         <>
                                             <StatGroup p={4}>

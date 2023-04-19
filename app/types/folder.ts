@@ -5,12 +5,13 @@ interface BaseFolder {
 }
 
 export interface RemoteFolder extends BaseFolder {
-    // Placeholder for future updates
+    syncing?: boolean;
 }
 
 export interface FolderInsert extends BaseFolder {
     user_id: string;
     account_id: string;
+    syncing: boolean;
 }
 
 export interface Folder extends FolderInsert {

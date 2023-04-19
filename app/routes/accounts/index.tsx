@@ -1,10 +1,10 @@
 import type { LoaderArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link as RemixLink, useLoaderData } from "@remix-run/react";
 import Navbar from "~/components/navbar";
 import { buildNavbarData } from "~/controllers/dashboard.server";
 import { requireUserId } from "~/utils/session";
 import {
-    Box, Button, Card, Flex, HStack, IconButton, Menu, MenuButton, MenuItemOption, MenuList,
+    Box, Button, Card, Flex, HStack, IconButton, Link, Menu, MenuButton, MenuItemOption, MenuList,
     MenuOptionGroup, Spacer, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr
 } from "@chakra-ui/react";
 import { AttachmentIcon, ChevronDownIcon } from "@chakra-ui/icons";
@@ -65,7 +65,7 @@ export default function Index() {
                                     <MenuList>
                                         <MenuOptionGroup defaultValue={data.selectedFolder.id} type='radio'>
                                             {data.folders.map((folder) => (
-                                                <MenuItemOption as={Link} to={folder.href ?? '#'} key={folder.id} value={folder.id}>
+                                                <MenuItemOption as={RemixLink} to={folder.href ?? '#'} key={folder.id} value={folder.id}>
                                                     <Text maxW={"250"} isTruncated fontSize={"sm"}>{folder.name}</Text>
                                                 </MenuItemOption>
                                             ))}
@@ -80,7 +80,7 @@ export default function Index() {
                                     <MenuList>
                                         <MenuOptionGroup defaultValue={data.selectedAccount.id} type='radio'>
                                             {data.allAccounts.map((account) => (
-                                                <MenuItemOption as={Link} to={"?accountId=" + account.id} key={account.id} value={account.id}>
+                                                <MenuItemOption as={RemixLink} to={"?accountId=" + account.id} key={account.id} value={account.id}>
                                                     <Text maxW={"250"} isTruncated fontSize={"sm"}>{account.email}</Text>
                                                 </MenuItemOption>
                                             ))}
@@ -93,8 +93,10 @@ export default function Index() {
                         <Box>
                             <HStack>
                                 <IconButton
+                                    as={RemixLink}
+                                    to={`/accounts/edit/${data.selectedAccount.id}`}
                                     colorScheme='blue'
-                                    aria-label='Search database'
+                                    aria-label='Edit account'
                                     size={"sm"}
                                     icon={<SlPencil />}
                                 />
@@ -120,7 +122,9 @@ export default function Index() {
                                 <Tbody>
                                     {data.emailsWithS3Data.map((email) => (
                                         <Tr key={email.id}>
-                                            <Td>{email.s3Data?.from}</Td>
+                                            <Td>
+                                                <Link href={`email/${email.id}`} isExternal>{email.s3Data?.from}</Link>
+                                            </Td>
                                             <Td>
                                                 <Text maxWidth="550px" isTruncated>
                                                     {email.s3Data?.subject} {email.has_attachments ? <AttachmentIcon /> : null}

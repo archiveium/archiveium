@@ -196,6 +196,10 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
         last_updated_msgno: {
             type: 'int4',
         },
+        syncing: {
+            type: 'boolean',
+            default: false,
+        },
         deleted: {
             type: 'boolean',
             default: false,

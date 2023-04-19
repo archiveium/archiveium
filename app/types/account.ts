@@ -7,6 +7,7 @@ export interface Account {
     syncing: boolean;
     deleted: boolean;
     searchable: boolean;
+    provider_id: string;
     created_at: Date;
     updated_at: Date;
 }
@@ -19,7 +20,16 @@ export interface NewAccount {
     provider_id: string;
 }
 
+export interface ExistingAccount extends NewAccount {
+    account_id: string;
+}
+
 export interface ValidatedAccount {
     account: NewAccount,
+    remoteFolders: RemoteFolder[];
+}
+
+export interface ValidatedExistingAccount {
+    account: ExistingAccount,
     remoteFolders: RemoteFolder[];
 }

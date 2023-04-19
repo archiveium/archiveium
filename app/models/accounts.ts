@@ -1,3 +1,4 @@
+import { AccountNotFoundException } from "~/exceptions/account";
 import type { Account } from "~/types/account";
 import type { Count } from "~/types/db";
 import { sql } from ".";
@@ -10,6 +11,15 @@ export async function getAllAccountsByUserIdCount(userId: string): Promise<numbe
 
 export async function getAllAccountsByUserId(userId: string): Promise<Account[]> {
     return sql<Account[]>`SELECT * FROM accounts WHERE user_id = ${userId} AND deleted = false`;
+}
+
+export async function getAccountByUserIdAndAccountId(userId: string, accountId: string): Promise<Account> {
+    const results = await sql<Account[]>`SELECT * FROM accounts 
+        WHERE user_id = ${userId} AND id = ${accountId} AND deleted = false`;
+    if (results.count > 0) {
+        return results[0];
+    }
+    throw new AccountNotFoundException(`Account ${accountId} for user ${userId} does not exist`);
 }
 
 export async function getAllFoldersByAccountAndUserId(userId: string, accountId: string) {
