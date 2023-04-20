@@ -4,14 +4,14 @@ import {
     Flex,
     Avatar,
     HStack,
-    Button,
     Menu,
     MenuButton,
     MenuList,
     MenuItem,
     Text,
+    Button,
 } from '@chakra-ui/react';
-import { useLoaderData } from "@remix-run/react";
+import { Form, useLoaderData } from "@remix-run/react";
 import type { NavbarLoaderData } from "~/types/navbar";
 
 export default function Navbar() {
@@ -49,7 +49,9 @@ export default function Navbar() {
                         </HStack>
                     </MenuButton>
                     <MenuList>
-                        <MenuItem>Logout</MenuItem>
+                        <Form action="/logout" method="post">
+                            <MenuItem type="submit">Logout</MenuItem>
+                        </Form>
                     </MenuList>
                 </Menu>
             </Flex>
