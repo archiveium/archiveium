@@ -1,15 +1,15 @@
 import type { LoaderArgs } from "@remix-run/node";
-import { Link as RemixLink, useLoaderData } from "@remix-run/react";
+import { Form, Link as RemixLink, useLoaderData } from "@remix-run/react";
 import Navbar from "~/components/navbar";
 import { buildNavbarData } from "~/controllers/dashboard.server";
 import { requireUserId } from "~/utils/session";
 import {
-    Box, Button, Card, Flex, HStack, IconButton, Link, Menu, MenuButton, MenuDivider, MenuItemOption, MenuList,
+    Box, Button, Card, Flex, HStack, IconButton, Input, Link, Menu, MenuButton, MenuDivider, MenuItemOption, MenuList,
     MenuOptionGroup, Spacer, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr
 } from "@chakra-ui/react";
 import { AttachmentIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { SlPencil } from 'react-icons/sl';
-import { CiPause1 } from 'react-icons/ci';
+import { CiPause1, CiPlay1 } from 'react-icons/ci';
 import { GetAllAccountsByUserId, GetAllFoldersByUserIdAndAccountId } from "~/controllers/account.server";
 import { GetAllEmailsWithS3DataByFolderAndUserId } from "~/controllers/email.server";
 import Pagination from "~/components/pagination";
@@ -111,12 +111,30 @@ export default function Index() {
                                     size={"sm"}
                                     icon={<SlPencil />}
                                 />
-                                <IconButton
-                                    colorScheme='yellow'
-                                    aria-label='Search database'
-                                    size={"sm"}
-                                    icon={<CiPause1 />}
-                                />
+                                <Form method="post" action={`/accounts/edit/${data.selectedAccount.id}`}>
+                                    <Input name="syncing" value={data.selectedAccount.syncing ? 'false' : 'true'} hidden readOnly />
+                                    {data.selectedAccount.syncing ?
+                                        <IconButton
+                                            type="submit"
+                                            name="formName"
+                                            value="updateAccountSync"
+                                            colorScheme='yellow'
+                                            aria-label='Pause account syncing'
+                                            size={"sm"}
+                                            icon={<CiPause1 />}
+                                        />
+                                        :
+                                        <IconButton
+                                            type="submit"
+                                            name="formName"
+                                            value="updateAccountSync"
+                                            colorScheme='green'
+                                            aria-label='Resume account syncing'
+                                            size={"sm"}
+                                            icon={<CiPlay1 />}
+                                        />
+                                    }
+                                </Form>
                             </HStack>
                         </Box>
                     </Flex>
@@ -147,7 +165,7 @@ export default function Index() {
                                 </Tbody>
                             </Table>
                         </TableContainer>
-                        <Pagination {...data.paginator}/>
+                        <Pagination {...data.paginator} />
                     </Card>
                 </Box>
             </Box>

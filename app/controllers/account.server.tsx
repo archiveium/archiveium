@@ -4,7 +4,7 @@ import { CacheKeyNotFoundException } from '~/exceptions/cache';
 import { getAllIMAPFolders } from '~/imap';
 import { buildClient } from '~/imap/builder';
 import { redis } from '~/models';
-import { getAccountByUserIdAndAccountId, getAllAccountsByUserId, getAllFoldersByAccountAndUserId, isAccountUnique } from '~/models/accounts';
+import { getAccountByUserIdAndAccountId, getAllAccountsByUserId, getAllFoldersByAccountAndUserId, isAccountUnique, updateAccountSyncingStatus } from '~/models/accounts';
 import { insertFoldersAndAccount, updateFoldersAndAccount } from '~/models/folders';
 import { getProviderById } from '~/models/providers';
 import type { Account, ValidatedAccount, ValidatedExistingAccount } from '~/types/account';
@@ -120,6 +120,10 @@ export async function UpdateAccount(
     const existingFolders = await getAllFoldersByAccountAndUserId(userId, accountId);
 
     await updateFoldersAndAccount(userId, cachedProvider, selectedRemoteFolders, existingFolders);
+}
+
+export async function UpdateAccountSyncingStatus(userId: string, accountId: string, syncing: boolean): Promise<boolean> {
+    return updateAccountSyncingStatus(userId, accountId, syncing);
 }
 
 export function GetAllAccountsByUserId(userId: string): Promise<Account[]> {

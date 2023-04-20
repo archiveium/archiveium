@@ -13,7 +13,7 @@ import { ChevronRightIcon } from "@chakra-ui/icons";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { getAllProviders } from "~/models/providers";
 import { badRequest } from "~/utils/request";
-import { GetAccountByUserIdAndAccountId, UpdateAccount, ValidateExistingAccount } from "~/controllers/account.server";
+import { GetAccountByUserIdAndAccountId, UpdateAccount, UpdateAccountSyncingStatus, ValidateExistingAccount } from "~/controllers/account.server";
 import { ZodError } from "zod";
 import AlertError from "~/components/alert_error";
 import { IMAPAuthenticationFailed } from "~/exceptions/imap";
@@ -22,6 +22,7 @@ import { Step, Steps } from 'chakra-ui-steps';
 enum formNames {
     SUBMIT_PROVIDER = "submitProvider",
     SUBMIT_FOLDERS = "submitFolders",
+    UPDATE_ACCOUNT_SYNC = "updateAccountSync",
 };
 
 export async function loader({ params, request }: LoaderArgs) {
@@ -51,7 +52,7 @@ export async function loader({ params, request }: LoaderArgs) {
     }
 };
 
-export const action = async ({ request }: ActionArgs) => {
+export const action = async ({ params, request }: ActionArgs) => {
     const userId = await requireUserId(request, '/login');
     const session = await getSession(
         request.headers.get("Cookie")
@@ -74,6 +75,18 @@ export const action = async ({ request }: ActionArgs) => {
             case formNames.SUBMIT_FOLDERS:
                 await UpdateAccount(userId, body.get('email'), body.getAll('folders'));
                 session.flash('globalMessage', 'Account has been updated successfully!');
+            case formNames.UPDATE_ACCOUNT_SYNC:
+                if (body.get('syncing')) {
+                    const syncStatus = body.get('syncing') === 'true' ? true : false;
+                    const isAccountUpdated = await UpdateAccountSyncingStatus(userId, params.id ?? '', syncStatus);
+                    if (isAccountUpdated) {
+                        session.flash('globalMessage', 'Account syncing status updated successfully.');
+                    } else {
+                        session.flash('globalMessage', 'There was an error updating account syncing status.');
+                    }
+                } else {
+                    session.flash('globalMessage', 'Unable to update account syncing status.');
+                }
         }
     } catch (error: any) {
         console.log(error);

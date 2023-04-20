@@ -9,6 +9,13 @@ export async function getAllAccountsByUserIdCount(userId: string): Promise<numbe
     return result[0].count;
 }
 
+export async function updateAccountSyncingStatus(userId: string, accountId: string, syncing: boolean): Promise<boolean> {
+    const result = await sql`UPDATE accounts 
+        SET syncing = ${syncing} 
+        WHERE user_id = ${userId} AND id = ${accountId}`;
+    return result.count == 1;
+}
+
 export async function getAllAccountsByUserId(userId: string): Promise<Account[]> {
     return sql<Account[]>`SELECT * FROM accounts WHERE user_id = ${userId} AND deleted = false`;
 }
