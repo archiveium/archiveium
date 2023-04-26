@@ -6,8 +6,9 @@
     "build": "remix build",
     "dev": "remix dev",
     "start": "remix-serve build",
-    "migrate": "ts-node ./node_modules/.bin/node-pg-migrate --config-value database --migration-file-language ts",
-    "seed": "ts-node ./seeds/providers.ts -p tsconfig.json",
+    "migrate": "node-pg-migrate",
+    "migrate:database": "ts-node ./node_modules/.bin/node-pg-migrate --config-value database --migration-file-language ts up",
+    "seed:database": "ts-node ./seeds/providers.ts -p tsconfig.json",
     "typecheck": "tsc"
   },
   "dependencies": {
