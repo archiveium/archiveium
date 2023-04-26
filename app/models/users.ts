@@ -1,13 +1,10 @@
 import type { CreateUser, User } from "~/types/user";
 import { sql } from ".";
 import { RecordNotFoundException } from "~/exceptions/database";
-import crypto from 'crypto';
+import * as authUtils from "~/utils/auth";
 
 export async function createUser(user: CreateUser): Promise<void> {
-    const salt = crypto.randomBytes(16).toString('hex');
-    const derivedKey = (crypto.scryptSync(user.password, salt, 64) as Buffer).toString('hex');
-    const hashedPassword = `${salt}:${derivedKey}`;
-
+    const hashedPassword = authUtils.hashPassword(user.password);
     await sql`INSERT INTO users (name, email, password)
     VALUES(${user.name}, ${user.email}, ${hashedPassword})`;
 }
@@ -47,4 +44,11 @@ export async function resetUserNotificationDate(id: string): Promise<void> {
     await sql`UPDATE users 
     SET email_notified_at = NULL 
     WHERE id = ${id}`;
+}
+
+export async function updatePasswordByUserEmail(email: string, rawPassword: string): Promise<void> {
+    const hashedPassword = authUtils.hashPassword(rawPassword);
+    await sql`UPDATE users 
+    SET updated_at = NOW(), password = ${hashedPassword}
+    WHERE email = ${email}`;
 }
