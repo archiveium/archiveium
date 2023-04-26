@@ -44,3 +44,8 @@ export async function isAccountUnique(email: string, userId: string): Promise<bo
     WHERE email = ${email} AND deleted = false AND user_id = ${userId}`;
     return result[0].count == 0;
 }
+
+export async function deleteAccountByAccountIdAndUserId(userId: string, accountId: string): Promise<void> {
+    await sql`DELETE FROM accounts 
+    WHERE user_id = ${userId} AND id = ${accountId}`;
+}

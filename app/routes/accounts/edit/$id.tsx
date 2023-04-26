@@ -7,22 +7,24 @@ import { commitSession, getSession, requireUserId } from "~/utils/session";
 import {
     Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Card, CardBody, Checkbox,
     Container, Flex, FormControl, FormErrorMessage, FormLabel, Heading, HStack, Input, Radio,
-    RadioGroup, Stack, Table, Tbody, Td, Text, Th, Thead, Tr
+    RadioGroup, Spacer, Stack, Table, Tbody, Td, Text, Th, Thead, Tr
 } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { getAllProviders } from "~/models/providers";
 import { badRequest } from "~/utils/request";
-import { GetAccountByUserIdAndAccountId, UpdateAccount, UpdateAccountSyncingStatus, ValidateExistingAccount } from "~/controllers/account.server";
+import { DeleteAccountByAccountIdAndUserId, GetAccountByUserIdAndAccountId, UpdateAccount, UpdateAccountSyncingStatus, ValidateExistingAccount } from "~/controllers/account.server";
 import { ZodError } from "zod";
 import AlertError from "~/components/alert_error";
 import { IMAPAuthenticationFailed } from "~/exceptions/imap";
 import { Step, Steps } from 'chakra-ui-steps';
+import { DeleteAccountDialog } from "~/components/alertDialog/deleteAccount";
 
 enum formNames {
     SUBMIT_PROVIDER = "submitProvider",
     SUBMIT_FOLDERS = "submitFolders",
     UPDATE_ACCOUNT_SYNC = "updateAccountSync",
+    DELETE_ACCOUNT = "deleteAccount",
 };
 
 export async function loader({ params, request }: LoaderArgs) {
@@ -30,11 +32,11 @@ export async function loader({ params, request }: LoaderArgs) {
     const session = await getSession(request.headers.get("Cookie"));
 
     try {
-        const selectedAccount = await GetAccountByUserIdAndAccountId(userId, params.id ?? '');        
+        const selectedAccount = await GetAccountByUserIdAndAccountId(userId, params.id ?? '');
         const navbarData = await buildNavbarData(userId);
         const availableProviders = await getAllProviders();
         const defaultProvider = availableProviders.find(provider => provider.id === selectedAccount.provider_id);
-    
+
         return json({
             navbar: navbarData,
             availableProviders,
@@ -54,9 +56,7 @@ export async function loader({ params, request }: LoaderArgs) {
 
 export const action = async ({ params, request }: ActionArgs) => {
     const userId = await requireUserId(request, '/login');
-    const session = await getSession(
-        request.headers.get("Cookie")
-    );
+    const session = await getSession(request.headers.get("Cookie"));
     const body = await request.formData();
 
     try {
@@ -87,6 +87,9 @@ export const action = async ({ params, request }: ActionArgs) => {
                 } else {
                     session.flash('globalMessage', 'Unable to update account syncing status.');
                 }
+            case formNames.DELETE_ACCOUNT:
+                await DeleteAccountByAccountIdAndUserId(params.id ?? '', userId);
+                session.flash('globalMessage', 'Account has been deleted successfully.');
         }
     } catch (error: any) {
         console.log(error);
@@ -142,7 +145,7 @@ export default function EditAccount() {
                 </FormControl>
                 <FormControl mt={6} isRequired isInvalid={actionData?.fieldErrors?.email ? true : false}>
                     <FormLabel>Email Address</FormLabel>
-                    <Input name="email" type={"email"} placeholder='Enter email address' defaultValue={loaderData.selectedAccount.email}/>
+                    <Input name="email" type={"email"} placeholder='Enter email address' defaultValue={loaderData.selectedAccount.email} />
                     <FormErrorMessage>{actionData?.fieldErrors?.email}</FormErrorMessage>
                 </FormControl>
                 <FormControl mt={6} isRequired isInvalid={actionData?.fieldErrors?.password ? true : false}>
@@ -240,6 +243,12 @@ export default function EditAccount() {
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                             </Breadcrumb>
+                        </Box>
+                        <Spacer />
+                        <Box>
+                            <HStack>
+                                <DeleteAccountDialog accountId={loaderData.selectedAccount.id} />
+                            </HStack>
                         </Box>
                     </Flex>
                     <Box pb={4}>
