@@ -1,6 +1,7 @@
 import { sql } from ".";
 import type { Folder, FolderInsert } from "~/types/folder";
 import type { Account, NewAccount, ValidatedAccount, ValidatedExistingAccount } from "~/types/account";
+import type { Count } from "~/types/db";
 
 export async function insertFoldersAndAccount(
     userId: string,
@@ -92,4 +93,11 @@ export async function updateFoldersAndAccount(
 export async function getFoldersByUserIdAndAccountId(userId: string, accountId: string): Promise<Folder[]> {
     return sql<Folder[]>`SELECT * FROM folders 
         WHERE user_id = ${userId} AND account_id = ${accountId} AND deleted = false AND deleted_remote = false`;
+}
+
+export async function getRemotedEmailCountForSyncedFoldersByUserId(userId: string): Promise<number> {
+    const result = await sql<Count[]>`SELECT SUM(status_messages) AS count
+    FROM folders 
+    WHERE user_id = 1 AND syncing = true;`;
+    return result[0].count;
 }

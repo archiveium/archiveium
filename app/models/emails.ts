@@ -24,3 +24,15 @@ export async function getAllEmailsCountByFolderAndUserId(userId: string, folderI
         WHERE user_id = ${userId} AND folder_id = ${folderId} AND imported = true`;
     return result[0].count;
 }
+
+export async function getAllEmailsCountByUserId(userId: string): Promise<number> {
+    const result = await sql<Count[]>`SELECT COUNT(*) FROM emails 
+        WHERE user_id = ${userId} AND imported = true`;
+    return result[0].count;
+}
+
+export async function getAllFailedEmailsCountByUserId(userId: string): Promise<number> {
+    const result = await sql<Count[]>`SELECT COUNT(*) FROM emails 
+        WHERE user_id = ${userId} AND imported = false`;
+    return result[0].count;
+}
