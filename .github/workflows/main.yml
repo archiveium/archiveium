@@ -24,7 +24,7 @@ on:
 
   build:
     name: Build
-    needs: lint
+    # needs: lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
