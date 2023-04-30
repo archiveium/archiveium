@@ -2,7 +2,7 @@
   "name": "archiveium-frontend",
   "private": true,
   "sideEffects": false,
-  "version": "0.0.3",
+  "version": "0.0.4",
   "scripts": {
     "build": "remix build",
     "dev": "remix dev",
