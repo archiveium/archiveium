@@ -1,0 +1,23 @@
+{
+    "git": {
+      "commitMessage": "chore: release ${version}",
+      "requireCleanWorkingDir": false,
+      "changelog": "git log --pretty=format:\"* %s (%h)\" ${from}...${to}"
+    },
+    "npm": {
+      "publish": false,
+      "versionArgs": [
+        "--allow-same-version"
+      ]
+    },
+    "github": {
+      "release": true,
+      "tokenRef": "PERSONAL_ACCESS_TOKEN"
+    },
+    "plugins": {
+      "@release-it/bumper": {
+        "in": "package.json",
+        "out": "package.json"
+      }
+    }
+  }
