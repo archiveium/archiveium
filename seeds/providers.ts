@@ -31,7 +31,8 @@ const providers: Array<Provider> = [
 
 async function seed() {
     try {
-        const result = await sql`INSERT INTO providers ${ sql(providers, 'name', 'host', 'port', 'secure', 'is_default') }`;
+        const result = await sql`INSERT INTO providers ${ sql(providers, 'name', 'host', 'port', 'secure', 'is_default') } 
+            ON CONFLICT (name, host) DO NOTHING;`;
         console.log(result.count);
         process.exit(0);
     } catch (error) {

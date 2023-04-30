@@ -16,5 +16,8 @@ COPY --from=0 /app/build ./build
 COPY --from=0 /app/public ./public
 COPY --from=0 /app/.cache ./.cache
 COPY --from=0 /app/config ./config
+COPY ./docker/docker-entrypoint.sh /usr/local/bin/
+RUN ["chmod", "+x", "/usr/local/bin/docker-entrypoint.sh"]
 RUN npm ci
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD [ "npm", "run", "start" ]

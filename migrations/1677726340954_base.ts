@@ -72,6 +72,10 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
             type: 'timestamp(0)',
             default: pgm.func('NOW()'),
         }
+    }, {
+        constraints: {
+            unique: ['name', 'host']
+        }
     });
 
     pgm.createTable('accounts', {
