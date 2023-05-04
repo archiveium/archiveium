@@ -2,7 +2,7 @@ import { useLoaderData } from "@remix-run/react";
 import type { LoaderArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { requireUserId, getSession, commitSession } from "~/utils/session";
+import { requireUserId, getSession, commitAppSession } from "~/utils/session";
 import { GetEmailWithS3DataByIdAndUserId } from "~/controllers/email.server";
 import parse from 'html-react-parser';
 
@@ -25,7 +25,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 
     return redirect('/dashboard', {
         headers: {
-            'Set-Cookie': await commitSession(session),
+            'Set-Cookie': await commitAppSession(session),
         }
     });
 };

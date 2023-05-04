@@ -4,7 +4,7 @@ import type { ActionArgs, LoaderArgs} from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { VerifyRegistrationUrl } from "~/controllers/register.server";
-import { commitSession, getSession } from "~/utils/session";
+import { commitAppSession, getSession } from "~/utils/session";
 import { getUserById, resetUserNotificationDate, verifyUser } from "~/models/users";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
@@ -24,7 +24,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
         session.flash('globalMessage', 'Email has already been verified. You can now login.');
         return redirect('/login', {
             headers: {
-                'Set-Cookie': await commitSession(session),
+                'Set-Cookie': await commitAppSession(session),
             }        
         });
     }
@@ -34,14 +34,14 @@ export const loader = async ({ params, request }: LoaderArgs) => {
         session.flash('globalMessage', 'Email verified successfully! You can now login.');
         return redirect('/login', {
             headers: {
-                'Set-Cookie': await commitSession(session),
+                'Set-Cookie': await commitAppSession(session),
             }        
         });
     } else if (!verificationUrl.signatureValid) {
         session.flash('globalMessage', 'Invalid verification url. Please try again.');
         return redirect('/login', {
             headers: {
-                'Set-Cookie': await commitSession(session),
+                'Set-Cookie': await commitAppSession(session),
             }
         });
     } else {
@@ -54,7 +54,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
         { flashMessage: session.get('globalMessage') || null },
         {
             headers: {
-              'Set-Cookie': await commitSession(session),
+              'Set-Cookie': await commitAppSession(session),
             },
         }
     );
@@ -82,7 +82,7 @@ export const action = async ({ params, request }: ActionArgs) => {
 
     return redirect('/login', {
         headers: {
-            'Set-Cookie': await commitSession(session),
+            'Set-Cookie': await commitAppSession(session),
         }
     });
 };

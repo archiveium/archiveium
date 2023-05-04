@@ -3,7 +3,7 @@ import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { commitSession, createUserSession, getSession, getUserId } from "~/utils/session";
+import { commitAppSession, createUserSession, getSession, getUserId } from "~/utils/session";
 import { LoginUser } from "~/controllers/auth.server";
 import { badRequest } from "~/utils/request";
 import {
@@ -41,7 +41,7 @@ export async function loader({ request }: LoaderArgs) {
         },
         {
             headers: {
-              'Set-Cookie': await commitSession(session),
+              'Set-Cookie': await commitAppSession(session),
             },
         }
     );

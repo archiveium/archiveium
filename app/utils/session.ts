@@ -1,3 +1,4 @@
+import type { Session } from "@remix-run/node";
 import { createCookie, createFileSessionStorage, redirect } from "@remix-run/node";
 import config from 'config';
 import type { SessionConfig } from "../types/config";
@@ -8,10 +9,15 @@ function getUserSession(request: Request) {
   return getSession(request.headers.get("Cookie"));
 }
 
+function getMaxAge(): number {
+  return 21600; // 6 hours
+}
+
 const sessionCookie = createCookie('__session', {
   secrets: sessionConfig.secrets,
   sameSite: true,
-  expires: new Date(Date.now() + 3 * 60 * 60 * 1000)
+  maxAge: getMaxAge(),
+  secure: process.env.NODE_ENV === 'production',
 });
 
 const { getSession, commitSession, destroySession } =
@@ -26,7 +32,7 @@ const createUserSession =  async function(userId: number, redirectTo: string) {
   session.set("userId", userId);
   return redirect(redirectTo, {
     headers: {
-      "Set-Cookie": await commitSession(session),
+      "Set-Cookie": await commitAppSession(session),
     },
   });
 }
@@ -56,4 +62,8 @@ export async function logout(request: Request) {
   });
 }
 
-export { getSession, commitSession, destroySession, createUserSession, getUserId, requireUserId };
+const commitAppSession = async function (session: Session): Promise<string> {
+  return commitSession(session);
+}
+
+export { getSession, commitAppSession, destroySession, createUserSession, getUserId, requireUserId };

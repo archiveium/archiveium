@@ -3,7 +3,7 @@ import { json } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import Navbar from "~/components/navbar";
 import { buildNavbarData } from "~/controllers/dashboard.server";
-import { commitSession, getSession, requireUserId } from "~/utils/session";
+import { commitAppSession, getSession, requireUserId } from "~/utils/session";
 import {
     Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Card, CardBody, Checkbox,
     Container, Flex, FormControl, FormErrorMessage, FormLabel, Heading, HStack, Input, Radio,
@@ -48,7 +48,7 @@ export async function loader({ params, request }: LoaderArgs) {
         session.flash('globalMessage', 'Invalid account');
         return redirect('/dashboard', {
             headers: {
-                'Set-Cookie': await commitSession(session),
+                'Set-Cookie': await commitAppSession(session),
             },
         });
     }
@@ -125,7 +125,7 @@ export const action = async ({ params, request }: ActionArgs) => {
 
     return redirect('/dashboard', {
         headers: {
-            'Set-Cookie': await commitSession(session),
+            'Set-Cookie': await commitAppSession(session),
         }
     });
 };

@@ -3,7 +3,7 @@ import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { commitSession, getSession, getUserId } from "~/utils/session";
+import { commitAppSession, getSession, getUserId } from "~/utils/session";
 import { UpdatePassword, ValidatePasswordResetToken } from "~/controllers/auth.server";
 import { ZodError } from "zod";
 import { badRequest } from "~/utils/request";
@@ -29,7 +29,7 @@ export const action = async ({ request }: ActionArgs) => {
             session.flash('globalMessage', 'Password reset token has expired. Please try again.');
             return redirect('/forgot-password', {
                 headers: {
-                    'Set-Cookie': await commitSession(session),
+                    'Set-Cookie': await commitAppSession(session),
                 }
             });
         } else if (error instanceof ZodError) {
@@ -49,7 +49,7 @@ export const action = async ({ request }: ActionArgs) => {
     session.flash('globalMessage', 'Password has been updated successfully.');
     return redirect('/login', {
         headers: {
-            'Set-Cookie': await commitSession(session),
+            'Set-Cookie': await commitAppSession(session),
         }
     });
 };
@@ -74,7 +74,7 @@ export async function loader({ request, params }: LoaderArgs) {
             session.flash('globalMessage', 'Password reset token has expired. Please try again.');
             return redirect('/forgot-password', {
                 headers: {
-                    'Set-Cookie': await commitSession(session),
+                    'Set-Cookie': await commitAppSession(session),
                 }
             });
         }
@@ -83,7 +83,7 @@ export async function loader({ request, params }: LoaderArgs) {
         session.flash('globalMessage', 'Invalid password reset token.');
         return redirect('/login', {
             headers: {
-                'Set-Cookie': await commitSession(session),
+                'Set-Cookie': await commitAppSession(session),
             }
         });
     }
@@ -96,7 +96,7 @@ export async function loader({ request, params }: LoaderArgs) {
         },
         {
             headers: {
-                'Set-Cookie': await commitSession(session),
+                'Set-Cookie': await commitAppSession(session),
             },
         }
     );

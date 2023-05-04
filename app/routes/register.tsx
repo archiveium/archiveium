@@ -3,7 +3,7 @@ import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { commitSession, getSession, getUserId } from "~/utils/session";
+import { commitAppSession, getSession, getUserId } from "~/utils/session";
 import { RegisterUser } from "~/controllers/auth.server";
 import { ZodError } from "zod";
 import { badRequest } from "~/utils/request";
@@ -46,7 +46,7 @@ export const action = async ({ request }: ActionArgs) => {
     session.flash('globalMessage', 'An email has been sent to your email address. Please verify before logging in.');
     return redirect('/login', {
         headers: {
-            'Set-Cookie': await commitSession(session),
+            'Set-Cookie': await commitAppSession(session),
         }
     });
 };
@@ -66,7 +66,7 @@ export async function loader({ request }: LoaderArgs) {
         { flashMessage: session.get('globalMessage') || null },
         {
             headers: {
-                'Set-Cookie': await commitSession(session),
+                'Set-Cookie': await commitAppSession(session),
             },
         }
     );

@@ -5,7 +5,7 @@ import type { ActionArgs , LoaderArgs} from "@remix-run/node";
 import { RegisterForPreview } from "~/controllers/register.server";
 import { badRequest } from "~/utils/request";
 import { ZodError } from "zod";
-import { commitSession, getSession, getUserId } from "../utils/session";
+import { commitAppSession, getSession, getUserId } from "../utils/session";
 import { Box, Button, Card, CardBody, Center, Container, FormControl, FormErrorMessage, FormLabel, Heading, HStack, Input, Link, Stack, Text } from "@chakra-ui/react";
 import AlertError from "~/components/alert_error";
 
@@ -44,7 +44,7 @@ export const action = async ({ request }: ActionArgs) => {
     session.flash('globalMessage', 'Thank you for showing interest. Keep an eye on your mailbox!');
     return redirect('/login', {
         headers: {
-            'Set-Cookie': await commitSession(session),
+            'Set-Cookie': await commitAppSession(session),
         }        
     });
 };

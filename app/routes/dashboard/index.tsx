@@ -3,7 +3,7 @@ import { defer } from "@remix-run/node";
 import { Await, Link, useLoaderData } from "@remix-run/react";
 import Navbar from "~/components/navbar";
 import { buildDashboardData, buildNavbarData } from "~/controllers/dashboard.server";
-import { getSession, requireUserId, commitSession } from "~/utils/session";
+import { getSession, requireUserId, commitAppSession } from "~/utils/session";
 import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Card, CardBody, Flex, Spacer, Stat, StatGroup, StatLabel, StatNumber, Text } from "@chakra-ui/react";
 import { AddIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { Suspense } from "react";
@@ -21,7 +21,7 @@ export async function loader({ request }: LoaderArgs) {
     },
     {
         headers: {
-            'Set-Cookie': await commitSession(session),
+            'Set-Cookie': await commitAppSession(session),
         },
     });
 }

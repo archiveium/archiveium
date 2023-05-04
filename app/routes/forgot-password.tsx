@@ -3,7 +3,7 @@ import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { commitSession, getSession, getUserId } from "~/utils/session";
+import { commitAppSession, getSession, getUserId } from "~/utils/session";
 import { badRequest } from "~/utils/request";
 import {
     Box,
@@ -43,7 +43,7 @@ export async function loader({ request }: LoaderArgs) {
         },
         {
             headers: {
-              'Set-Cookie': await commitSession(session),
+              'Set-Cookie': await commitAppSession(session),
             },
         }
     );
@@ -59,7 +59,7 @@ export const action = async ({ request }: ActionArgs) => {
         session.flash('globalMessage', 'A password reset email has been sent.');
         return redirect('/login', {
             headers: {
-                'Set-Cookie': await commitSession(session),
+                'Set-Cookie': await commitAppSession(session),
             }        
         });
     } catch (error) {
