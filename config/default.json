@@ -19,7 +19,8 @@
         "credentials": {
             "accessKeyId": "",
             "secretAccessKey": ""
-        }
+        },
+        "forcePathStyle": true
     },
     "session": {
         "secrets": [ "" ]
