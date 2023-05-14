@@ -20,7 +20,7 @@ import { IMAPAuthenticationFailed } from "~/exceptions/imap";
 import { Step, Steps } from 'chakra-ui-steps';
 import { DeleteAccountDialog } from "~/components/alertDialog/deleteAccount";
 
-enum formNames {
+export enum formNames {
     SUBMIT_PROVIDER = "submitProvider",
     SUBMIT_FOLDERS = "submitFolders",
     UPDATE_ACCOUNT_SYNC = "updateAccountSync",
@@ -75,6 +75,7 @@ export const action = async ({ params, request }: ActionArgs) => {
             case formNames.SUBMIT_FOLDERS:
                 await UpdateAccount(userId, body.get('email'), body.getAll('folders'));
                 session.flash('globalMessage', 'Account has been updated successfully!');
+                break;
             case formNames.UPDATE_ACCOUNT_SYNC:
                 if (body.get('syncing')) {
                     const syncStatus = body.get('syncing') === 'true' ? true : false;
@@ -87,9 +88,11 @@ export const action = async ({ params, request }: ActionArgs) => {
                 } else {
                     session.flash('globalMessage', 'Unable to update account syncing status.');
                 }
+                break;
             case formNames.DELETE_ACCOUNT:
                 await DeleteAccountByAccountIdAndUserId(params.id ?? '', userId);
                 session.flash('globalMessage', 'Account has been deleted successfully.');
+                break;
         }
     } catch (error: any) {
         console.log(error);
