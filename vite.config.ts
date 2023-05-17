@@ -22,7 +22,7 @@ export default defineConfig({
             all: true,
             exclude: ["build", "node_modules", "public", "test"],
             include: ["app"],
-            reporter: ["text", "json"]
+            reporter: ['text', 'json-summary', 'json']
         }
     },
 })
