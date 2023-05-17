@@ -40,6 +40,7 @@ jobs:
   release:
     name: Release
     needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -63,6 +64,7 @@ jobs:
   docker:
     name: Build & Deploy Docker Image
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: release
     steps:
       - name: Checkout Repository
@@ -97,6 +99,7 @@ jobs:
   trigger:
     name: Update deployer
     needs: docker
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
