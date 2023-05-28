@@ -99,5 +99,5 @@ export async function getRemotedEmailCountForSyncedFoldersByUserId(userId: strin
     const result = await sql<Count[]>`SELECT SUM(status_messages) AS count
     FROM folders 
     WHERE user_id = 1 AND syncing = true;`;
-    return result[0].count;
+    return result[0].count ?? 0;
 }
