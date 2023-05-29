@@ -37,9 +37,29 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+  test:
+    name: Test
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run test
+      - run: npm run test:coverage
+      - name: Coverage Report
+        if: always() # generate the report if tests are failing
+        uses:  davelosert/vitest-coverage-report-action@v1
+
   release:
     name: Release
     needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -63,6 +83,7 @@ jobs:
   docker:
     name: Build & Deploy Docker Image
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: release
     steps:
       - name: Checkout Repository
@@ -97,6 +118,7 @@ jobs:
   trigger:
     name: Update deployer
     needs: docker
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository

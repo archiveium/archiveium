@@ -19,11 +19,11 @@ export async function loader({ request }: LoaderArgs) {
         navbar: await buildNavbarData(userId),
         dashboard: buildDashboardData(userId)
     },
-    {
-        headers: {
-            'Set-Cookie': await commitAppSession(session),
-        },
-    });
+        {
+            headers: {
+                'Set-Cookie': await commitAppSession(session),
+            },
+        });
 }
 
 export default function Index() {
@@ -59,32 +59,37 @@ export default function Index() {
                                     {(dashboard) => (
                                         <>
                                             <StatGroup p={4}>
-                                                <Stat as={Link} to="/accounts">
-                                                    <StatLabel>Accounts Added</StatLabel>
-                                                    <StatNumber>
-                                                        { dashboard.accounts.added }
-                                                    </StatNumber>
-                                                </Stat>
+                                                {dashboard.accounts.added > 0 ? (
+                                                    <Stat as={Link} to="/accounts">
+                                                        <StatLabel>Accounts Added</StatLabel>
+                                                        <StatNumber>{dashboard.accounts.added}</StatNumber>
+                                                    </Stat>
+                                                ) : (
+                                                    <Stat>
+                                                        <StatLabel>Accounts Added</StatLabel>
+                                                        <StatNumber>{dashboard.accounts.added}</StatNumber>
+                                                    </Stat>
+                                                )}
                                                 <Stat>
                                                     <StatLabel>Accounts Syncing</StatLabel>
-                                                    <StatNumber>{ dashboard.accounts.syncing }</StatNumber>
+                                                    <StatNumber>{dashboard.accounts.syncing}</StatNumber>
                                                 </Stat>
                                                 <Stat>
                                                     <StatLabel>Total Emails (Remote)</StatLabel>
-                                                    <StatNumber>{ dashboard.emails.total }</StatNumber>
+                                                    <StatNumber>{dashboard.emails.total}</StatNumber>
                                                 </Stat>
                                             </StatGroup><StatGroup p={4}>
                                                 <Stat>
                                                     <StatLabel>Emails Processed</StatLabel>
-                                                    <StatNumber>{ dashboard.emails.processed }</StatNumber>
+                                                    <StatNumber>{dashboard.emails.processed}</StatNumber>
                                                 </Stat>
                                                 <Stat>
                                                     <StatLabel>Failures</StatLabel>
-                                                    <StatNumber>{ dashboard.emails.failure }</StatNumber>
+                                                    <StatNumber>{dashboard.emails.failure}</StatNumber>
                                                 </Stat>
                                                 <Stat>
-                                                    <StatLabel>Quota Used ({ dashboard.emails.quota } emails)</StatLabel>
-                                                    <StatNumber>{ dashboard.emails.used }</StatNumber>
+                                                    <StatLabel>Quota Used ({dashboard.emails.quota} emails)</StatLabel>
+                                                    <StatNumber>{dashboard.emails.used}</StatNumber>
                                                 </Stat>
                                             </StatGroup>
                                         </>
