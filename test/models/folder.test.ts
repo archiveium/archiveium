@@ -9,7 +9,7 @@ vi.mock('~/models/index.ts', () => {
     }
 });
 
-describe.only('folders model', () => {
+describe('folders model', () => {
     afterEach(() => {
         vi.clearAllMocks();
     });
