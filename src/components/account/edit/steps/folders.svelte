@@ -37,7 +37,7 @@
 											name="folders"
 											value={remoteFolder.name}
 											aria-label="Select folder"
-                                            checked={remoteFolder.syncing}
+											checked={remoteFolder.syncing}
 										/>
 									</td>
 									<td>{remoteFolder.name}</td>
@@ -54,11 +54,8 @@
 				<div class="card-footer text-end">
 					<div class="d-flex">
 						<input name="email" value={form?.email} hidden />
-						<button
-							type="submit"
-							name="step"
-							value="addAccountStep2"
-							class="btn btn-primary">Update Account</button
+						<button type="submit" name="step" value="addAccountStep2" class="btn btn-primary"
+							>Update Account</button
 						>
 					</div>
 				</div>

@@ -88,7 +88,8 @@
 			<div class="card-footer text-end">
 				<div class="d-flex">
 					<button type="submit" name="step" value="addAccountStep1" class="btn btn-primary me-auto"
-						>Next</button>
+						>Next</button
+					>
 					<button
 						type="button"
 						class="btn btn-outline-danger"
@@ -128,8 +129,8 @@
 				</svg>
 				<h3>Sure you want to delete account?</h3>
 				<div class="text-muted">
-					All your synced emails and folders will be deleted.
-					This is an irreversable action. Please make sure you have a backup before proceeding.
+					All your synced emails and folders will be deleted. This is an irreversable action. Please
+					make sure you have a backup before proceeding.
 				</div>
 			</div>
 			<div class="modal-footer">
@@ -141,7 +142,13 @@
 						</div>
 						<div class="col">
 							<form method="post" use:enhance>
-							<button type="submit" name="step" value="deleteAccount" data-bs-dismiss="modal" class="btn btn-danger w-100">Delete</button>
+								<button
+									type="submit"
+									name="step"
+									value="deleteAccount"
+									data-bs-dismiss="modal"
+									class="btn btn-danger w-100">Delete</button
+								>
 							</form>
 						</div>
 					</div>

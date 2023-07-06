@@ -14,7 +14,10 @@
 		<div class="card card-md">
 			<div class="card-body">
 				<h2 class="h2 text-center mb-4">Thank you for signing up!</h2>
-                <p>Unfortunately your email verification url has expired. Use the button below to resend email.</p>
+				<p>
+					Unfortunately your email verification url has expired. Use the button below to resend
+					email.
+				</p>
 				<form method="post" autocomplete="off" use:enhance>
 					<div class="form-footer">
 						<button type="submit" class="btn btn-primary w-100">Resend Verification Email</button>
@@ -23,7 +26,7 @@
 			</div>
 		</div>
 		<div class="text-center text-muted mt-3">
-            Already have an account? <a href="/login" tabindex="-1">Sign In</a>
+			Already have an account? <a href="/login" tabindex="-1">Sign In</a>
 		</div>
 	</div>
 </div>

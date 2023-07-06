@@ -9,7 +9,6 @@
 
 <div class="page-body">
 	<div class="container-xl">
-
 		<!-- Success alert -->
 		{#if data.flashMessage}
 			<div class="alert alert-success" role="alert">
@@ -22,10 +21,24 @@
 				<h3 class="card-title">Overview</h3>
 				<div class="card-actions">
 					<a href="/accounts/add" class="btn btn-primary btn-md">
-					  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 5l0 14"></path><path d="M5 12l14 0"></path></svg>
-					  Add Account
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="icon"
+							width="24"
+							height="24"
+							viewBox="0 0 24 24"
+							stroke-width="2"
+							stroke="currentColor"
+							fill="none"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path
+								d="M5 12l14 0"
+							/></svg
+						>
+						Add Account
 					</a>
-				  </div>
+				</div>
 			</div>
 			<div class="card-body">
 				<div class="datagrid">
@@ -46,8 +59,8 @@
 								Loading...
 							{:then value}
 								{value}
-							{/await}                            
-                        </div>
+							{/await}
+						</div>
 					</div>
 					<div class="datagrid-item">
 						<div class="datagrid-title">Saved Emails</div>
@@ -56,8 +69,8 @@
 								Loading...
 							{:then value}
 								{value}
-							{/await}                            
-                        </div>
+							{/await}
+						</div>
 					</div>
 					<div class="datagrid-item">
 						<div class="datagrid-title">Failures</div>
@@ -66,8 +79,8 @@
 								Loading...
 							{:then value}
 								{value}
-							{/await}                            
-                        </div>
+							{/await}
+						</div>
 					</div>
 					<div class="datagrid-item">
 						<div class="datagrid-title">Quota Used</div>
@@ -75,9 +88,9 @@
 							{#await data.streamed.emails.processed}
 								Loading...
 							{:then value}
-								{ ((value / data.streamed.emails.quota ) * 100).toFixed(2) + ' %' }
+								{((value / data.streamed.emails.quota) * 100).toFixed(2) + ' %'}
 							{/await}
-                        </div>
+						</div>
 					</div>
 				</div>
 			</div>

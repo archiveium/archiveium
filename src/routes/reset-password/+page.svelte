@@ -36,17 +36,27 @@
 					<div class="mb-3">
 						<!-- svelte-ignore a11y-label-has-associated-control -->
 						<label class="form-label required">New Password</label>
-						<input type="password" name="password" class="form-control { form?.fieldErrors?.password ? 'is-invalid' : '' }" autocomplete="off" />
-						<div class="invalid-feedback">{ form?.fieldErrors?.password ?? '' }</div>
+						<input
+							type="password"
+							name="password"
+							class="form-control {form?.fieldErrors?.password ? 'is-invalid' : ''}"
+							autocomplete="off"
+						/>
+						<div class="invalid-feedback">{form?.fieldErrors?.password ?? ''}</div>
 					</div>
 					<div class="mb-2">
 						<!-- svelte-ignore a11y-label-has-associated-control -->
 						<label class="form-label required">Confirm Password</label>
-						<input type="password" name="passwordConfirm" class="form-control { form?.fieldErrors?.passwordConfirm ? 'is-invalid' : '' }" autocomplete="off" />
-						<div class="invalid-feedback">{ form?.fieldErrors?.passwordConfirm ?? '' }</div>
+						<input
+							type="password"
+							name="passwordConfirm"
+							class="form-control {form?.fieldErrors?.passwordConfirm ? 'is-invalid' : ''}"
+							autocomplete="off"
+						/>
+						<div class="invalid-feedback">{form?.fieldErrors?.passwordConfirm ?? ''}</div>
 					</div>
 					<input name="token" value={data.token} hidden />
-					<input name="email" value={data.email} hidden />					
+					<input name="email" value={data.email} hidden />
 					<div class="form-footer">
 						<button type="submit" class="btn btn-primary w-100">Update Password</button>
 					</div>

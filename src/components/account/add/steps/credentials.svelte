@@ -9,7 +9,6 @@
 
 <div class="page-body">
 	<div class="container-xl">
-
 		<!-- Error alert -->
 		{#if form?.error}
 			<div class="alert alert-danger" role="alert">
@@ -34,33 +33,33 @@
 						<label class="form-label">Name</label>
 						<input
 							type="text"
-							class="form-control { form?.fieldErrors?.name ? 'is-invalid' : '' }"
+							class="form-control {form?.fieldErrors?.name ? 'is-invalid' : ''}"
 							name="name"
 							placeholder="Enter a name for this account"
 						/>
-						<div class="invalid-feedback">{ form?.fieldErrors?.name ?? '' }</div>
+						<div class="invalid-feedback">{form?.fieldErrors?.name ?? ''}</div>
 					</div>
 					<div class="mb-3">
 						<!-- svelte-ignore a11y-label-has-associated-control -->
 						<label class="form-label">Email Address</label>
 						<input
 							type="text"
-							class="form-control { form?.fieldErrors?.email ? 'is-invalid' : '' }"
+							class="form-control {form?.fieldErrors?.email ? 'is-invalid' : ''}"
 							name="email"
 							placeholder="Enter email address"
 						/>
-						<div class="invalid-feedback">{ form?.fieldErrors?.email ?? '' }</div>						
+						<div class="invalid-feedback">{form?.fieldErrors?.email ?? ''}</div>
 					</div>
 					<div class="mb-3">
 						<!-- svelte-ignore a11y-label-has-associated-control -->
 						<label class="form-label">Password</label>
 						<input
 							type="password"
-							class="form-control { form?.fieldErrors?.password ? 'is-invalid' : '' }"
+							class="form-control {form?.fieldErrors?.password ? 'is-invalid' : ''}"
 							name="password"
 							placeholder="Enter application password (not the password used for logging in)"
 						/>
-						<div class="invalid-feedback">{ form?.fieldErrors?.password ?? '' }</div>
+						<div class="invalid-feedback">{form?.fieldErrors?.password ?? ''}</div>
 					</div>
 					<div class="mb-3">
 						<div class="form-label">Providers</div>
@@ -83,7 +82,9 @@
 			</div>
 			<div class="card-footer text-end">
 				<div class="d-flex">
-					<button type="submit" name="step" value="addAccountStep1" class="btn btn-primary ms-auto">Next</button>
+					<button type="submit" name="step" value="addAccountStep1" class="btn btn-primary ms-auto"
+						>Next</button
+					>
 				</div>
 			</div>
 		</form>

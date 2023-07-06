@@ -24,7 +24,10 @@
 		<div class="card card-md">
 			<div class="card-body">
 				<h2 class="h2 text-center mb-4">Closed Preview Enrollment</h2>
-                <p>After you have submitted email address, an email will be sent once we are ready to register your account.</p>
+				<p>
+					After you have submitted email address, an email will be sent once we are ready to
+					register your account.
+				</p>
 				<form method="post" autocomplete="off" use:enhance>
 					<div class="mb-3">
 						<!-- svelte-ignore a11y-label-has-associated-control -->
@@ -38,7 +41,7 @@
 			</div>
 		</div>
 		<div class="text-center text-muted mt-3">
-            Already have an account? <a href="/login" tabindex="-1">Sign in</a>
+			Already have an account? <a href="/login" tabindex="-1">Sign in</a>
 		</div>
 	</div>
 </div>

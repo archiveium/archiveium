@@ -12,7 +12,7 @@
 <Header />
 
 {#if form?.remoteFolders}
-	<Folders form={form} />
+	<Folders {form} />
 {:else}
-	<Credentials data={data} form={form} />
+	<Credentials {data} {form} />
 {/if}

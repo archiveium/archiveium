@@ -1,7 +1,7 @@
 // See https://kit.svelte.dev/docs/types#app
 
-import type { FlashMessage } from "./types/session";
-import type { User } from "./types/user";
+import type { FlashMessage } from './types/session';
+import type { User } from './types/user';
 
 // for information about these interfaces
 declare global {

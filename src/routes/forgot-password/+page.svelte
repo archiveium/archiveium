@@ -37,7 +37,7 @@
 			</div>
 		</div>
 		<div class="text-center text-muted mt-3">
-            Remember it already? <a href="/login" tabindex="-1">Sign in</a>
+			Remember it already? <a href="/login" tabindex="-1">Sign in</a>
 		</div>
 	</div>
 </div>

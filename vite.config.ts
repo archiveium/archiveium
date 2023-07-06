@@ -5,11 +5,11 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}'],
-        coverage: {
-            all: true,
-            exclude: ["build", "node_modules", "public", "test"],
-            include: ["app"],
-            reporter: ['text', 'json-summary', 'json']
-        }		
+		coverage: {
+			all: true,
+			exclude: ['build', 'node_modules', 'public', 'test'],
+			include: ['app'],
+			reporter: ['text', 'json-summary', 'json']
+		}
 	}
 });

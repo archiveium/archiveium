@@ -13,7 +13,6 @@
 
 <div class="page-body">
 	<div class="container-xl">
-
 		<!-- Error alert -->
 		{#if form?.error}
 			<div class="alert alert-danger" role="alert">

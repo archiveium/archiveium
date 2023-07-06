@@ -36,26 +36,46 @@
 					<div class="mb-3">
 						<!-- svelte-ignore a11y-label-has-associated-control -->
 						<label class="form-label required">Name</label>
-						<input type="text" name="name" class="form-control { form?.fieldErrors?.name ? 'is-invalid' : '' }" autocomplete="off" />
-						<div class="invalid-feedback">{ form?.fieldErrors?.name ?? '' }</div>
+						<input
+							type="text"
+							name="name"
+							class="form-control {form?.fieldErrors?.name ? 'is-invalid' : ''}"
+							autocomplete="off"
+						/>
+						<div class="invalid-feedback">{form?.fieldErrors?.name ?? ''}</div>
 					</div>
-                    <div class="mb-3">
+					<div class="mb-3">
 						<!-- svelte-ignore a11y-label-has-associated-control -->
 						<label class="form-label required">Email Address</label>
-						<input type="email" name="email" class="form-control { form?.fieldErrors?.email ? 'is-invalid' : '' }" autocomplete="off" />
-						<div class="invalid-feedback">{ form?.fieldErrors?.email ?? '' }</div>
+						<input
+							type="email"
+							name="email"
+							class="form-control {form?.fieldErrors?.email ? 'is-invalid' : ''}"
+							autocomplete="off"
+						/>
+						<div class="invalid-feedback">{form?.fieldErrors?.email ?? ''}</div>
 					</div>
-                    <div class="mb-3">
+					<div class="mb-3">
 						<!-- svelte-ignore a11y-label-has-associated-control -->
 						<label class="form-label required">Password</label>
-						<input type="password" name="password" class="form-control { form?.fieldErrors?.password ? 'is-invalid' : '' }" autocomplete="off" />
-						<div class="invalid-feedback">{ form?.fieldErrors?.password ?? '' }</div>
+						<input
+							type="password"
+							name="password"
+							class="form-control {form?.fieldErrors?.password ? 'is-invalid' : ''}"
+							autocomplete="off"
+						/>
+						<div class="invalid-feedback">{form?.fieldErrors?.password ?? ''}</div>
 					</div>
 					<div class="mb-2">
 						<!-- svelte-ignore a11y-label-has-associated-control -->
 						<label class="form-label required">Confirm Password</label>
-						<input type="password" name="passwordConfirm" class="form-control { form?.fieldErrors?.passwordConfirm ? 'is-invalid' : '' }" autocomplete="off" />
-						<div class="invalid-feedback">{ form?.fieldErrors?.passwordConfirm ?? '' }</div>
+						<input
+							type="password"
+							name="passwordConfirm"
+							class="form-control {form?.fieldErrors?.passwordConfirm ? 'is-invalid' : ''}"
+							autocomplete="off"
+						/>
+						<div class="invalid-feedback">{form?.fieldErrors?.passwordConfirm ?? ''}</div>
 					</div>
 					<div class="form-footer">
 						<button type="submit" class="btn btn-primary w-100">Register</button>

@@ -2,4 +2,4 @@
 	export let data;
 </script>
 
-{@html data.email.html }
+{@html data.email.html}

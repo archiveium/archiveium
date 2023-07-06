@@ -1,11 +1,11 @@
-import type { SessionUser } from "./user";
+import type { SessionUser } from './user';
 
 export interface FlashMessage {
-    type: 'success' | 'error';
-    message: string;
+	type: 'success' | 'error';
+	message: string;
 }
 
 export interface SessionData {
-    user?: SessionUser;
-    flashMessage?: FlashMessage;
+	user?: SessionUser;
+	flashMessage?: FlashMessage;
 }
