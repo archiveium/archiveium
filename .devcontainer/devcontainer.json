@@ -23,7 +23,8 @@
 				"Gruntfuggly.todo-tree",
 				"mtxr.sqltools",
 				"mtxr.sqltools-driver-pg",
-				"donjayamanne.githistory"
+				"donjayamanne.githistory",
+				"svelte.svelte-vscode"
 			]
 		}
 	},
