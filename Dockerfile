@@ -13,8 +13,6 @@ ENV NODE_ENV=production
 WORKDIR /app
 COPY package*.json ./
 COPY --from=0 /app/build ./build
-COPY --from=0 /app/public ./public
-COPY --from=0 /app/.cache ./.cache
 COPY --from=0 /app/config ./config
-RUN npm ci
-CMD [ "npm", "run", "start" ]
+RUN npm ci --omit dev
+CMD [ "node", "build" ]
