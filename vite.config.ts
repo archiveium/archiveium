@@ -7,8 +7,8 @@ export default defineConfig({
 		include: ['src/**/*.{test,spec}.{js,ts}'],
 		coverage: {
 			all: true,
-			exclude: ['build', 'node_modules', 'public', 'test'],
-			include: ['app'],
+			exclude: ['tests'],
+			include: ['src'],
 			reporter: ['text', 'json-summary', 'json']
 		}
 	}
