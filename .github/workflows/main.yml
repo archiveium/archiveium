@@ -1,4 +1,4 @@
-name: Build Docker Image
+name: Archiveium Frontend
 
 on:
   push:
@@ -56,8 +56,8 @@ jobs:
         if: always() # generate the report if tests are failing
         uses: davelosert/vitest-coverage-report-action@v1
 
-  release:
-    name: Release
+  release-prod:
+    name: Release Prod
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -78,13 +78,72 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          npm run release
+          npm run release:prod
 
-  docker:
-    name: Build & Deploy Docker Image
+  release-beta:
+    name: Release Beta
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/beta'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: beta
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: 'npm'
+      - run: npm ci
+      - env:
+          PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          npm run release:beta
+
+  docker-beta:
+    name: Build & Push Beta Docker Image
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/beta'
+    needs: release-beta
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: beta
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set Release Version
+        run: |
+          version=$(node -p "require('./package.json').version")
+          echo "RELEASE_VERSION=$version" >> $GITHUB_ENV
+      - name: Push to Docker
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: |-
+            linux/amd64
+            linux/arm64
+          file: Dockerfile
+          push: true
+          tags: archiveium/frontend:${{ env.RELEASE_VERSION }}
+
+  docker-prod:
+    name: Build & Push Prod Docker Image
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: release
+    needs: release-prod
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -117,7 +176,7 @@ jobs:
 
   trigger:
     name: Update deployer
-    needs: docker
+    needs: docker-prod
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:

@@ -13,8 +13,9 @@
 		"test:unit:monitor": "vitest",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write .",
-		"release": "release-it --ci --config release-it.json",
-		"release-dry-run": "release-it --ci --config release-it.json --dry-run",
+		"release:prod": "release-it --ci --config release-it.json",
+		"release:beta": "release-it --ci --config release-it.json --preRelease=beta",
+		"release:dry-run": "release-it --ci --config release-it.json --dry-run",
 		"typecheck": "tsc",
 		"test:coverage": "vitest run --coverage"
 	},
