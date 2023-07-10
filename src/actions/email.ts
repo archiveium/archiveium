@@ -11,9 +11,10 @@ const BUCKET_NAME = 'emails';
 export async function GetAllEmailsWithS3DataByFolderAndUserId(
 	userId: string,
 	folderId: string,
-	currentPage: string
+	currentPage: string,
+	resultsPerPage: number,
 ): Promise<Email[]> {
-	const emails = await getAllEmailsByFolderAndUserId(userId, folderId, currentPage);
+	const emails = await getAllEmailsByFolderAndUserId(userId, folderId, currentPage, resultsPerPage);
 	const promises = emails.map(async (email) => {
 		const params: GetObjectCommandInput = {
 			Bucket: BUCKET_NAME,

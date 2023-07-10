@@ -18,6 +18,8 @@ export interface Paginator {
 	currentPage: number;
 }
 
+const MAX_PAGE_NUMBERS = 5;
+
 export function GeneratePagination(
 	resultCount: number,
 	resultsPerPage: number,
@@ -42,12 +44,11 @@ export function GeneratePagination(
 					isActive: true
 			  };
 
-	const maxPageNumbers = 10;
-	let startPage = Math.max(pageNum - Math.floor(maxPageNumbers / 2), 1);
-	const endPage = Math.min(startPage + maxPageNumbers - 1, pageCount);
+	let startPage = Math.max(pageNum - Math.floor(MAX_PAGE_NUMBERS / 2), 1);
+	const endPage = Math.min(startPage + MAX_PAGE_NUMBERS - 1, pageCount);
 
-	if (endPage - startPage < maxPageNumbers - 1) {
-		startPage = Math.max(endPage - maxPageNumbers + 1, 1);
+	if (endPage - startPage < MAX_PAGE_NUMBERS - 1) {
+		startPage = Math.max(endPage - MAX_PAGE_NUMBERS + 1, 1);
 	}
 
 	const pageNumbers: Array<PageLink> = [];

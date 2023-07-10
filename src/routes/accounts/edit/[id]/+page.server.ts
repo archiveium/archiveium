@@ -88,8 +88,9 @@ export const actions = {
 				});
 			}
 
+			console.log(error);
 			return fail(400, {
-				error: 'There was an error adding account.',
+				error: 'There was an error editing account.',
 				fieldErrors: undefined
 			});
 		}

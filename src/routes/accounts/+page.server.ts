@@ -12,6 +12,8 @@ import type { Folder } from '../../types/folder';
 import { requireUserId } from '../../utils/auth';
 import { GeneratePagination, type Paginator } from '../../utils/pagination';
 
+const RESULTS_PER_PAGE = 12;
+
 export const load = async ({ locals, url }) => {
 	const userId = requireUserId(false, locals.user);
 
@@ -80,10 +82,11 @@ async function buildPageData(
 	const emailsWithS3Data = await GetAllEmailsWithS3DataByFolderAndUserId(
 		userId,
 		selectedFolder.id,
-		page
+		page,
+		RESULTS_PER_PAGE,
 	);
 	const emailCount = await getAllEmailsCountByFolderAndUserId(userId, selectedFolder.id);
-	const paginator = GeneratePagination(emailCount, 5, page, selectedFolder.id, selectedAccount.id);
+	const paginator = GeneratePagination(emailCount, RESULTS_PER_PAGE, page, selectedFolder.id, selectedAccount.id);
 
 	return {
 		accounts: {
