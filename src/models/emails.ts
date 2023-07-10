@@ -2,12 +2,11 @@ import type { Count } from '../types/database';
 import type { Email } from '../types/email';
 import { sql } from '.';
 
-const resultsPerPage = 5;
-
 export async function getAllEmailsByFolderAndUserId(
 	userId: string,
 	folderId: string,
-	currentPage: string
+	currentPage: string,
+	resultsPerPage: number,
 ): Promise<Email[]> {
 	const page = Number(currentPage);
 	const offset = page === 1 ? '0' : (page - 1) * resultsPerPage;

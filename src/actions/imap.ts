@@ -40,6 +40,7 @@ export async function buildClient(
 		} else if (error.authenticationFailed) {
 			throw new IMAPAuthenticationFailed(error.response);
 		} else if (error instanceof Error) {
+			console.log(error);
 			throw new IMAPGenericException(error.message);
 		}
 		throw error;
