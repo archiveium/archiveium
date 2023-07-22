@@ -70,7 +70,7 @@ export async function CreatePasswordResetRequest(data: FormData): Promise<void> 
 		user = await getUserByEmail(validatedData.email);
 		if (!user.email_verified_at) {
 			throw new UserNotVerifiedException(
-				'Please verify your email before attempting to reset password'
+				'Please verify your email before resetting password.'
 			);
 		}
 	} catch (error) {
