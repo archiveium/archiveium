@@ -1,21 +1,16 @@
+import type { LinkType } from "flowbite-svelte/dist/types";
+
 interface Link {
 	href: string;
 	isActive: boolean;
 }
 
-interface PageLink {
-	href: string;
-	value: number;
-	isActive: boolean;
-}
-
 export interface Paginator {
 	previousLink: Link;
-	pageNumbers: Array<PageLink>;
+	pages: Array<LinkType>;
 	nextLink: Link;
 	resultCount: number;
 	resultsPerPage: number;
-	currentPage: number;
 }
 
 const MAX_PAGE_NUMBERS = 5;
@@ -51,23 +46,22 @@ export function GeneratePagination(
 		startPage = Math.max(endPage - MAX_PAGE_NUMBERS + 1, 1);
 	}
 
-	const pageNumbers: Array<PageLink> = [];
+	const pages: Array<LinkType> = [];
 	for (let i = startPage; i <= endPage; i++) {
 		const query = buildSearchParams(i, selectedAccountId, selectedFolderId);
-		pageNumbers.push({
-			value: i,
+		pages.push({
+			name: `${i}`,
 			href: query,
-			isActive: i === pageNum
+			active: i === pageNum
 		});
 	}
 
 	return {
 		previousLink,
 		nextLink,
-		pageNumbers,
+		pages,
 		resultCount,
 		resultsPerPage,
-		currentPage: pageNum
 	};
 }
 
