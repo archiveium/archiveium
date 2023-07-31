@@ -72,6 +72,7 @@
 				<DropdownItem href="/accounts/edit/{value.accounts.selected.id}">Edit</DropdownItem>
 				<DropdownItem>
 					<form method="post" use:enhance>
+						<input name="accountId" value={value.accounts.selected.id} hidden readonly />
 						{#if value.accounts.selected.syncing}
 							<input name="syncing" value="false" hidden readonly />
 							<button type="submit">Pause Syncing</button>

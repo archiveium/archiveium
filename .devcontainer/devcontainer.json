@@ -15,7 +15,8 @@
 				"mtxr.sqltools",
 				"mtxr.sqltools-driver-pg",
 				"donjayamanne.githistory",
-				"svelte.svelte-vscode"
+				"svelte.svelte-vscode",
+				"eamodio.gitlens"
 			]
 		}
 	},
