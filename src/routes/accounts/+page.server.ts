@@ -26,10 +26,10 @@ export const load = async ({ locals, url }) => {
 };
 
 export const actions = {
-	default: async ({ request, locals, url }) => {
+	default: async ({ request, locals }) => {
 		const data = await request.formData();
 		const userId = requireUserId(false, locals.user);
-		const accountId = url.searchParams.get('accountId') ?? data.get('accountId')?.toString();
+		const accountId = data.get('accountId')?.toString();
 		const syncStatus = data.get('syncing');
 
 		if (syncStatus && accountId) {
