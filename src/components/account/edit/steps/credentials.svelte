@@ -3,6 +3,18 @@
 	import type { ActionData } from '../../../../routes/accounts/add/$types';
 	import type { Account } from '../../../../types/account';
 	import type { Provider } from '../../../../types/provider';
+	import {
+		Card,
+		MenuButton,
+		Dropdown,
+		DropdownItem,
+		Button,
+		Label,
+		Input,
+		Radio,
+		Modal,
+		Alert
+	} from 'flowbite-svelte';
 
 	export let data: {
 		availableProviders: Provider[];
@@ -10,150 +22,90 @@
 		selectedAccount: Account;
 	};
 	export let form: ActionData;
+
+	let popupModal = false;
 </script>
 
-<div class="page-body">
-	<div class="container-xl">
-		<!-- Error alert -->
-		{#if form?.error}
-			<div class="alert alert-danger" role="alert">
-				<div class="text-muted">{form.error}</div>
-			</div>
-		{/if}
+<!-- Error alert -->
+{#if form?.error}
+	<Alert border color="red" class="mb-4 mt-4">
+		{form.error}
+	</Alert>
+{/if}
 
-		<form method="post" class="card" use:enhance>
-			<div class="card-header">
-				<h4 class="card-title">Edit Account</h4>
-				<div class="card-actions">
-					<ol class="breadcrumb breadcrumb-arrows">
-						<li class="breadcrumb-item"><a href=".">Credentials</a></li>
-						<li class="breadcrumb-item disabled"><a href=".">Folders</a></li>
-					</ol>
-				</div>
-			</div>
-			<div class="card-body">
-				<div class="row">
-					<div class="mb-3">
-						<!-- svelte-ignore a11y-label-has-associated-control -->
-						<label class="form-label">Name</label>
-						<input
-							type="text"
-							class="form-control {form?.fieldErrors?.name ? 'is-invalid' : ''}"
-							name="name"
-							placeholder="Enter a name for this account"
-							value={data.selectedAccount.name}
-						/>
-						<div class="invalid-feedback">{form?.fieldErrors?.name ?? ''}</div>
-					</div>
-					<div class="mb-3">
-						<!-- svelte-ignore a11y-label-has-associated-control -->
-						<label class="form-label">Email Address</label>
-						<input
-							type="text"
-							class="form-control {form?.fieldErrors?.email ? 'is-invalid' : ''}"
-							value={data.selectedAccount.email}
-							disabled
-						/>
-						<div class="invalid-feedback">{form?.fieldErrors?.email ?? ''}</div>
-					</div>
-					<div class="mb-3">
-						<!-- svelte-ignore a11y-label-has-associated-control -->
-						<label class="form-label">Password</label>
-						<input
-							type="password"
-							class="form-control {form?.fieldErrors?.password ? 'is-invalid' : ''}"
-							name="password"
-							placeholder="Update application password (leave blank if unchanged)"
-						/>
-						<div class="invalid-feedback">{form?.fieldErrors?.password ?? ''}</div>
-					</div>
-					<div class="mb-3">
-						<div class="form-label">Providers</div>
-						<div>
-							{#each data.availableProviders as provider}
-								<label class="form-check form-check-inline">
-									<input
-										class="form-check-input"
-										type="radio"
-										checked={provider.id == data.selectedAccount.provider_id}
-										disabled
-									/>
-									<span class="form-check-label">{provider.name}</span>
-								</label>
-							{/each}
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="card-footer text-end">
-				<div class="d-flex">
-					<button type="submit" name="step" value="addAccountStep1" class="btn btn-primary me-auto"
-						>Next</button
-					>
-					<button
-						type="button"
-						class="btn btn-outline-danger"
-						data-bs-toggle="modal"
-						data-bs-target="#deleteAccountModal"
-					>
-						Delete
-					</button>
-				</div>
-			</div>
-		</form>
+<Card class="py-8 px-4 mx-auto max-w-2xl mt-4">
+	<div class="flex justify-end">
+		<MenuButton vertical />
+		<Dropdown class="w-36">
+			<DropdownItem on:click={() => (popupModal = true)}>Delete</DropdownItem>
+		</Dropdown>
 	</div>
-</div>
-
-<div class="modal" id="deleteAccountModal" tabindex="-1">
-	<div class="modal-dialog modal-sm" role="document">
-		<div class="modal-content">
-			<div class="modal-status bg-danger" />
-			<div class="modal-body text-center py-4">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="icon mb-2 text-danger icon-lg"
-					width="24"
-					height="24"
-					viewBox="0 0 24 24"
-					stroke-width="2"
-					stroke="currentColor"
-					fill="none"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-					<path d="M12 9v2m0 4v.01" />
-					<path
-						d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75"
-					/>
-				</svg>
-				<h3>Sure you want to delete account?</h3>
-				<div class="text-muted">
-					All your synced emails and folders will be deleted. This is an irreversable action. Please
-					make sure you have a backup before proceeding.
-				</div>
+	<form method="post" use:enhance>
+		<div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
+			<div class="sm:col-span-2">
+				<Label for="name" class="mb-2">Name</Label>
+				<Input
+					type="text"
+					name="name"
+					placeholder="Enter a name for this account"
+					value={data.selectedAccount.name}
+					required
+				/>
 			</div>
-			<div class="modal-footer">
-				<div class="w-100">
-					<div class="row">
-						<div class="col">
-							<!-- svelte-ignore a11y-invalid-attribute -->
-							<a href="#" class="btn w-100" data-bs-dismiss="modal">Cancel</a>
-						</div>
-						<div class="col">
-							<form method="post" use:enhance>
-								<button
-									type="submit"
-									name="step"
-									value="deleteAccount"
-									data-bs-dismiss="modal"
-									class="btn btn-danger w-100">Delete</button
-								>
-							</form>
-						</div>
-					</div>
+			<div class="sm:col-span-2">
+				<Label for="email" class="mb-2">Email Address</Label>
+				<Input type="email" id="email" value={data.selectedAccount.email} disabled />
+			</div>
+			<div class="sm:col-span-2">
+				<Label for="password" class="mb-2">Password</Label>
+				<Input
+					type="password"
+					name="password"
+					placeholder="Update password (leave blank if unchanged)"
+				/>
+			</div>
+			<div class="sm:col-span-2">
+				<!-- TODO Disable lable similar to email field -->
+				<Label for="providers" class="mb-2">Providers</Label>
+				<div class="flex gap-3">
+					{#each data.availableProviders as provider}
+						<Radio group={data.defaultProvider?.name} value={provider.name} disabled>
+							{provider.name}
+						</Radio>
+					{/each}
 				</div>
 			</div>
 		</div>
+		<Button type="submit" name="step" value="addAccountStep1" class="w-full mt-6">Next</Button>
+	</form>
+</Card>
+
+<Modal bind:open={popupModal} size="xs" autoclose>
+	<div class="text-center">
+		<svg
+			aria-hidden="true"
+			class="mx-auto mb-4 w-14 h-14 text-gray-400 dark:text-gray-200"
+			fill="none"
+			stroke="currentColor"
+			viewBox="0 0 24 24"
+			xmlns="http://www.w3.org/2000/svg"
+			><path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+			/></svg
+		>
+		<h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+			Sure you want to delete account?
+		</h3>
+		<p class="text-base leading-relaxed text-gray-500 dark:text-gray-400 mb-4">
+			All your synced emails and folders will be deleted. This is an irreversable action. Please
+			make sure you have a backup before proceeding.
+		</p>
+		<form method="post" use:enhance>
+			<Button color="alternative" type="submit" name="step" value="deleteAccount">Yes, I'm Sure</Button>
+			<Button>No, Cancel</Button>
+		</form>
 	</div>
-</div>
+</Modal>
