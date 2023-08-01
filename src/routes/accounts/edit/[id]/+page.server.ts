@@ -23,7 +23,10 @@ export const load = async ({ locals, params }) => {
 	return {
 		availableProviders,
 		defaultProvider,
-		selectedAccount
+		selectedAccount,
+		steps: {
+			current: 2
+		}
 	};
 };
 
@@ -46,7 +49,10 @@ export const actions = {
 				case 'addAccountStep1': {
 					const validatedProvider = await ValidateExistingAccount(data, selectedAccount, userId);
 					return {
-						remoteFolders: validatedProvider.remoteFolders
+						remoteFolders: validatedProvider.remoteFolders,
+						steps: {
+							current: 2
+						}
 					};
 				}
 				case 'addAccountStep2':

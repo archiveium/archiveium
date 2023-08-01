@@ -1,14 +1,19 @@
 <script lang="ts">
-	import Header from '../../../../components/header.svelte';
 	import Folders from '../../../../components/account/edit/steps/folders.svelte';
 	import Credentials from '../../../../components/account/edit/steps/credentials.svelte';
-	import type { ActionData } from '../../$types';
+	import { StepIndicator } from 'flowbite-svelte'
 
 	export let data;
-	export let form: ActionData;
+	export let form;
+
+	$: currentStep = form?.steps?.current ?? 1;
+	let steps = [
+		'Credentials',
+		'Folders'
+	];
 </script>
 
-<Header />
+<StepIndicator {currentStep} {steps} />
 
 {#if form?.remoteFolders}
 	<Folders {form} />
