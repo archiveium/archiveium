@@ -2,91 +2,79 @@
 	import { enhance } from '$app/forms';
 	import type { ActionData } from '../../../../routes/accounts/add/$types';
 	import type { Provider } from '../../../../types/provider';
+	import {
+		Card,
+		Button,
+		Label,
+		Input,
+		Radio,
+		Alert,
+		Helper
+	} from 'flowbite-svelte';	
 
 	export let data: { availableProviders: Provider[]; defaultProvider: Provider | undefined };
 	export let form: ActionData;
 </script>
 
-<div class="page-body">
-	<div class="container-xl">
-		<!-- Error alert -->
-		{#if form?.error}
-			<div class="alert alert-danger" role="alert">
-				<div class="text-muted">{form.error}</div>
-			</div>
-		{/if}
+<!-- Error alert -->
+{#if form?.error}
+	<Alert border color="red" class="mb-4 mt-4">
+		{form.error}
+	</Alert>
+{/if}
 
-		<form method="post" class="card" use:enhance>
-			<div class="card-header">
-				<h4 class="card-title">Add Account</h4>
-				<div class="card-actions">
-					<ol class="breadcrumb breadcrumb-arrows">
-						<li class="breadcrumb-item"><a href=".">Credentials</a></li>
-						<li class="breadcrumb-item disabled"><a href=".">Folders</a></li>
-					</ol>
+<Card class="py-8 px-4 mx-auto max-w-2xl mt-4">
+	<form method="post" use:enhance>
+		<div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
+			<div class="sm:col-span-2">
+				<Label for="name" class="mb-2">Name</Label>
+				<Input
+					color={form?.fieldErrors?.name ? 'red' : undefined}
+					type="text"
+					name="name"
+					placeholder="Enter a name for this account"
+					required
+				/>
+				{#if form?.fieldErrors?.name}
+					<Helper color="red">{form?.fieldErrors?.name}</Helper>
+				{/if}
+			</div>
+			<div class="sm:col-span-2">
+				<Label for="email" class="mb-2">Email Address</Label>
+				<Input
+					color={form?.fieldErrors?.email ? 'red' : undefined}				
+					type="email"
+					name="email"
+					placeholder="Enter email address"
+					required
+				/>
+				{#if form?.fieldErrors?.email}
+					<Helper color="red">{form?.fieldErrors?.email}</Helper>
+				{/if}
+			</div>
+			<div class="sm:col-span-2">
+				<Label for="password" class="mb-2">Password</Label>
+				<Input
+					color={form?.fieldErrors?.password ? 'red' : undefined}
+					type="password"
+					name="password"
+					placeholder="Enter application password (not the password used for logging in)"
+				/>
+				{#if form?.fieldErrors?.password}
+					<Helper color="red">{form?.fieldErrors?.password}</Helper>
+				{/if}
+			</div>
+			<div class="sm:col-span-2">
+				<Label for="providers" class="mb-2">Providers</Label>
+				<div class="flex gap-3">
+					{#each data.availableProviders as provider}
+						<Radio name="provider_id" value={provider.id} group={provider.is_default ? provider.id : ''}>
+							{provider.name}
+						</Radio>
+					{/each}
 				</div>
 			</div>
-			<div class="card-body">
-				<div class="row">
-					<div class="mb-3">
-						<!-- svelte-ignore a11y-label-has-associated-control -->
-						<label class="form-label">Name</label>
-						<input
-							type="text"
-							class="form-control {form?.fieldErrors?.name ? 'is-invalid' : ''}"
-							name="name"
-							placeholder="Enter a name for this account"
-						/>
-						<div class="invalid-feedback">{form?.fieldErrors?.name ?? ''}</div>
-					</div>
-					<div class="mb-3">
-						<!-- svelte-ignore a11y-label-has-associated-control -->
-						<label class="form-label">Email Address</label>
-						<input
-							type="text"
-							class="form-control {form?.fieldErrors?.email ? 'is-invalid' : ''}"
-							name="email"
-							placeholder="Enter email address"
-						/>
-						<div class="invalid-feedback">{form?.fieldErrors?.email ?? ''}</div>
-					</div>
-					<div class="mb-3">
-						<!-- svelte-ignore a11y-label-has-associated-control -->
-						<label class="form-label">Password</label>
-						<input
-							type="password"
-							class="form-control {form?.fieldErrors?.password ? 'is-invalid' : ''}"
-							name="password"
-							placeholder="Enter application password (not the password used for logging in)"
-						/>
-						<div class="invalid-feedback">{form?.fieldErrors?.password ?? ''}</div>
-					</div>
-					<div class="mb-3">
-						<div class="form-label">Providers</div>
-						<div>
-							{#each data.availableProviders as provider}
-								<label class="form-check form-check-inline">
-									<input
-										class="form-check-input"
-										type="radio"
-										name="provider_id"
-										value={provider.id}
-										checked={provider.is_default}
-									/>
-									<span class="form-check-label">{provider.name}</span>
-								</label>
-							{/each}
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="card-footer text-end">
-				<div class="d-flex">
-					<button type="submit" name="step" value="addAccountStep1" class="btn btn-primary ms-auto"
-						>Next</button
-					>
-				</div>
-			</div>
-		</form>
-	</div>
-</div>
+		</div>
+		<Button type="submit" name="step" value="addAccountStep1" class="w-full mt-6">Next</Button>
+	</form>
+</Card>

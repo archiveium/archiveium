@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Folders from '../../../../components/account/edit/steps/folders.svelte';
 	import Credentials from '../../../../components/account/edit/steps/credentials.svelte';
-	import { StepIndicator } from 'flowbite-svelte'
+	import { StepIndicator } from 'flowbite-svelte';
 
 	export let data;
 	export let form;
