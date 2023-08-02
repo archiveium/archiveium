@@ -80,7 +80,7 @@
 	</form>
 </Card>
 
-<Modal bind:open={popupModal} size="xs" autoclose>
+<Modal bind:open={popupModal} size="xs" outsideclose>
 	<div class="text-center">
 		<svg
 			aria-hidden="true"
@@ -105,7 +105,6 @@
 		</p>
 		<form method="post" use:enhance>
 			<Button color="alternative" type="submit" name="step" value="deleteAccount">Yes, I'm Sure</Button>
-			<Button>No, Cancel</Button>
 		</form>
 	</div>
 </Modal>

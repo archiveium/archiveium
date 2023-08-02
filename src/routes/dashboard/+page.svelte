@@ -7,7 +7,7 @@
 
 <!-- Success alert -->
 {#if data.flashMessage}
-	<Alert border color="green">
+	<Alert border color="green" class="mb-4">
 		{data.flashMessage.message}
 	</Alert>
 {/if}
@@ -21,16 +21,16 @@
 			<Li class="pb-3 sm:pb-4 pt-2">
 				<div class="flex items-center space-x-4">
 					<A href="/accounts" aClass="inline-flex w-full hover:underline">
-					<div class="flex-1 min-w-0">
-						<p class="text-sm font-medium truncate text-primary-600 dark:text-primary-500">Accounts</p>
-					</div>
-					<div class="inline-flex items-center text-base font-semibold text-primary-600 dark:text-primary-500">
-						{#await data.streamed.accounts.added}
-							Loading...
-						{:then value}
-							{value}
-						{/await}
-					</div>
+						<div class="flex-1 min-w-0">
+							<p class="text-sm font-medium truncate text-primary-600 dark:text-primary-500">Accounts</p>
+						</div>
+						<div class="inline-flex items-center text-base font-semibold text-primary-600 dark:text-primary-500">
+							{#await data.streamed.accounts.added}
+								Loading...
+							{:then value}
+								{value}
+							{/await}
+						</div>
 					</A>
 				</div>
 			</Li>

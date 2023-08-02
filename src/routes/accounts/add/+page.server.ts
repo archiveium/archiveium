@@ -13,7 +13,10 @@ export const load = async ({ locals }) => {
 	const defaultProvider = availableProviders.find((provider) => provider.is_default);
 	return {
 		availableProviders,
-		defaultProvider
+		defaultProvider,
+		steps: {
+			current: 1
+		}
 	};
 };
 
@@ -29,7 +32,10 @@ export const actions = {
 						const validatedProvider = await ValidateAccount(data, userId);
 						return {
 							email: validatedProvider.account.email,
-							remoteFolders: validatedProvider.remoteFolders
+							remoteFolders: validatedProvider.remoteFolders,
+							steps: {
+								current: 2
+							}
 						};
 					}
 					break;

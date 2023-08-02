@@ -25,7 +25,7 @@ export const load = async ({ locals, params }) => {
 		defaultProvider,
 		selectedAccount,
 		steps: {
-			current: 2
+			current: 1
 		}
 	};
 };
