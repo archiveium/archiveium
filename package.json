@@ -22,7 +22,6 @@
 	"dependencies": {
 		"@aws-sdk/client-s3": "3.256.0",
 		"@floating-ui/dom": "^1.4.5",
-		"@tabler/icons-svelte": "^2.23.0",
 		"@types/mailparser": "^3.4.0",
 		"config": "^3.3.9",
 		"flowbite": "^1.7.0",
