@@ -66,12 +66,16 @@ async function buildPageData(
 	};
 	emails: Email[];
 	paginator: Paginator;
-}> {
+} | undefined> {
 	const folderId = url.searchParams.get('folderId');
 	const accountId = url.searchParams.get('accountId');
 	const page = url.searchParams.get('page') ?? '1';
 
 	const allAccounts = await GetAllAccountsByUserId(userId);
+	if (allAccounts.length === 0) {
+		return undefined;
+	}
+
 	const selectedAccount = allAccounts.find((account) => account.id == accountId) ?? allAccounts[0];
 
 	const folders = await GetAllFoldersByUserIdAndAccountId(userId, selectedAccount.id);
