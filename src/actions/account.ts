@@ -3,18 +3,10 @@ import { AccountExistsException } from '../exceptions/account';
 import { CacheKeyNotFoundException } from '../exceptions/cache';
 import { getAllIMAPFolders, buildClient } from '../actions/imap';
 import { redis } from '../models';
-import {
-	deleteAccountByAccountIdAndUserId,
-	getAccountByUserIdAndAccountId,
-	getAllAccountsByUserId,
-	getAllFoldersByAccountAndUserId,
-	isAccountUnique,
-	updateAccountSyncingStatus
-} from '../models/accounts';
-import { insertFoldersAndAccount, updateFoldersAndAccount } from '../models/folders';
 import { getProviderById } from '../models/providers';
+import * as accountService from '$lib/server/services/accountService';
+import * as folderService from '$lib/server/services/folderService';
 import type { Account, ValidatedAccount, ValidatedExistingAccount } from '../types/account';
-import type { Folder } from '../types/folder';
 
 const addAccountSchema = z.object({
 	name: z.string().trim().min(4, 'Must be of at-least 4 characters'),
@@ -49,7 +41,7 @@ export async function ValidateExistingAccount(
 			: account.password;
 	const imapClient = await buildClient(account.email, updatedPassword, provider.host);
 	const remoteFolders = await getAllIMAPFolders(imapClient);
-	const selectedFolders = await getAllFoldersByAccountAndUserId(userId, account.id);
+	const selectedFolders = await folderService.findFoldersByAccountIdAndUserId(userId, account.id);
 
 	const validatedProvider = {
 		account: {
@@ -64,7 +56,8 @@ export async function ValidateExistingAccount(
 			return {
 				name: remoteFolder.path,
 				status_uidvalidity: Number(remoteFolder.status?.uidValidity),
-				status_messages: remoteFolder.status?.messages,
+				// TODO Is this required?
+				status_messages: remoteFolder.status?.messages ?? 0,
 				syncing: selectedFolders.some(
 					(selectedFolder) => selectedFolder.name === remoteFolder.path && selectedFolder.syncing
 				)
@@ -84,7 +77,7 @@ export async function ValidateAccount(data: FormData, userId: string): Promise<V
 		password: data.get('password'),
 		provider_id: data.get('provider_id')
 	});
-	const accountUnique = await isAccountUnique(validatedData.email, userId);
+	const accountUnique = await accountService.isAccountUnique(validatedData.email, userId);
 	if (!accountUnique) {
 		throw new AccountExistsException(`${validatedData.email} has already been added.`);
 	}
@@ -99,7 +92,8 @@ export async function ValidateAccount(data: FormData, userId: string): Promise<V
 			return {
 				name: remoteFolder.path,
 				status_uidvalidity: Number(remoteFolder.status?.uidValidity),
-				status_messages: remoteFolder.status?.messages
+				// TODO Is this required?
+				status_messages: remoteFolder.status?.messages ?? 0
 			};
 		})
 	};
@@ -140,7 +134,7 @@ export async function SaveAccount(
 	const cachedProvider = await getCachedValidatedAccount<ValidatedAccount>(userId, email);
 	const selectedRemoteFolders = formDataSelectedRemoteFolders ?? [];
 
-	await insertFoldersAndAccount(userId, cachedProvider, selectedRemoteFolders);
+	await folderService.insertFoldersAndAccount(userId, cachedProvider, selectedRemoteFolders);
 	//TODO Delete cachedProvider
 }
 
@@ -152,45 +146,8 @@ export async function UpdateAccount(
 ): Promise<void> {
 	const cachedProvider = await getCachedValidatedAccount<ValidatedExistingAccount>(userId, email);
 	const selectedRemoteFolders = formDataSelectedRemoteFolders ?? [];
-	const existingFolders = await getAllFoldersByAccountAndUserId(userId, accountId);
+	const existingFolders = await folderService.findFoldersByAccountIdAndUserId(userId, accountId);
 
-	await updateFoldersAndAccount(userId, cachedProvider, selectedRemoteFolders, existingFolders);
+	await folderService.updateFoldersAndAccount(userId, cachedProvider, selectedRemoteFolders, existingFolders);
 }
 
-export async function DeleteAccountByAccountIdAndUserId(
-	accountId: string,
-	userId: string
-): Promise<void> {
-	await deleteAccountByAccountIdAndUserId(userId, accountId);
-}
-
-export async function UpdateAccountSyncingStatus(
-	userId: string,
-	accountId: string,
-	syncing: boolean
-): Promise<boolean> {
-	return updateAccountSyncingStatus(userId, accountId, syncing);
-}
-
-export function GetAllAccountsByUserId(userId: string): Promise<Account[]> {
-	return getAllAccountsByUserId(userId);
-}
-
-export function GetAccountByUserIdAndAccountId(
-	userId: string,
-	accountId: string
-): Promise<Account> {
-	return getAccountByUserIdAndAccountId(userId, accountId);
-}
-
-export async function GetAllFoldersByUserIdAndAccountId(
-	userId: string,
-	accountId: string
-): Promise<Folder[]> {
-	const folders = await getAllFoldersByAccountAndUserId(userId, accountId);
-	return folders.map((folder) => {
-		const query = new URLSearchParams({ accountId, folderId: folder.id });
-		folder.href = `?${query.toString()}`;
-		return folder;
-	});
-}

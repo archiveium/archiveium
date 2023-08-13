@@ -1,7 +1,5 @@
-import {
-	getAllAccountsByUserIdCount,
-	getAllSyncingAccountsByUserIdCount
-} from '../../models/accounts';
+import { findAccountsCountByUserId } from '$lib/server/database/repositories/accountRepository';
+import * as accountService from '$lib/server/services/accountService';
 import { getAllEmailsCountByUserId, getAllFailedEmailsCountByUserId } from '../../models/emails';
 import { requireUserId } from '../../utils/auth';
 
@@ -14,8 +12,8 @@ export const load = ({ locals }) => {
 	return {
 		streamed: {
 			accounts: {
-				added: getAllAccountsByUserIdCount(userId),
-				syncing: getAllSyncingAccountsByUserIdCount(userId)
+				added: findAccountsCountByUserId(userId),
+				syncing: accountService.findAllSyncingAccountCountByUserId(userId)
 			},
 			emails: {
 				processed: getAllEmailsCountByUserId(userId),

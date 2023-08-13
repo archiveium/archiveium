@@ -1,7 +1,7 @@
 interface BaseFolder {
 	name: string;
-	status_uidvalidity: number | undefined;
-	status_messages: number | undefined;
+	status_uidvalidity: number;
+	status_messages: number;
 }
 
 export interface RemoteFolder extends BaseFolder {
@@ -11,7 +11,7 @@ export interface RemoteFolder extends BaseFolder {
 export interface FolderInsert extends BaseFolder {
 	user_id: string;
 	account_id: string;
-	syncing: boolean;
+	syncing: boolean | null;
 }
 
 export interface Folder extends FolderInsert {

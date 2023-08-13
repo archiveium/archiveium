@@ -1,9 +1,6 @@
 import { fail, type Actions } from '@sveltejs/kit';
-import {
-	GetAllAccountsByUserId,
-	GetAllFoldersByUserIdAndAccountId,
-	UpdateAccountSyncingStatus
-} from '../../actions/account';
+import * as accountService from '$lib/server/services/accountService';
+import * as folderService from '$lib/server/services/folderService';
 import { GetAllEmailsWithS3DataByFolderAndUserId } from '../../actions/email';
 import { getAllEmailsCountByFolderAndUserId } from '../../models/emails';
 import type { Account } from '../../types/account';
@@ -33,7 +30,7 @@ export const actions = {
 		const syncStatus = data.get('syncing');
 
 		if (syncStatus && accountId) {
-			const isAccountUpdated = await UpdateAccountSyncingStatus(
+			const isAccountUpdated = await accountService.updateAccountSyncingStatus(
 				userId,
 				accountId,
 				syncStatus === 'true'
@@ -71,14 +68,14 @@ async function buildPageData(
 	const accountId = url.searchParams.get('accountId');
 	const page = url.searchParams.get('page') ?? '1';
 
-	const allAccounts = await GetAllAccountsByUserId(userId);
+	const allAccounts = await accountService.findAccountsByUserId(userId);
 	if (allAccounts.length === 0) {
 		return undefined;
 	}
 
 	const selectedAccount = allAccounts.find((account) => account.id == accountId) ?? allAccounts[0];
 
-	const folders = await GetAllFoldersByUserIdAndAccountId(userId, selectedAccount.id);
+	const folders = await folderService.findFoldersByAccountIdAndUserId(userId, selectedAccount.id);
 	const syncingFolders = folders.filter((folder) => folder.syncing);
 	const notSyncingFolders = folders.filter((folder) => !folder.syncing);
 	const selectedFolder = folders.find((folder) => folder.id == folderId) ?? folders[0];
