@@ -7,13 +7,13 @@ import {
 import * as accountService from '$lib/server/services/accountService.js';
 import { AccountExistsException } from '../../../../exceptions/account.js';
 import { IMAPAuthenticationFailed } from '../../../../exceptions/imap.js';
-import { getAllProviders } from '../../../../models/providers.js';
+import * as providerService from '$lib/server/services/providerService.js';
 import { requireUserId, saveFlashMessage } from '../../../../utils/auth.js';
 
 export const load = async ({ locals, params }) => {
 	const userId = requireUserId(false, locals.user);
 
-	const availableProviders = await getAllProviders();
+	const availableProviders = await providerService.findAllProviders();
 	const selectedAccount = await accountService.findAccountByUserIdAndAccountId(userId, params.id);
 	const defaultProvider = availableProviders.find(
 		(provider) => provider.id === selectedAccount.provider_id

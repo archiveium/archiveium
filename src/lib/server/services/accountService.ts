@@ -1,4 +1,4 @@
-import * as accountRepository from '$lib/server/database/repositories/accountRepository';
+import * as accountRepository from '$lib/server/repositories/accountRepository';
 import { NoResultError } from 'kysely';
 import { AccountNotFoundException } from '../../../exceptions/account';
 

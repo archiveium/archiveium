@@ -1,4 +1,4 @@
-import * as folderRepository from '$lib/server/database/repositories/folderRepository';
+import * as folderRepository from '$lib/server/repositories/folderRepository';
 import type { NewAccount, ValidatedAccount, ValidatedExistingAccount } from '../../../types/account';
 import type { Folder, FolderInsert } from '../../../types/folder';
 import { db } from '../database/connection';

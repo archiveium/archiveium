@@ -1,4 +1,4 @@
-import { findAccountsCountByUserId } from '$lib/server/database/repositories/accountRepository';
+import { findAccountsCountByUserId } from '$lib/server/repositories/accountRepository';
 import * as accountService from '$lib/server/services/accountService';
 import { getAllEmailsCountByUserId, getAllFailedEmailsCountByUserId } from '../../models/emails';
 import { requireUserId } from '../../utils/auth';

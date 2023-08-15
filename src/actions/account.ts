@@ -3,9 +3,9 @@ import { AccountExistsException } from '../exceptions/account';
 import { CacheKeyNotFoundException } from '../exceptions/cache';
 import { getAllIMAPFolders, buildClient } from '../actions/imap';
 import { redis } from '../models';
-import { getProviderById } from '../models/providers';
 import * as accountService from '$lib/server/services/accountService';
 import * as folderService from '$lib/server/services/folderService';
+import * as providerService from '$lib/server/services/providerService';
 import type { Account, ValidatedAccount, ValidatedExistingAccount } from '../types/account';
 
 const addAccountSchema = z.object({
@@ -34,7 +34,7 @@ export async function ValidateExistingAccount(
 		name: data.get('name'),
 		password: data.get('password')
 	});
-	const provider = await getProviderById(account.provider_id);
+	const provider = await providerService.findProviderById(account.provider_id);
 	const updatedPassword =
 		validatedData.password && validatedData.password != ''
 			? validatedData.password
@@ -82,7 +82,7 @@ export async function ValidateAccount(data: FormData, userId: string): Promise<V
 		throw new AccountExistsException(`${validatedData.email} has already been added.`);
 	}
 
-	const provider = await getProviderById(validatedData.provider_id);
+	const provider = await providerService.findProviderById(validatedData.provider_id);
 	const imapClient = await buildClient(validatedData.email, validatedData.password, provider.host);
 	const remoteFolders = await getAllIMAPFolders(imapClient);
 

@@ -3,13 +3,13 @@ import { ZodError } from 'zod';
 import { SaveAccount, ValidateAccount } from '../../../actions/account.js';
 import { AccountExistsException } from '../../../exceptions/account.js';
 import { IMAPAuthenticationFailed } from '../../../exceptions/imap.js';
-import { getAllProviders } from '../../../models/providers.js';
+import * as providerService from '$lib/server/services/providerService.js';
 import { requireUserId, saveFlashMessage } from '../../../utils/auth.js';
 
 export const load = async ({ locals }) => {
 	requireUserId(false, locals.user);
 
-	const availableProviders = await getAllProviders();
+	const availableProviders = await providerService.findAllProviders();
 	const defaultProvider = availableProviders.find((provider) => provider.is_default);
 	return {
 		availableProviders,
