@@ -1,9 +1,9 @@
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 import { ZodError } from 'zod';
-import { SaveAccount, ValidateAccount } from '../../../actions/account.js';
 import { AccountExistsException } from '../../../exceptions/account.js';
 import { IMAPAuthenticationFailed } from '../../../exceptions/imap.js';
 import * as providerService from '$lib/server/services/providerService.js';
+import * as accountService from '$lib/server/services/accountService.js';
 import { requireUserId, saveFlashMessage } from '../../../utils/auth.js';
 
 export const load = async ({ locals }) => {
@@ -29,7 +29,7 @@ export const actions = {
 			switch (data.get('step')) {
 				case 'addAccountStep1':
 					{
-						const validatedProvider = await ValidateAccount(data, userId);
+						const validatedProvider = await accountService.validateAccount(data, userId);
 						return {
 							email: validatedProvider.account.email,
 							remoteFolders: validatedProvider.remoteFolders,
@@ -40,7 +40,7 @@ export const actions = {
 					}
 					break;
 				case 'addAccountStep2':
-					await SaveAccount(userId, data.get('email'), data.getAll('folders'));
+					await accountService.saveAccount(userId, data.get('email'), data.getAll('folders'));
 					await saveFlashMessage(locals.sessionId, {
 						type: 'success',
 						message: 'Account has been saved successfully!'

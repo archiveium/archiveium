@@ -1,9 +1,5 @@
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 import { ZodError } from 'zod';
-import {
-	UpdateAccount,
-	ValidateExistingAccount
-} from '../../../../actions/account.js';
 import * as accountService from '$lib/server/services/accountService.js';
 import { AccountExistsException } from '../../../../exceptions/account.js';
 import { IMAPAuthenticationFailed } from '../../../../exceptions/imap.js';
@@ -46,7 +42,7 @@ export const actions = {
 		try {
 			switch (data.get('step')) {
 				case 'addAccountStep1': {
-					const validatedProvider = await ValidateExistingAccount(data, selectedAccount, userId);
+					const validatedProvider = await accountService.validateExistingAccount(data, selectedAccount, userId);
 					return {
 						remoteFolders: validatedProvider.remoteFolders,
 						steps: {
@@ -55,7 +51,7 @@ export const actions = {
 					};
 				}
 				case 'addAccountStep2':
-					await UpdateAccount(
+					await accountService.updateAccount(
 						userId,
 						selectedAccount.email,
 						selectedAccount.id,
