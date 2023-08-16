@@ -1,13 +1,12 @@
 import { db } from '$lib/server/database/connection';
+import { sql } from 'kysely';
 
 export async function findEmailByFolderIdAndUserId(userId: string, folderId: string, offset: number, limit: number) {
     return db.selectFrom('emails')
-        .select(({ fn }) => [
+        .select([
             'id', 'folder_id', 'has_attachments', 'message_number',
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            fn.agg<string[]>('to_char', ['udate', 'Mon DD, YYYY']).as('formatted_date')
-        ])        
+            sql<string>`to_char(udate, 'Mon DD, YYYY')`.as('formatted_date')
+        ])
         .where('user_id', '=', userId)
         .where('folder_id', '=', folderId)
         .where('imported', '=', true)
