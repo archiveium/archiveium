@@ -1,9 +1,10 @@
 import type { DB } from './types';
-import { Pool } from 'pg';
+import pg from 'pg';
 import config from 'config';
 import { Kysely, PostgresDialect } from 'kysely';
 import type { DatabaseConfig } from '../../../types/config';
 
+const { Pool } = pg;
 const dbConfig = config.get<DatabaseConfig>('database');
 const dialect = new PostgresDialect({
   pool: new Pool(dbConfig),
