@@ -1,4 +1,4 @@
-// import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 // import { getRemotedEmailCountForSyncedFoldersByUserId } from '../../../models/folders';
 
 // vi.mock('../../../models/index.ts', () => {
@@ -9,7 +9,7 @@
 // 	};
 // });
 
-// describe('folders model', () => {
+describe.skip('folders model', () => {
 // 	afterEach(() => {
 // 		vi.clearAllMocks();
 // 	});
@@ -23,4 +23,4 @@
 // 			expect(count).toEqual(0);
 // 		});
 // 	});
-// });
+});
