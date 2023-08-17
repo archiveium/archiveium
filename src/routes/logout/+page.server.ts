@@ -1,12 +1,12 @@
 import type { Actions } from './$types';
 import { redirect } from '@sveltejs/kit';
-import * as authAction from '../../actions/auth';
+import * as authService from '$lib/server/services/authService';
 import { saveFlashMessage } from '../../utils/auth';
 
 export const actions = {
 	default: async ({ locals }) => {
 		try {
-			await authAction.LogoutUser(locals.sessionId);
+			await authService.logoutUser(locals.sessionId);
 			await saveFlashMessage(locals.sessionId, {
 				type: 'success',
 				message: 'You have been logged out.'

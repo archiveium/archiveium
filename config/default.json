@@ -7,7 +7,8 @@
 		"password": "",
 		"host": "",
 		"port": 5432,
-		"database": ""
+		"database": "",
+		"max": 10
 	},
 	"redis": {
 		"host": "redis",

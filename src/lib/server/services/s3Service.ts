@@ -1,20 +1,19 @@
 import type { GetObjectCommandInput } from '@aws-sdk/client-s3';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
 import type { AddressObject } from 'mailparser';
-import { getAllEmailsByFolderAndUserId, getEmailByIdAndUserId } from '../models/emails';
-import { s3Client } from '../actions/s3';
-import type { Email } from '../types/email';
-import { parseEmail } from '../utils/emailParser';
+import type { Email } from '../../../types/email';
+import { BUCKET_NAME } from '../constants/s3';
+import { parseEmail } from '../../../utils/emailParser';
+import * as emailService from '$lib/server/services/emailService';
+import { s3Client } from '../s3/connection';
 
-const BUCKET_NAME = 'emails';
-
-export async function GetAllEmailsWithS3DataByFolderAndUserId(
+export async function findEmailsByFolderIdAndUserId(
 	userId: string,
 	folderId: string,
 	currentPage: string,
 	resultsPerPage: number,
 ): Promise<Email[]> {
-	const emails = await getAllEmailsByFolderAndUserId(userId, folderId, currentPage, resultsPerPage);
+	const emails = await emailService.findEmailByFolderIdAndUserId(userId, folderId, currentPage, resultsPerPage);
 	const promises = emails.map(async (email) => {
 		const params: GetObjectCommandInput = {
 			Bucket: BUCKET_NAME,
@@ -32,11 +31,11 @@ export async function GetAllEmailsWithS3DataByFolderAndUserId(
 	return await Promise.all(promises);
 }
 
-export async function GetEmailWithS3DataByIdAndUserId(
+export async function findEmailByIdAndUserId(
 	userId: string,
 	emailId: string
 ): Promise<Email & { html: string }> {
-	const email = await getEmailByIdAndUserId(userId, emailId);
+	const email = await emailService.findEmailByIdAndUserId(userId, emailId);
 	const params: GetObjectCommandInput = {
 		Bucket: BUCKET_NAME,
 		Key: `${userId}/${email.folder_id}/${email.message_number}.eml`
@@ -46,6 +45,8 @@ export async function GetEmailWithS3DataByIdAndUserId(
 	const html = parsedEmail.html ? parsedEmail.html : '';
 	return { ...email, html };
 }
+
+// Private functions
 
 function getFromNameOrAddress(address?: AddressObject): string {
 	const addressValues = address?.value;

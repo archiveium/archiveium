@@ -1,32 +1,24 @@
 <script lang="ts">
 	import logo from '$lib/images/logo.svg';
 	import { enhance } from '$app/forms';
+	import { Card, Button, Label, Input, A, Heading, Alert, P } from 'flowbite-svelte';
 </script>
 
-<div class="page page-center">
-	<div class="container container-tight py-4">
-		<div class="text-center mb-4">
-			<a href="." class="navbar-brand navbar-brand-autodark">
-				<img src={logo} alt="" height="100" />
-			</a>
-		</div>
+<div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+	<a href="/login" class="flex items-center mb-6">
+		<img src={logo} alt="" class="mr-2 h-25" />
+	</a>
 
-		<div class="card card-md">
-			<div class="card-body">
-				<h2 class="h2 text-center mb-4">Thank you for signing up!</h2>
-				<p>
-					Unfortunately your email verification url has expired. Use the button below to resend
-					email.
-				</p>
-				<form method="post" autocomplete="off" use:enhance>
-					<div class="form-footer">
-						<button type="submit" class="btn btn-primary w-100">Resend Verification Email</button>
-					</div>
-				</form>
+	<Card class="w-full">
+		<P class="mb-4">
+			Unfortunately your email verification url has expired. Use the button below to resend
+			email.
+		</P>
+		<form method="post" class="flex flex-col space-y-6" autocomplete="off" use:enhance>
+			<Button type="submit" class="w-full">Resend Verification Email</Button>
+			<div class="text-sm font-medium text-gray-500 dark:text-gray-300">
+				Already have an account? <A href="/login">Login</A>
 			</div>
-		</div>
-		<div class="text-center text-muted mt-3">
-			Already have an account? <a href="/login" tabindex="-1">Sign In</a>
-		</div>
-	</div>
+		</form>
+	</Card>
 </div>

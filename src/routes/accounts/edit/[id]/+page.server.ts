@@ -1,21 +1,16 @@
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 import { ZodError } from 'zod';
-import {
-	DeleteAccountByAccountIdAndUserId,
-	GetAccountByUserIdAndAccountId,
-	UpdateAccount,
-	ValidateExistingAccount
-} from '../../../../actions/account.js';
+import * as accountService from '$lib/server/services/accountService.js';
 import { AccountExistsException } from '../../../../exceptions/account.js';
 import { IMAPAuthenticationFailed } from '../../../../exceptions/imap.js';
-import { getAllProviders } from '../../../../models/providers.js';
+import * as providerService from '$lib/server/services/providerService.js';
 import { requireUserId, saveFlashMessage } from '../../../../utils/auth.js';
 
 export const load = async ({ locals, params }) => {
 	const userId = requireUserId(false, locals.user);
 
-	const availableProviders = await getAllProviders();
-	const selectedAccount = await GetAccountByUserIdAndAccountId(userId, params.id);
+	const availableProviders = await providerService.findAllProviders();
+	const selectedAccount = await accountService.findAccountByUserIdAndAccountId(userId, params.id);
 	const defaultProvider = availableProviders.find(
 		(provider) => provider.id === selectedAccount.provider_id
 	);
@@ -42,12 +37,12 @@ export const actions = {
 			throw redirect(302, '/dashboard');
 		}
 
-		const selectedAccount = await GetAccountByUserIdAndAccountId(userId, params.id);
+		const selectedAccount = await accountService.findAccountByUserIdAndAccountId(userId, params.id);
 
 		try {
 			switch (data.get('step')) {
 				case 'addAccountStep1': {
-					const validatedProvider = await ValidateExistingAccount(data, selectedAccount, userId);
+					const validatedProvider = await accountService.validateExistingAccount(data, selectedAccount, userId);
 					return {
 						remoteFolders: validatedProvider.remoteFolders,
 						steps: {
@@ -56,7 +51,7 @@ export const actions = {
 					};
 				}
 				case 'addAccountStep2':
-					await UpdateAccount(
+					await accountService.updateAccount(
 						userId,
 						selectedAccount.email,
 						selectedAccount.id,
@@ -68,7 +63,7 @@ export const actions = {
 					});
 					break;
 				case 'deleteAccount':
-					await DeleteAccountByAccountIdAndUserId(selectedAccount.id, userId);
+					await accountService.deleteAccountByUserId(selectedAccount.id, userId);
 					await saveFlashMessage(locals.sessionId, {
 						type: 'success',
 						message: 'Account has been deleted successfully.'

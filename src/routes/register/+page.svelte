@@ -2,86 +2,65 @@
 	import logo from '$lib/images/logo.svg';
 	import type { PageData, ActionData } from './$types';
 	import { enhance } from '$app/forms';
+	import { Card, Button, Label, Input, A, Heading, Alert, Helper } from 'flowbite-svelte';
 
 	export let data: PageData;
 	export let form: ActionData;
 </script>
 
-<div class="page page-center">
-	<div class="container container-tight py-4">
-		<div class="text-center mb-4">
-			<a href="." class="navbar-brand navbar-brand-autodark">
-				<img src={logo} alt="" height="100" />
-			</a>
-		</div>
-
-		<!-- Success alert -->
-		{#if data.flashMessage}
-			<div class="alert alert-success" role="alert">
-				<div class="text-muted">{data.flashMessage.message}</div>
-			</div>
-		{/if}
-
-		<!-- Error alert -->
-		{#if form?.error}
-			<div class="alert alert-danger" role="alert">
-				<div class="text-muted">{form.error}</div>
-			</div>
-		{/if}
-
-		<div class="card card-md">
-			<div class="card-body">
-				<h2 class="h2 text-center mb-4">Register Account</h2>
-				<form method="post" autocomplete="off" use:enhance>
-					<div class="mb-3">
-						<!-- svelte-ignore a11y-label-has-associated-control -->
-						<label class="form-label required">Name</label>
-						<input
-							type="text"
-							name="name"
-							class="form-control {form?.fieldErrors?.name ? 'is-invalid' : ''}"
-							autocomplete="off"
-						/>
-						<div class="invalid-feedback">{form?.fieldErrors?.name ?? ''}</div>
-					</div>
-					<div class="mb-3">
-						<!-- svelte-ignore a11y-label-has-associated-control -->
-						<label class="form-label required">Email Address</label>
-						<input
-							type="email"
-							name="email"
-							class="form-control {form?.fieldErrors?.email ? 'is-invalid' : ''}"
-							autocomplete="off"
-						/>
-						<div class="invalid-feedback">{form?.fieldErrors?.email ?? ''}</div>
-					</div>
-					<div class="mb-3">
-						<!-- svelte-ignore a11y-label-has-associated-control -->
-						<label class="form-label required">Password</label>
-						<input
-							type="password"
-							name="password"
-							class="form-control {form?.fieldErrors?.password ? 'is-invalid' : ''}"
-							autocomplete="off"
-						/>
-						<div class="invalid-feedback">{form?.fieldErrors?.password ?? ''}</div>
-					</div>
-					<div class="mb-2">
-						<!-- svelte-ignore a11y-label-has-associated-control -->
-						<label class="form-label required">Confirm Password</label>
-						<input
-							type="password"
-							name="passwordConfirm"
-							class="form-control {form?.fieldErrors?.passwordConfirm ? 'is-invalid' : ''}"
-							autocomplete="off"
-						/>
-						<div class="invalid-feedback">{form?.fieldErrors?.passwordConfirm ?? ''}</div>
-					</div>
-					<div class="form-footer">
-						<button type="submit" class="btn btn-primary w-100">Register</button>
-					</div>
-				</form>
-			</div>
-		</div>
+<div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+	<a href="/login" class="flex items-center mb-6">
+		<img src={logo} alt="" class="mr-2 h-25" />
+	</a>
+	<div class="items-center justify-center mb-4">
+		<Heading tag="h4">Register Account</Heading>
 	</div>
+
+	<!-- Success alert -->
+	{#if data.flashMessage}
+		<Alert border color="green" class="mb-4">
+			{data.flashMessage.message}
+		</Alert>
+	{/if}
+
+	<!-- Error alert -->
+	{#if form?.error}
+		<Alert border color="red" class="mb-4">
+			{form.error}
+		</Alert>
+	{/if}
+
+	<Card class="w-full">
+		<form method="post" class="flex flex-col space-y-6" autocomplete="off" use:enhance>
+			<Label class="space-y-2">
+				<span>Name</span>
+				<Input type="text" name="name" required />
+				{#if form?.fieldErrors?.name}
+					<Helper color="red">{form?.fieldErrors?.name}</Helper>
+				{/if}				
+			</Label>
+			<Label class="space-y-2">
+				<span>Email</span>
+				<Input type="email" name="email" required />
+				{#if form?.fieldErrors?.email}
+					<Helper color="red">{form?.fieldErrors?.email}</Helper>
+				{/if}				
+			</Label>
+			<Label class="space-y-2">
+				<span>Password</span>
+				<Input type="password" name="password" required />
+				{#if form?.fieldErrors?.password}
+					<Helper color="red">{form?.fieldErrors?.password}</Helper>
+				{/if}				
+			</Label>
+			<Label class="space-y-2">
+				<span>Confirm Password</span>
+				<Input type="password" name="passwordConfirm" required />
+				{#if form?.fieldErrors?.passwordConfirm}
+					<Helper color="red">{form?.fieldErrors?.passwordConfirm}</Helper>
+				{/if}				
+			</Label>
+			<Button type="submit" class="w-full">Register</Button>
+		</form>
+	</Card>
 </div>

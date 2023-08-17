@@ -1,7 +1,7 @@
 import { redirect, type Cookies } from '@sveltejs/kit';
 import crypto from 'crypto';
 import { CacheDeleteFailedException, CacheSaveFailedException } from '../exceptions/cache';
-import { redis } from '../models';
+import { redis } from '$lib/server/redis/connection';
 import type { FlashMessage, SessionData } from '../types/session';
 import type { User } from '../types/user';
 
