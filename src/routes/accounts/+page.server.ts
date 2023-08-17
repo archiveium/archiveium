@@ -1,8 +1,8 @@
 import { fail, type Actions } from '@sveltejs/kit';
 import * as accountService from '$lib/server/services/accountService';
 import * as folderService from '$lib/server/services/folderService';
-import { GetAllEmailsWithS3DataByFolderAndUserId } from '../../actions/email';
-import { getAllEmailsCountByFolderAndUserId } from '../../models/emails';
+import * as emailService from '$lib/server/services/emailService';
+import * as s3Service from '$lib/server/services/s3Service';
 import type { Account } from '../../types/account';
 import type { Email } from '../../types/email';
 import type { Folder } from '../../types/folder';
@@ -80,13 +80,13 @@ async function buildPageData(
 	const notSyncingFolders = folders.filter((folder) => !folder.syncing);
 	const selectedFolder = folders.find((folder) => folder.id == folderId) ?? folders[0];
 
-	const emailsWithS3Data = await GetAllEmailsWithS3DataByFolderAndUserId(
+	const emailsWithS3Data = await s3Service.findEmailsByFolderIdAndUserId(
 		userId,
 		selectedFolder.id,
 		page,
 		RESULTS_PER_PAGE,
 	);
-	const emailCount = await getAllEmailsCountByFolderAndUserId(userId, selectedFolder.id);
+	const emailCount = await emailService.findEmailCountByFolderAndUserId(userId, selectedFolder.id);
 	const paginator = GeneratePagination(emailCount, RESULTS_PER_PAGE, page, selectedFolder.id, selectedAccount.id);
 
 	return {

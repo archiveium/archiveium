@@ -1,5 +1,5 @@
 import type { Handle } from '@sveltejs/kit';
-import { redis } from './models';
+import { redis } from '$lib/server/redis/connection';
 import { createUserSession, deleteFlashMessage } from './utils/auth';
 
 export const handle = (async ({ event, resolve }) => {

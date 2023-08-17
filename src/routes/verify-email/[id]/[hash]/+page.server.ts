@@ -1,6 +1,6 @@
 import { redirect, type Actions } from '@sveltejs/kit';
-import { VerifyRegistrationUrl } from '../../../../actions/register.js';
-import { getUserById, resetUserNotificationDate, verifyUser } from '../../../../models/users.js';
+import * as registrationService from '$lib/server/services/registrationService';
+import * as userService from '$lib/server/services/userService';
 import { getUserId, saveFlashMessage } from '../../../../utils/auth.js';
 
 export const load = async ({ locals, params, url }) => {
@@ -9,14 +9,14 @@ export const load = async ({ locals, params, url }) => {
 		throw redirect(302, '/dashboard');
 	}
 
-	const verificationUrl = await VerifyRegistrationUrl({
+	const verificationUrl = await registrationService.verifyRegistrationUrl({
 		id: params.id,
 		hash: params.hash,
 		expires: url.searchParams.get('expires') ?? '',
 		signature: url.searchParams.get('signature') ?? ''
 	});
 
-	const user = await getUserById(verificationUrl.userId);
+	const user = await userService.findUserById(verificationUrl.userId);
 	if (user.email_verified_at) {
 		await saveFlashMessage(locals.sessionId, {
 			type: 'success',
@@ -26,7 +26,7 @@ export const load = async ({ locals, params, url }) => {
 	}
 
 	if (!verificationUrl.hasExpired && verificationUrl.signatureValid) {
-		await verifyUser(verificationUrl.userId);
+		await userService.verifyUser(verificationUrl.userId);
 		await saveFlashMessage(locals.sessionId, {
 			type: 'success',
 			message: 'Email verified successfully! You can now login.'
@@ -48,13 +48,13 @@ export const actions = {
 			throw redirect(302, '/dashboard');
 		}
 
-		const verificationUrl = await VerifyRegistrationUrl({
+		const verificationUrl = await registrationService.verifyRegistrationUrl({
 			id: params.id,
 			hash: params.hash,
 			expires: url.searchParams.get('expires') ?? '',
 			signature: url.searchParams.get('signature') ?? ''
 		});
-		const user = await getUserById(verificationUrl.userId);
+		const user = await userService.findUserById(verificationUrl.userId);
 
 		if (user.email_verified_at) {
 			await saveFlashMessage(locals.sessionId, {
@@ -62,7 +62,7 @@ export const actions = {
 				message: 'Email has already been verified. You can now login.'
 			});
 		} else if (verificationUrl.hasExpired && verificationUrl.signatureValid) {
-			await resetUserNotificationDate(verificationUrl.userId);
+			await userService.resetUserNotificationDate(verificationUrl.userId);
 			await saveFlashMessage(locals.sessionId, {
 				type: 'success',
 				message: 'Verification email has been sent.'

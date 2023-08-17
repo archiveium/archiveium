@@ -6,9 +6,9 @@ import { addAccountSchema, editAccountSchema } from '../schemas/accountSchemas';
 import * as accountService from '$lib/server/services/accountService';
 import * as folderService from '$lib/server/services/folderService';
 import * as providerService from '$lib/server/services/providerService';
-import { getAllIMAPFolders, buildClient } from '../../../actions/imap';
-import { redis } from '../../../models';
+import * as imapService from '$lib/server/services/imapService';
 import { CacheKeyNotFoundException } from '../../../exceptions/cache';
+import { redis } from '../redis/connection';
 
 export async function updateAccountSyncingStatus(
 	userId: string,
@@ -61,8 +61,8 @@ export async function validateExistingAccount(
 		validatedData.password && validatedData.password != ''
 			? validatedData.password
 			: account.password;
-	const imapClient = await buildClient(account.email, updatedPassword, provider.host);
-	const remoteFolders = await getAllIMAPFolders(imapClient);
+	const imapClient = await imapService.buildClient(account.email, updatedPassword, provider.host);
+	const remoteFolders = await imapService.getAllIMAPFolders(imapClient);
 	const selectedFolders = await folderService.findFoldersByAccountIdAndUserId(userId, account.id);
 
 	const validatedProvider = {
@@ -105,8 +105,8 @@ export async function validateAccount(data: FormData, userId: string): Promise<V
 	}
 
 	const provider = await providerService.findProviderById(validatedData.provider_id);
-	const imapClient = await buildClient(validatedData.email, validatedData.password, provider.host);
-	const remoteFolders = await getAllIMAPFolders(imapClient);
+	const imapClient = await imapService.buildClient(validatedData.email, validatedData.password, provider.host);
+	const remoteFolders = await imapService.getAllIMAPFolders(imapClient);
 
 	const validatedProvider = {
 		account: { ...validatedData, user_id: userId },

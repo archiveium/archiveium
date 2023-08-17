@@ -1,6 +1,6 @@
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 import { ZodError } from 'zod';
-import { UpdatePassword, ValidatePasswordResetToken } from '../../actions/auth';
+import * as authService from '$lib/server/services/authService';
 import { PasswordResetRequestTokenExpiredException } from '../../exceptions/auth';
 import { getUserId, saveFlashMessage } from '../../utils/auth';
 
@@ -15,7 +15,7 @@ export const load = async ({ locals, url }) => {
 
 	// validate token and email
 	try {
-		await ValidatePasswordResetToken(passwordResetToken, email);
+		await authService.validatePasswordResetToken(passwordResetToken, email);
 	} catch (error) {
 		if (error instanceof PasswordResetRequestTokenExpiredException) {
 			await saveFlashMessage(locals.sessionId, {
@@ -48,7 +48,7 @@ export const actions = {
 		const body = await request.formData();
 
 		try {
-			await UpdatePassword(body);
+			await authService.updatePassword(body);
 		} catch (error: any) {
 			if (error instanceof PasswordResetRequestTokenExpiredException) {
 				await saveFlashMessage(locals.sessionId, {

@@ -3,9 +3,9 @@ import { GetObjectCommand } from '@aws-sdk/client-s3';
 import type { AddressObject } from 'mailparser';
 import type { Email } from '../../../types/email';
 import { BUCKET_NAME } from '../constants/s3';
-import { s3Client } from '../../../actions/s3';
 import { parseEmail } from '../../../utils/emailParser';
 import * as emailService from '$lib/server/services/emailService';
+import { s3Client } from '../s3/connection';
 
 export async function findEmailsByFolderIdAndUserId(
 	userId: string,

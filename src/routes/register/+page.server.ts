@@ -1,6 +1,6 @@
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 import { ZodError } from 'zod';
-import { RegisterUser } from '../../actions/auth';
+import * as authService from '$lib/server/services/authService';
 import {
 	UserAlreadyRegisteredException,
 	UserNotAcceptedException,
@@ -25,7 +25,7 @@ export const actions = {
 		const body = await request.formData();
 
 		try {
-			await RegisterUser(body);
+			await authService.registerUser(body);
 		} catch (error: any) {
 			if (error instanceof ZodError) {
 				return fail(400, {

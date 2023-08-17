@@ -1,9 +1,9 @@
 import type { Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { getUserId, saveFlashMessage } from '../../utils/auth';
-import { CreatePasswordResetRequest } from '../../actions/auth';
 import { ZodError } from 'zod';
 import { UserNotVerifiedException } from '../../exceptions/auth';
+import * as authService from '$lib/server/services/authService';
 
 export const load = ({ locals }) => {
 	const userId = getUserId(locals.user);
@@ -17,7 +17,7 @@ export const actions = {
 		const data = await request.formData();
 
 		try {
-			await CreatePasswordResetRequest(data);
+			await authService.createPasswordResetRequest(data);
 			saveFlashMessage(locals.sessionId, {
 				type: 'success',
 				message: 'A password reset email has been sent.'
@@ -28,6 +28,7 @@ export const actions = {
 			} else if (error instanceof UserNotVerifiedException) {
 				return fail(400, { error: error.message });
 			}
+			console.log(error);
 			return fail(400, { error: 'There was an error processing your request. Please try again.' });
 		}
 

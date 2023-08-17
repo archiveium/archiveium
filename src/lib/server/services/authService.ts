@@ -3,14 +3,18 @@ import { DateTime } from 'luxon';
 import { InvalidPasswordException, PasswordResetRequestTokenExpiredException, UserNotAcceptedException, UserNotVerifiedException } from "../../../exceptions/auth";
 import { RecordNotFoundException } from '../../../exceptions/database';
 import { forgotPasswordFormSchema, loginFormSchema, passwordResetFormSchema, registerFormSchema } from '../schemas/authSchema';
+import * as userService from '$lib/server/services/userService';
+import * as passwordResetService from '$lib/server/services/passwordResetService';
+import * as userInvitationService from '$lib/server/services/userInvitiationService';
+import { deleteUserSession } from '../../../utils/auth';
 
 export async function createPasswordResetRequest(data: FormData): Promise<void> {
 	const validatedData = forgotPasswordFormSchema.parse({ email: data.get('email') });
-	let user: User;
+	let user;
 
 	// validate if email exists in users table and has a verified email
 	try {
-		user = await getUserByEmail(validatedData.email);
+		user = await userService.findUserByEmail(validatedData.email);
 		if (!user.email_verified_at) {
 			throw new UserNotVerifiedException(
 				'Please verify your email before resetting password.'
@@ -26,8 +30,8 @@ export async function createPasswordResetRequest(data: FormData): Promise<void> 
 
 	// if there's an existing token, delete that and generate new one
 	try {
-		const passwordResetRequest = await getPasswordResetRequestByEmail(user.email);
-		await deletePasswordResetRequestById(passwordResetRequest.id);
+		const passwordResetRequest = await passwordResetService.findPasswordResetRequestByEmail(user.email);
+		await passwordResetService.deletePasswordResetRequestById(passwordResetRequest.id);
 	} catch (error) {
 		if (!(error instanceof RecordNotFoundException)) {
 			throw error;
@@ -37,15 +41,15 @@ export async function createPasswordResetRequest(data: FormData): Promise<void> 
 	// insert password_reset_token and expiry in users table
 	const resetToken = crypto.randomBytes(32).toString('hex');
 	const hashedResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-	await createPasswordResetRequest({ email: user.email, password_reset_token: hashedResetToken });
+	await passwordResetService.createPasswordResetRequest({ email: user.email, password_reset_token: hashedResetToken });
 }
 
-export async function loginUser(credentials: FormData): Promise<User> {
+export async function loginUser(credentials: FormData) {
 	const validatedData = loginFormSchema.parse({
 		email: credentials.get('email'),
 		password: credentials.get('password')
 	});
-	const user = await getUserByEmail(validatedData.email);
+	const user = await userService.findUserByEmail(validatedData.email);
 
 	if (user.email_verified_at) {
 		verifyUserPassword(user.password, validatedData.password);
@@ -65,18 +69,18 @@ export async function registerUser(data: FormData) {
 		password: data.get('password'),
 		passwordConfirm: data.get('passwordConfirm')
 	});
-	const invitedUser = await getInvitedUser(validatedData.email);
+	const invitedUser = await userInvitationService.findUserInvitationByEmail(validatedData.email);
 	if (!invitedUser.accepted) {
 		throw new UserNotAcceptedException(
 			`${validatedData.email} has not been chosen for registration yet.`
 		);
 	}
 
-	await createUser(validatedData);
+	await userService.createUser(validatedData);
 }
 
 export async function validatePasswordResetToken(token: string, email: string): Promise<void> {
-	const passwordRequestRequest = await getPasswordResetRequestByTokenAndEmail(token, email);
+	const passwordRequestRequest = await passwordResetService.findPasswordResetRequestByTokenAndEmail(token, email);
 	// check token expiry
 	const currentDate = DateTime.now();
 	const expiryDate = DateTime.fromJSDate(passwordRequestRequest.created_at).plus({ hours: 1 });
@@ -95,11 +99,11 @@ export async function updatePassword(data: FormData): Promise<void> {
 		passwordConfirm: data.get('passwordConfirm')
 	});
 	await validatePasswordResetToken(validatedData.token, validatedData.email);
-	await updatePasswordByUserEmail(validatedData.email, validatedData.password);
+	await userService.updatePasswordByUserEmail(validatedData.email, validatedData.password);
 
 	// allow failure
 	try {
-		await deletePasswordResetRequestByEmail(validatedData.email);
+		await passwordResetService.deletePasswordResetRequestByEmail(validatedData.email);
 	} catch (error) {
 		console.error(error);
 	}

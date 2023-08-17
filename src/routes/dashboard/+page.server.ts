@@ -1,6 +1,6 @@
 import { findAccountsCountByUserId } from '$lib/server/repositories/accountRepository';
 import * as accountService from '$lib/server/services/accountService';
-import { getAllEmailsCountByUserId, getAllFailedEmailsCountByUserId } from '../../models/emails';
+import * as emailService from '$lib/server/services/emailService';
 import { requireUserId } from '../../utils/auth';
 
 // TODO Save this in database
@@ -16,8 +16,8 @@ export const load = ({ locals }) => {
 				syncing: accountService.findAllSyncingAccountCountByUserId(userId)
 			},
 			emails: {
-				processed: getAllEmailsCountByUserId(userId),
-				failure: getAllFailedEmailsCountByUserId(userId),
+				processed: emailService.findEmailCountByUserId(userId),
+				failure: emailService.findFailedEmailCountByUserId(userId),
 				quota: EMAIL_QUOTA
 			}
 		}

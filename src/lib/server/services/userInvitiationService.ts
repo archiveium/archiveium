@@ -6,10 +6,10 @@ export async function insertUserInvitation(username: string) {
     return userInvitationRepository.insertUserInvitation(username);
 }
 
-export async function findUserByEmail(email: string) {
+export async function findUserInvitationByEmail(email: string) {
     try {
-        const user = userInvitationRepository.findUserByEmail(email);
-        return  user;        
+        const user = await userInvitationRepository.findUserInvitationByEmail(email);
+        return user;        
     } catch (error) {
         if (error instanceof NoResultError) {
             throw new UserNotInvitedException(`${email} has not been invited`);

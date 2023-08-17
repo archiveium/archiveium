@@ -5,7 +5,7 @@ import { formSchema, registrationSchema } from "../schemas/registrationSchema";
 import * as userInvitationService from '$lib/server/services/userInvitiationService';
 import type { RegistrationVerificationUrl, VerifyEmailParams } from "../../../types/registration";
 
-export async function RegisterForPreview(data: FormData): Promise<void> {
+export async function registerForPreview(data: FormData): Promise<void> {
 	// TODO Throw error if email is present in users table
 	// TODO Add honeypot spam protection
 	const validatedData = formSchema.parse({
@@ -14,7 +14,7 @@ export async function RegisterForPreview(data: FormData): Promise<void> {
 	await userInvitationService.insertUserInvitation(validatedData.email);
 }
 
-export async function VerifyRegistrationUrl(params: VerifyEmailParams): Promise<RegistrationVerificationUrl> {
+export async function verifyRegistrationUrl(params: VerifyEmailParams): Promise<RegistrationVerificationUrl> {
 	const appConfig = config.get<AppConfig>('app');
 	const validatedData = registrationSchema.parse(params);
 	const signUrlObj = new SignUrl(
