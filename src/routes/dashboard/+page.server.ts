@@ -1,8 +1,6 @@
-import {
-	getAllAccountsByUserIdCount,
-	getAllSyncingAccountsByUserIdCount
-} from '../../models/accounts';
-import { getAllEmailsCountByUserId, getAllFailedEmailsCountByUserId } from '../../models/emails';
+import { findAccountsCountByUserId } from '$lib/server/repositories/accountRepository';
+import * as accountService from '$lib/server/services/accountService';
+import * as emailService from '$lib/server/services/emailService';
 import { requireUserId } from '../../utils/auth';
 
 // TODO Save this in database
@@ -14,12 +12,12 @@ export const load = ({ locals }) => {
 	return {
 		streamed: {
 			accounts: {
-				added: getAllAccountsByUserIdCount(userId),
-				syncing: getAllSyncingAccountsByUserIdCount(userId)
+				added: findAccountsCountByUserId(userId),
+				syncing: accountService.findAllSyncingAccountCountByUserId(userId)
 			},
 			emails: {
-				processed: getAllEmailsCountByUserId(userId),
-				failure: getAllFailedEmailsCountByUserId(userId),
+				processed: emailService.findEmailCountByUserId(userId),
+				failure: emailService.findFailedEmailCountByUserId(userId),
 				quota: EMAIL_QUOTA
 			}
 		}

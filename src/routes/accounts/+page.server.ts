@@ -1,11 +1,8 @@
 import { fail, type Actions } from '@sveltejs/kit';
-import {
-	GetAllAccountsByUserId,
-	GetAllFoldersByUserIdAndAccountId,
-	UpdateAccountSyncingStatus
-} from '../../actions/account';
-import { GetAllEmailsWithS3DataByFolderAndUserId } from '../../actions/email';
-import { getAllEmailsCountByFolderAndUserId } from '../../models/emails';
+import * as accountService from '$lib/server/services/accountService';
+import * as folderService from '$lib/server/services/folderService';
+import * as emailService from '$lib/server/services/emailService';
+import * as s3Service from '$lib/server/services/s3Service';
 import type { Account } from '../../types/account';
 import type { Email } from '../../types/email';
 import type { Folder } from '../../types/folder';
@@ -26,14 +23,14 @@ export const load = async ({ locals, url }) => {
 };
 
 export const actions = {
-	default: async ({ request, locals, url }) => {
+	default: async ({ request, locals }) => {
 		const data = await request.formData();
 		const userId = requireUserId(false, locals.user);
-		const accountId = url.searchParams.get('accountId') ?? data.get('accountId')?.toString();
+		const accountId = data.get('accountId')?.toString();
 		const syncStatus = data.get('syncing');
 
 		if (syncStatus && accountId) {
-			const isAccountUpdated = await UpdateAccountSyncingStatus(
+			const isAccountUpdated = await accountService.updateAccountSyncingStatus(
 				userId,
 				accountId,
 				syncStatus === 'true'
@@ -66,26 +63,30 @@ async function buildPageData(
 	};
 	emails: Email[];
 	paginator: Paginator;
-}> {
+} | undefined> {
 	const folderId = url.searchParams.get('folderId');
 	const accountId = url.searchParams.get('accountId');
 	const page = url.searchParams.get('page') ?? '1';
 
-	const allAccounts = await GetAllAccountsByUserId(userId);
+	const allAccounts = await accountService.findAccountsByUserId(userId);
+	if (allAccounts.length === 0) {
+		return undefined;
+	}
+
 	const selectedAccount = allAccounts.find((account) => account.id == accountId) ?? allAccounts[0];
 
-	const folders = await GetAllFoldersByUserIdAndAccountId(userId, selectedAccount.id);
+	const folders = await folderService.findFoldersByAccountIdAndUserId(userId, selectedAccount.id);
 	const syncingFolders = folders.filter((folder) => folder.syncing);
 	const notSyncingFolders = folders.filter((folder) => !folder.syncing);
 	const selectedFolder = folders.find((folder) => folder.id == folderId) ?? folders[0];
 
-	const emailsWithS3Data = await GetAllEmailsWithS3DataByFolderAndUserId(
+	const emailsWithS3Data = await s3Service.findEmailsByFolderIdAndUserId(
 		userId,
 		selectedFolder.id,
 		page,
 		RESULTS_PER_PAGE,
 	);
-	const emailCount = await getAllEmailsCountByFolderAndUserId(userId, selectedFolder.id);
+	const emailCount = await emailService.findEmailCountByFolderAndUserId(userId, selectedFolder.id);
 	const paginator = GeneratePagination(emailCount, RESULTS_PER_PAGE, page, selectedFolder.id, selectedAccount.id);
 
 	return {

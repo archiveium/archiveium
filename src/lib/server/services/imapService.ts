@@ -7,7 +7,7 @@ import {
 	IMAPGenericException,
 	IMAPTooManyRequests,
 	IMAPUserAuthenticatedNotConnected
-} from '../exceptions/imap';
+} from '../../../exceptions/imap';
 
 export async function buildClient(
 	username: string,

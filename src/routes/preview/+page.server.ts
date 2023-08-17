@@ -2,7 +2,7 @@ import type { Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { getUserId, saveFlashMessage } from '../../utils/auth';
 import { ZodError } from 'zod';
-import { RegisterForPreview } from '../../actions/register';
+import * as registrationService from '$lib/server/services/registrationService';
 
 export const load = ({ locals }) => {
 	const userId = getUserId(locals.user);
@@ -16,7 +16,7 @@ export const actions = {
 		const data = await request.formData();
 
 		try {
-			await RegisterForPreview(data);
+			await registrationService.registerForPreview(data);
 		} catch (error: any) {
 			if (error instanceof ZodError) {
 				return fail(400, { error: error.message });

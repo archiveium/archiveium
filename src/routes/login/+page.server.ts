@@ -1,8 +1,8 @@
 import type { Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
-import * as authAction from '../../actions/auth';
 import { UserNotVerifiedException } from '../../exceptions/auth';
 import { createUserSession, getUserId } from '../../utils/auth';
+import * as authService from '$lib/server/services/authService';
 
 export const load = ({ locals }) => {
 	const userId = getUserId(locals.user);
@@ -20,7 +20,7 @@ export const actions = {
 		const data = await request.formData();
 
 		try {
-			const user = await authAction.LoginUser(data);
+			const user = await authService.loginUser(data);
 			await createUserSession(cookies, user);
 		} catch (error) {
 			if (error instanceof UserNotVerifiedException) {

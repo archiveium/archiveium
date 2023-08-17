@@ -1,19 +1,22 @@
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 import { ZodError } from 'zod';
-import { SaveAccount, ValidateAccount } from '../../../actions/account.js';
 import { AccountExistsException } from '../../../exceptions/account.js';
 import { IMAPAuthenticationFailed } from '../../../exceptions/imap.js';
-import { getAllProviders } from '../../../models/providers.js';
+import * as providerService from '$lib/server/services/providerService.js';
+import * as accountService from '$lib/server/services/accountService.js';
 import { requireUserId, saveFlashMessage } from '../../../utils/auth.js';
 
 export const load = async ({ locals }) => {
 	requireUserId(false, locals.user);
 
-	const availableProviders = await getAllProviders();
+	const availableProviders = await providerService.findAllProviders();
 	const defaultProvider = availableProviders.find((provider) => provider.is_default);
 	return {
 		availableProviders,
-		defaultProvider
+		defaultProvider,
+		steps: {
+			current: 1
+		}
 	};
 };
 
@@ -26,15 +29,18 @@ export const actions = {
 			switch (data.get('step')) {
 				case 'addAccountStep1':
 					{
-						const validatedProvider = await ValidateAccount(data, userId);
+						const validatedProvider = await accountService.validateAccount(data, userId);
 						return {
 							email: validatedProvider.account.email,
-							remoteFolders: validatedProvider.remoteFolders
+							remoteFolders: validatedProvider.remoteFolders,
+							steps: {
+								current: 2
+							}
 						};
 					}
 					break;
 				case 'addAccountStep2':
-					await SaveAccount(userId, data.get('email'), data.getAll('folders'));
+					await accountService.saveAccount(userId, data.get('email'), data.getAll('folders'));
 					await saveFlashMessage(locals.sessionId, {
 						type: 'success',
 						message: 'Account has been saved successfully!'
