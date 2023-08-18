@@ -68,7 +68,7 @@ export async function validateExistingAccount(
 	const validatedProvider = {
 		account: {
 			name: validatedData.name ?? account.name,
-			password: validatedData.password ?? account.password,
+			password: updatedPassword,
 			account_id: account.id,
 			email: account.email,
 			provider_id: account.provider_id,
