@@ -55,30 +55,26 @@
 							<Dropdown class="w-48 overflow-y-auto py-1 h-48">
 								{#each value.accounts.all as account}
 									<DropdownItem href={`?accountId=${account.id}`} class="px-2">
-										<Checkbox checked={value.accounts.selected.id === account.id}
+										<Checkbox checked={value.accounts.selected?.id === account.id}
 											>{account.email}</Checkbox
 										>
 									</DropdownItem>
 								{/each}
 							</Dropdown>
+							{#if value.folders.all && value.accounts.selected}
 							<Button color="alternative" size="sm" class="mr-2">
 								<Chevron>Folders</Chevron>
-							</Button>
+							</Button>							
 							<Dropdown class="w-48 overflow-y-auto py-1 h-48">
-								{#each value.folders.syncing as folder}
+								{#each value.folders.all as folder}
 								<DropdownItem href={`?accountId=${value.accounts.selected.id}&folderId=${folder.id}`} class="flex items-center">
-									<Checkbox checked={folder.id === value.folders.selected.id}>
+									<Checkbox checked={folder.id === value.folders?.selected?.id}>
 										{folder.name}
 									</Checkbox>
 								</DropdownItem>
 								{/each}
-								<DropdownDivider />
-								{#each value.folders.notSyncing as folder}
-								<DropdownItem class="flex items-center">
-									{folder.name}
-								</DropdownItem>
-								{/each}
 							</Dropdown>
+							{/if}
 						</div>
 						<div class="flex items-center lg:order-2">
 							<!-- TODO Reintroduce when search is integrated -->
@@ -93,6 +89,7 @@
 									<input type="text" id="simple-search" class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Search">
 								</div>
 							</form> -->
+							{#if value.accounts.selected}
 							<MenuButton vertical />
 							<Dropdown placement="bottom-start" class="w-36">
 								<DropdownItem href="/accounts/edit/{value.accounts.selected.id}">
@@ -111,6 +108,7 @@
 									</form>
 								</DropdownItem>
 							</Dropdown>
+							{/if}
 						</div>
 					</div>
 

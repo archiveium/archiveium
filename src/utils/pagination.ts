@@ -19,8 +19,8 @@ export function GeneratePagination(
 	resultCount: number,
 	resultsPerPage: number,
 	currentPageNum: string,
-	selectedFolderId: string,
-	selectedAccountId: string
+	selectedFolderId?: string,
+	selectedAccountId?: string
 ): Paginator {
 	const pageCount = Math.ceil(resultCount / resultsPerPage);
 	const pageNum = Number(currentPageNum);
@@ -67,13 +67,17 @@ export function GeneratePagination(
 
 export function buildSearchParams(
 	page: string | number,
-	accountId: string,
-	folderId: string
+	accountId?: string,
+	folderId?: string
 ): string {
-	const query = new URLSearchParams({
-		page: typeof page === 'string' ? page : page.toString(),
-		accountId,
-		folderId
-	});
+	const queryParams: Record<string, string> = {};
+	queryParams['page'] = typeof page === 'string' ? page : page.toString();
+	if (accountId) {
+		queryParams['accountId'] = accountId;
+	}
+	if (folderId) {
+		queryParams['folderId'] = folderId;
+	}
+	const query = new URLSearchParams(queryParams);
 	return `?${query.toString()}`;
 }

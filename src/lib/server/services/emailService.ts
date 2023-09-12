@@ -11,6 +11,16 @@ export async function findEmailByFolderIdAndUserId(
     return emailService.findEmailByFolderIdAndUserId(userId, folderId, offset, resultsPerPage);
 }
 
+export async function findEmailByUserId(
+	userId: string,
+	currentPage: string,
+	resultsPerPage: number,
+) {
+	const page = Number(currentPage);
+	const offset = page === 1 ? 0 : (page - 1) * resultsPerPage;
+    return emailService.findEmailByUserId(userId, offset, resultsPerPage);
+}
+
 export async function findEmailByIdAndUserId(userId: string, emailId: string) {
     return emailService.findEmailByIdAndUserId(userId, emailId);
 }
