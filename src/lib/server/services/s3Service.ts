@@ -54,6 +54,29 @@ export async function findEmailsByUserId(
 	return await Promise.all(promises);
 }
 
+export async function findEmailsByUserId(
+	userId: string,
+	currentPage: string,
+	resultsPerPage: number,
+): Promise<Email[]> {
+	const emails = await emailService.findEmailByUserId(userId, currentPage, resultsPerPage);
+	const promises = emails.map(async (email) => {
+		const params: GetObjectCommandInput = {
+			Bucket: BUCKET_NAME,
+			Key: `${userId}/${email.folder_id}/${email.message_number}.eml`
+		};
+		const s3Data = await s3Client.send(new GetObjectCommand(params));
+		const parsedEmail = await parseEmail(await s3Data.Body?.transformToString());
+		email.s3Data = {
+			subject: parsedEmail.subject ?? 'Not Available',
+			from: getFromNameOrAddress(parsedEmail.from)
+		};
+		return email;
+	});
+
+	return await Promise.all(promises);
+}
+
 export async function findEmailByIdAndUserId(
 	userId: string,
 	emailId: string
