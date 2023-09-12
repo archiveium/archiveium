@@ -16,6 +16,20 @@ export async function findEmailByFolderIdAndUserId(userId: string, folderId: str
         .execute();
 }
 
+export async function findEmailByUserId(userId: string, offset: number, limit: number) {
+    return db.selectFrom('emails')
+        .select([
+            'id', 'folder_id', 'has_attachments', 'message_number',
+            sql<string>`to_char(udate, 'Mon DD, YYYY')`.as('formatted_date')
+        ])
+        .where('user_id', '=', userId)
+        .where('imported', '=', true)
+        .orderBy('udate', 'desc')
+        .offset(offset)
+        .limit(limit)
+        .execute();
+}
+
 export async function findEmailByIdAndUserId(userId: string, emailId: string) {
     return db.selectFrom('emails')
         .select(['id', 'folder_id', 'udate', 'has_attachments', 'message_number'])        

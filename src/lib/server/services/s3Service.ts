@@ -3,7 +3,7 @@ import { GetObjectCommand } from '@aws-sdk/client-s3';
 import type { AddressObject } from 'mailparser';
 import type { Email } from '../../../types/email';
 import { BUCKET_NAME } from '../constants/s3';
-import { parseEmail } from '../../../utils/emailParser';
+import { parseEmail, parseEmailSubject } from '../../../utils/emailParser';
 import * as emailService from '$lib/server/services/emailService';
 import { s3Client } from '../s3/connection';
 
@@ -22,7 +22,30 @@ export async function findEmailsByFolderIdAndUserId(
 		const s3Data = await s3Client.send(new GetObjectCommand(params));
 		const parsedEmail = await parseEmail(await s3Data.Body?.transformToString());
 		email.s3Data = {
-			subject: parsedEmail.subject ?? 'Not Available',
+			subject: parseEmailSubject(parsedEmail.subject),
+			from: getFromNameOrAddress(parsedEmail.from)
+		};
+		return email;
+	});
+
+	return await Promise.all(promises);
+}
+
+export async function findEmailsByUserId(
+	userId: string,
+	currentPage: string,
+	resultsPerPage: number,
+): Promise<Email[]> {
+	const emails = await emailService.findEmailByUserId(userId, currentPage, resultsPerPage);
+	const promises = emails.map(async (email) => {
+		const params: GetObjectCommandInput = {
+			Bucket: BUCKET_NAME,
+			Key: `${userId}/${email.folder_id}/${email.message_number}.eml`
+		};
+		const s3Data = await s3Client.send(new GetObjectCommand(params));
+		const parsedEmail = await parseEmail(await s3Data.Body?.transformToString());
+		email.s3Data = {
+			subject: parseEmailSubject(parsedEmail.subject),
 			from: getFromNameOrAddress(parsedEmail.from)
 		};
 		return email;

@@ -18,7 +18,8 @@
 		Alert,
 		Pagination,
 		ChevronLeft,
-		ChevronRight
+		ChevronRight,
+		Checkbox
 	} from 'flowbite-svelte';
 
 	export let data;
@@ -43,76 +44,104 @@
 	Loading...
 {:then value}
 	{#if value}
-		<div class="flex justify-between items-center mb-4">
-			<div>
-				<Button class="" size="sm"><Chevron>Accounts</Chevron></Button>
-				<Dropdown class="w-48 overflow-y-auto py-1 h-48">
-					{#each value.accounts.all as account}
-						<DropdownItem href={`?accountId=${account.id}`} class="flex items-center"
-							>{account.email}</DropdownItem
-						>
-					{/each}
-				</Dropdown>
-				<Button class="" size="sm"><Chevron>Folders</Chevron></Button>
-				<Dropdown class="w-48 overflow-y-auto py-1 h-48">
-					{#each value.folders.syncing as folder}
-						<DropdownItem
-							href={`?accountId=${value.accounts.selected.id}&folderId=${folder.id}`}
-							class="flex items-center">{folder.name}</DropdownItem
-						>
-					{/each}
-					<DropdownDivider />
-					{#each value.folders.notSyncing as folder}
-						<DropdownItem class="flex items-center">{folder.name}</DropdownItem>
-					{/each}
-				</Dropdown>
-			</div>
-			<div class="flex justify-end">
-				<MenuButton vertical />
-				<Dropdown class="w-36">
-					<DropdownItem href="/accounts/edit/{value.accounts.selected.id}">Edit</DropdownItem>
-					<DropdownItem>
-						<form method="post" use:enhance>
-							<input name="accountId" value={value.accounts.selected.id} hidden readonly />
-							{#if value.accounts.selected.syncing}
-								<input name="syncing" value="false" hidden readonly />
-								<button type="submit">Pause Syncing</button>
-							{:else}
-								<input name="syncing" value="true" hidden readonly />
-								<button type="submit">Resume Syncing</button>
+		<section class="bg-gray-50 dark:bg-gray-900 flex items-center">
+			<div class="mx-auto w-full">
+				<div class="relative bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
+					<div class="flex flex-wrap items-center justify-between p-2 space-y-2">
+						<div class="flex justify-start items-center">
+							<Button color="alternative" size="sm" class="mr-2">
+								<Chevron>Accounts</Chevron>
+							</Button>
+							<Dropdown class="w-48 overflow-y-auto py-1 h-48">
+								{#each value.accounts.all as account}
+									<DropdownItem href={`?accountId=${account.id}`} class="px-2">
+										<Checkbox checked={value.accounts.selected?.id === account.id}
+											>{account.email}</Checkbox
+										>
+									</DropdownItem>
+								{/each}
+							</Dropdown>
+							{#if value.folders.all && value.accounts.selected}
+							<Button color="alternative" size="sm" class="mr-2">
+								<Chevron>Folders</Chevron>
+							</Button>							
+							<Dropdown class="w-48 overflow-y-auto py-1 h-48">
+								{#each value.folders.all as folder}
+								<DropdownItem href={`?accountId=${value.accounts.selected.id}&folderId=${folder.id}`} class="flex items-center">
+									<Checkbox checked={folder.id === value.folders?.selected?.id}>
+										{folder.name}
+									</Checkbox>
+								</DropdownItem>
+								{/each}
+							</Dropdown>
 							{/if}
-						</form>
-					</DropdownItem>
-				</Dropdown>
-			</div>
-		</div>
+						</div>
+						<div class="flex items-center lg:order-2">
+							<!-- TODO Reintroduce when search is integrated -->
+							<!-- <form class="flex items-center">
+								<label for="simple-search" class="sr-only">Search</label>
+								<div class="relative w-full">
+									<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+									<svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+									</svg>
+									</div>
+									<input type="text" id="simple-search" class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Search">
+								</div>
+							</form> -->
+							{#if value.accounts.selected}
+							<MenuButton vertical />
+							<Dropdown placement="bottom-start" class="w-36">
+								<DropdownItem href="/accounts/edit/{value.accounts.selected.id}">
+									Edit
+								</DropdownItem>
+								<DropdownItem>
+									<form method="post" use:enhance>
+										<input name="accountId" value={value.accounts.selected.id} hidden readonly />
+										{#if value.accounts.selected.syncing}
+											<input name="syncing" value="false" hidden readonly />
+											<button type="submit">Pause Syncing</button>
+										{:else}
+											<input name="syncing" value="true" hidden readonly />
+											<button type="submit">Resume Syncing</button>
+										{/if}
+									</form>
+								</DropdownItem>
+							</Dropdown>
+							{/if}
+						</div>
+					</div>
 
-		<Table shadow divClass="overflow-x-auto shadow-md sm:rounded-lg">
-			<TableHead>
-				<TableHeadCell>From</TableHeadCell>
-				<TableHeadCell>Subject</TableHeadCell>
-				<TableHeadCell>Date</TableHeadCell>
-				<TableHeadCell />
-			</TableHead>
-			<TableBody tableBodyClass="divide-y">
-				{#each value.emails as email}
-					<TableBodyRow>
-						<TableBodyCell tdClass="px-6 py-3 whitespace-nowrap font-medium">
-							{email.s3Data?.from}
-						</TableBodyCell>
-						<TableBodyCell tdClass="px-6 py-3 whitespace-nowrap font-medium">
-							{email.s3Data?.subject}
-						</TableBodyCell>
-						<TableBodyCell tdClass="px-6 py-3 whitespace-nowrap font-medium">
-							{email.formatted_date}
-						</TableBodyCell>
-						<TableBodyCell tdClass="px-6 py-3 whitespace-nowrap font-medium">
-							<A href={`/email/${email.id}`} target="_blank">View</A>
-						</TableBodyCell>
-					</TableBodyRow>
-				{/each}
-			</TableBody>
-		</Table>
+					<Table shadow divClass="overflow-x-auto">
+						<TableHead>
+							<TableHeadCell>From</TableHeadCell>
+							<TableHeadCell>Subject</TableHeadCell>
+							<TableHeadCell>Date</TableHeadCell>
+							<TableHeadCell />
+						</TableHead>
+						<TableBody tableBodyClass="divide-y">
+							{#each value.emails as email}
+								<TableBodyRow>
+									<TableBodyCell tdClass="px-6 py-3 whitespace-nowrap font-medium">
+										{email.s3Data?.from}
+									</TableBodyCell>
+									<TableBodyCell tdClass="px-6 py-3 whitespace-nowrap font-medium text-ellipsis">
+										{email.s3Data?.subject}
+									</TableBodyCell>
+									<TableBodyCell tdClass="px-6 py-3 whitespace-nowrap font-medium">
+										{email.formatted_date}
+									</TableBodyCell>
+									<TableBodyCell tdClass="px-6 py-3 whitespace-nowrap font-medium">
+										<A href={`/email/${email.id}`} target="_blank">View</A>
+									</TableBodyCell>
+								</TableBodyRow>
+							{/each}
+						</TableBody>
+					</Table>
+				</div>
+			</div>
+		</section>
+
 		<div class="flex justify-center items-center mt-2">
 			<Pagination large pages={value.paginator.pages}>
 				<svelte:fragment slot="prev">
