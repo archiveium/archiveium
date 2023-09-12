@@ -68,7 +68,7 @@ export async function findEmailsByUserId(
 		const s3Data = await s3Client.send(new GetObjectCommand(params));
 		const parsedEmail = await parseEmail(await s3Data.Body?.transformToString());
 		email.s3Data = {
-			subject: parsedEmail.subject ?? 'Not Available',
+			subject: parseEmailSubject(parsedEmail.subject),
 			from: getFromNameOrAddress(parsedEmail.from)
 		};
 		return email;
