@@ -63,14 +63,14 @@ export const actions = {
 					});
 					break;
 				case 'deleteAccount':
-					await accountService.deleteAccountByUserId(selectedAccount.id, userId);
+					await accountService.deleteAccountByUserId(userId, selectedAccount.id);
 					await saveFlashMessage(locals.sessionId, {
 						type: 'success',
 						message: 'Account has been deleted successfully.'
 					});
 					break;
 			}
-		} catch (error: any) {
+		} catch (error) {
 			// TODO Log error
 			if (error instanceof ZodError) {
 				return fail(400, {
@@ -90,9 +90,9 @@ export const actions = {
 			}
 
 			console.log(error);
-			return fail(400, {
-				error: 'There was an error editing account.',
-				fieldErrors: undefined
+			await saveFlashMessage(locals.sessionId, {
+				type: 'error',
+				message: 'There was an error editing account.'
 			});
 		}
 
