@@ -37,7 +37,7 @@ export interface Accounts {
 export interface Emails {
   id: Generated<Int8>;
   user_id: Int8;
-  folder_id: Int8;
+  email_id: Int8;
   message_number: number;
   udate: Timestamp;
   has_attachments: boolean;
@@ -53,7 +53,6 @@ export interface Folders {
   account_id: Int8;
   name: string;
   status_uidvalidity: number;
-  status_messages: number;
   last_updated_msgno: number | null;
   syncing: Generated<boolean | null>;
   deleted: Generated<boolean | null>;

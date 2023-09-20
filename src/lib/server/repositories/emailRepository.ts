@@ -4,11 +4,11 @@ import { sql } from 'kysely';
 export async function findEmailByFolderIdAndUserId(userId: string, folderId: string, offset: number, limit: number) {
     return db.selectFrom('emails')
         .select([
-            'id', 'folder_id', 'has_attachments', 'message_number',
+            'id', 'email_id', 'has_attachments', 'message_number',
             sql<string>`to_char(udate, 'Mon DD, YYYY')`.as('formatted_date')
         ])
         .where('user_id', '=', userId)
-        .where('folder_id', '=', folderId)
+        // .where('folder_id', '=', folderId)
         .where('imported', '=', true)
         .orderBy('udate', 'desc')
         .offset(offset)
@@ -19,7 +19,7 @@ export async function findEmailByFolderIdAndUserId(userId: string, folderId: str
 export async function findEmailByUserId(userId: string, offset: number, limit: number) {
     return db.selectFrom('emails')
         .select([
-            'id', 'folder_id', 'has_attachments', 'message_number',
+            'id', 'email_id', 'has_attachments', 'message_number',
             sql<string>`to_char(udate, 'Mon DD, YYYY')`.as('formatted_date')
         ])
         .where('user_id', '=', userId)
@@ -32,7 +32,7 @@ export async function findEmailByUserId(userId: string, offset: number, limit: n
 
 export async function findEmailByIdAndUserId(userId: string, emailId: string) {
     return db.selectFrom('emails')
-        .select(['id', 'folder_id', 'udate', 'has_attachments', 'message_number'])        
+        .select(['id', 'email_id', 'udate', 'has_attachments', 'message_number'])        
         .where('user_id', '=', userId)
         .where('id', '=', emailId)
         .where('imported', '=', true)
@@ -43,7 +43,7 @@ export async function findEmailCountByFolderAndUserId(userId: string, folderId: 
     const result = await db.selectFrom('emails')
         .select((eb) => eb.fn('count', ['id']).as('count'))
         .where('user_id', '=', userId)
-        .where('folder_id', '=', folderId)
+        // .where('folder_id', '=', folderId)
         .where('imported', '=', true)
         .executeTakeFirstOrThrow();
     return result.count as number;

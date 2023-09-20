@@ -1,7 +1,6 @@
 interface BaseFolder {
 	name: string;
 	status_uidvalidity: number;
-	status_messages: number;
 }
 
 export interface RemoteFolder extends BaseFolder {
