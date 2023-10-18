@@ -18,7 +18,7 @@
 		"release:dry-run": "release-it --ci --config release-it.json --dry-run",
 		"typecheck": "tsc",
 		"test:coverage": "vitest run --coverage",
-		"kysely:codegen": "kysely-codegen --out-file src/lib/server/database/types.d.ts"
+		"kysely:codegen": "DATABASE_URL=postgres://archiveium:archiveiumPassword@db/archiveium kysely-codegen --out-file src/lib/server/database/types.d.ts"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "3.256.0",
