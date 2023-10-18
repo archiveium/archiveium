@@ -3,7 +3,7 @@ import pg from 'pg';
 import config from 'config';
 import { Kysely, PostgresDialect } from 'kysely';
 import type { DatabaseConfig } from '../../../types/config';
-import { LOG_LEVEL } from '$env/dynamic/private';
+import { LOG_LEVEL } from '$env/static/private';
 
 const { Pool } = pg;
 const dbConfig = config.get<DatabaseConfig>('database');
