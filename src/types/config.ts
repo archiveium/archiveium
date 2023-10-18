@@ -17,6 +17,7 @@ export interface SessionConfig {
 
 export interface AppConfig {
 	url: string;
+	logLevel: string;
 }
 
 export interface S3Config {

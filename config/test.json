@@ -1,6 +1,7 @@
 {
 	"app": {
-		"url": ""
+		"url": "",
+		"logLevel": ""
 	},
 	"database": {
 		"user": "",

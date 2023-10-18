@@ -35,11 +35,7 @@ jobs:
           node-version: 16.x
           cache: 'npm'
       - run: npm ci
-      # env values passed here are to ensure build step in Github does not fail
-      # Remove once there's a resolution https://github.com/sveltejs/kit/discussions/7265
-      - env:
-          LOG_LEVEL: ''
-        run: npm run build
+      - run: npm run build
 
   test:
     name: Test
