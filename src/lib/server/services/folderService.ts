@@ -37,7 +37,8 @@ export async function insertFoldersAndAccount(
 			);
 			if (remoteFolder) {
 				foldersToSave.push({
-					...remoteFolder,
+					name: remoteFolder.name,
+					status_uidvalidity: remoteFolder.status_uidvalidity,
 					user_id: userId,
 					account_id: insertedAccount.id,
 					syncing: true

@@ -9,6 +9,7 @@ import * as providerService from '$lib/server/services/providerService';
 import * as imapService from '$lib/server/services/imapService';
 import { CacheKeyNotFoundException } from '../../../exceptions/cache';
 import { redis } from '../redis/connection';
+import { RecordDeleteFailedException } from '../../../exceptions/database';
 
 export async function updateAccountSyncingStatus(
 	userId: string,
@@ -42,9 +43,11 @@ export async function isAccountUnique(email: string, userId: string) {
     return accountRepository.isAccountUnique(email, userId);
 }
 
-export async function deleteAccountByUserId(userId: string, accountId: string): Promise<boolean> {
+export async function deleteAccountByUserId(userId: string, accountId: string): Promise<void> {
     const result = await accountRepository.deleteAccountByUserId(userId, accountId);
-    return Number(result.numDeletedRows) === 1;
+    if (Number(result.numDeletedRows) !== 1) {
+		throw new RecordDeleteFailedException(`Failed to delete account ${accountId} for user ${userId}`);
+	}
 }
 
 export async function validateExistingAccount(
@@ -78,7 +81,6 @@ export async function validateExistingAccount(
 			return {
 				name: remoteFolder.path,
 				status_uidvalidity: Number(remoteFolder.status?.uidValidity),
-				// TODO Is this required?
 				status_messages: remoteFolder.status?.messages ?? 0,
 				syncing: selectedFolders.some(
 					(selectedFolder) => selectedFolder.name === remoteFolder.path && selectedFolder.syncing
@@ -114,7 +116,6 @@ export async function validateAccount(data: FormData, userId: string): Promise<V
 			return {
 				name: remoteFolder.path,
 				status_uidvalidity: Number(remoteFolder.status?.uidValidity),
-				// TODO Is this required?
 				status_messages: remoteFolder.status?.messages ?? 0
 			};
 		})

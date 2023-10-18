@@ -11,6 +11,17 @@ export async function findEmailByFolderIdAndUserId(
     return emailService.findEmailByFolderIdAndUserId(userId, folderId, offset, resultsPerPage);
 }
 
+export async function findEmailByAccountIdAndUserId(
+	userId: string,
+	accountId: string,
+	currentPage: string,
+	resultsPerPage: number,
+) {
+	const page = Number(currentPage);
+	const offset = page === 1 ? 0 : (page - 1) * resultsPerPage;
+    return emailService.findEmailByAccountIdAndUserId(userId, accountId, offset, resultsPerPage);
+}
+
 export async function findEmailByUserId(
 	userId: string,
 	currentPage: string,
@@ -27,6 +38,10 @@ export async function findEmailByIdAndUserId(userId: string, emailId: string) {
 
 export async function findEmailCountByFolderAndUserId(userId: string, folderId: string): Promise<number> {
     return emailService.findEmailCountByFolderAndUserId(userId, folderId);
+}
+
+export async function findEmailCountByAccountIdAndUserId(userId: string, accountId: string): Promise<number> {
+    return emailService.findEmailCountByAccountIdAndUserId(userId, accountId);
 }
 
 export async function findEmailCountByUserId(userId: string): Promise<number> {

@@ -47,8 +47,8 @@ export const actions = {
 					});
 					break;
 			}
-		} catch (error: any) {
-			// TODO Log error
+		} catch (error) {
+			console.log(error);
 			if (error instanceof ZodError) {
 				return fail(400, {
 					error: undefined,

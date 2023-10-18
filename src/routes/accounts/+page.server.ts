@@ -64,8 +64,11 @@ async function buildPageData(
 	let folders;
 	if (selectedAccount) {
 		folders = await folderService.findFoldersByAccountIdAndUserId(userId, selectedAccount.id);
-		// remove folders not syncing
-		folders = folders.filter((folder) => folder.syncing);
+		// do not remove folders not syncing
+		// we need them to be discoverable since they might have emails
+		// that user might want to see
+		// let user filter these out if they want to
+		// folders = folders.filter((folder) => folder.syncing);
 	}
 
 	const selectedFolder = folders?.find((folder) => folder.id == folderId);
@@ -81,12 +84,22 @@ async function buildPageData(
 		);
 		emailCount = await emailService.findEmailCountByFolderAndUserId(userId, selectedFolder.id);
 	} else {
-		emailsWithS3Data = await s3Service.findEmailsByUserId(
-			userId,
-			page,
-			RESULTS_PER_PAGE,
-		);
-		emailCount = await emailService.findEmailCountByUserId(userId);
+		if (selectedAccount) {
+			emailsWithS3Data = await s3Service.findEmailsByAccountIdAndUserId(
+				userId,
+				selectedAccount.id,
+				page,
+				RESULTS_PER_PAGE,
+			);
+			emailCount = await emailService.findEmailCountByAccountIdAndUserId(userId, selectedAccount.id);
+		} else {
+			emailsWithS3Data = await s3Service.findEmailsByUserId(
+				userId,
+				page,
+				RESULTS_PER_PAGE,
+			);
+			emailCount = await emailService.findEmailCountByUserId(userId);
+		}
 	}
 
 	const paginator = GeneratePagination(emailCount, RESULTS_PER_PAGE, page, selectedFolder?.id, selectedAccount?.id);

@@ -7,7 +7,7 @@
 
 <!-- Success alert -->
 {#if data.flashMessage}
-	<Alert border color="green" class="mb-4">
+	<Alert border color={data.flashMessage.type === "error" ? "red" : "green"} class="mb-4">
 		{data.flashMessage.message}
 	</Alert>
 {/if}
