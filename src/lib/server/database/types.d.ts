@@ -34,17 +34,25 @@ export interface Accounts {
   updated_at: Generated<Timestamp | null>;
 }
 
+export interface EmailFolders {
+  id: Generated<Int8>;
+  email_id: Int8;
+  folder_id: Int8;
+}
+
 export interface Emails {
   id: Generated<Int8>;
   user_id: Int8;
-  email_id: Int8;
+  account_id: Int8;
+  email_id: Int8 | null;
   message_number: number;
   udate: Timestamp;
   has_attachments: boolean;
   imported: boolean;
   import_fail_reason: string | null;
+  size_total: Int8;
+  size_without_attachments: Int8;
   created_at: Generated<Timestamp | null>;
-  updated_at: Generated<Timestamp | null>;
 }
 
 export interface Folders {
@@ -92,6 +100,7 @@ export interface Providers {
   port: number;
   secure: boolean;
   is_default: boolean;
+  check_email_id: boolean;
   created_at: Generated<Timestamp | null>;
   updated_at: Generated<Timestamp | null>;
 }
@@ -117,6 +126,7 @@ export interface Users {
 
 export interface DB {
   accounts: Accounts;
+  email_folders: EmailFolders;
   emails: Emails;
   folders: Folders;
   jobs: Jobs;
