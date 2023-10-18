@@ -52,12 +52,12 @@
 							<Button color="alternative" size="sm" class="mr-2">
 								<Chevron>Accounts</Chevron>
 							</Button>
-							<Dropdown class="w-48 overflow-y-auto py-1 h-48">
+							<Dropdown placement="bottom-start" class="w-full overflow-y-auto py-1 h-48">
 								{#each value.accounts.all as account}
 									<DropdownItem href={`?accountId=${account.id}`} class="px-2">
-										<Checkbox checked={value.accounts.selected?.id === account.id}
-											>{account.email}</Checkbox
-										>
+										<Checkbox checked={value.accounts.selected?.id === account.id}>
+											{account.email}
+										</Checkbox>
 									</DropdownItem>
 								{/each}
 							</Dropdown>
@@ -65,7 +65,7 @@
 							<Button color="alternative" size="sm" class="mr-2">
 								<Chevron>Folders</Chevron>
 							</Button>							
-							<Dropdown class="w-48 overflow-y-auto py-1 h-48">
+							<Dropdown placement="bottom-start" class="w-48 overflow-y-auto py-1 h-48">
 								{#each value.folders.all as folder}
 								<DropdownItem href={`?accountId=${value.accounts.selected.id}&folderId=${folder.id}`} class="flex items-center">
 									<Checkbox checked={folder.id === value.folders?.selected?.id}>
