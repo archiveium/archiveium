@@ -1,6 +1,6 @@
 {
 	"name": "archiveium-frontend",
-	"version": "0.0.10-beta.3",
+	"version": "0.0.10",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
