@@ -18,40 +18,43 @@ export async function findEmailByFolderIdAndUserId(userId: string, folderId: str
 }
 
 export async function findEmailByAccountIdAndUserId(userId: string, accountId: string, offset: number, limit: number) {
-    return db.selectFrom('emails')
+    return db.selectFrom('emails as e')
+        .innerJoin('email_folders as ef', 'ef.email_id', 'e.id')
         .select([
-            'id', 'has_attachments', 'message_number',
-            sql<string>`to_char(udate, 'Mon DD, YYYY')`.as('formatted_date')
+            'e.id', 'e.has_attachments', 'e.message_number', 'ef.folder_id',
+            sql<string>`to_char(e.udate, 'Mon DD, YYYY')`.as('formatted_date')
         ])
-        .where('user_id', '=', userId)
-        .where('account_id', '=', accountId)
-        .where('imported', '=', true)
-        .orderBy('udate', 'desc')
+        .where('e.user_id', '=', userId)
+        .where('e.account_id', '=', accountId)
+        .where('e.imported', '=', true)
+        .orderBy('e.udate', 'desc')
         .offset(offset)
         .limit(limit)
         .execute();
 }
 
 export async function findEmailByUserId(userId: string, offset: number, limit: number) {
-    return db.selectFrom('emails')
+    return db.selectFrom('emails as e')
+        .innerJoin('email_folders as ef', 'ef.email_id', 'e.id')
         .select([
-            'id', 'email_id', 'has_attachments', 'message_number',
-            sql<string>`to_char(udate, 'Mon DD, YYYY')`.as('formatted_date')
+            'e.id', 'e.email_id', 'e.has_attachments', 'e.message_number', 'ef.folder_id',
+            sql<string>`to_char(e.udate, 'Mon DD, YYYY')`.as('formatted_date')
         ])
-        .where('user_id', '=', userId)
-        .where('imported', '=', true)
-        .orderBy('udate', 'desc')
+        .where('e.user_id', '=', userId)
+        .where('e.imported', '=', true)
+        .orderBy('e.udate', 'desc')
         .offset(offset)
         .limit(limit)
         .execute();
 }
 
 export async function findEmailByIdAndUserId(userId: string, emailId: string) {
-    return db.selectFrom('emails')
-        .select(['id', 'email_id', 'udate', 'has_attachments', 'message_number'])        
-        .where('user_id', '=', userId)
-        .where('id', '=', emailId)
-        .where('imported', '=', true)
+    return db.selectFrom('emails as e')
+        .innerJoin('email_folders as ef', 'ef.email_id', 'e.id')
+        .select(['e.id', 'e.email_id', 'e.udate', 'e.has_attachments', 'e.message_number', 'ef.folder_id'])        
+        .where('e.user_id', '=', userId)
+        .where('e.id', '=', emailId)
+        .where('e.imported', '=', true)
         .executeTakeFirstOrThrow();
 }
 
