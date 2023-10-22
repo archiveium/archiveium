@@ -36,12 +36,14 @@ export async function findEmailByAccountIdAndUserId(userId: string, accountId: s
 export async function findEmailByUserId(userId: string, offset: number, limit: number) {
     return db.selectFrom('emails as e')
         .innerJoin('email_folders as ef', 'ef.email_id', 'e.id')
+        .innerJoin('accounts as a', 'a.id', 'e.account_id')
         .select([
             'e.id', 'e.email_id', 'e.has_attachments', 'e.message_number', 'ef.folder_id',
             sql<string>`to_char(e.udate, 'Mon DD, YYYY')`.as('formatted_date')
         ])
         .where('e.user_id', '=', userId)
         .where('e.imported', '=', true)
+        .where('a.deleted', '!=', true)
         .orderBy('e.udate', 'desc')
         .offset(offset)
         .limit(limit)
