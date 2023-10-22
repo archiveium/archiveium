@@ -1,5 +1,6 @@
 import { db } from '$lib/server/database/connection';
-import type { DeleteResult } from 'kysely';
+import type { Transaction, UpdateResult } from 'kysely';
+import type { DB } from '../database/types';
 
 export async function findAccountsCountByUserId(userId: string): Promise<number> {
   const result = await db.selectFrom('accounts')
@@ -57,8 +58,13 @@ export async function isAccountUnique(email: string, userId: string): Promise<bo
   return result.count as number == 0;
 }
 
-export async function deleteAccountByUserId(userId: string, accountId: string): Promise<DeleteResult> {
-  return db.deleteFrom('accounts')
+export async function deleteAccountByUserId(userId: string, accountId: string, trx?: Transaction<DB>): Promise<UpdateResult> {
+  const dbObject = trx ?? db;
+  return dbObject.updateTable('accounts')
+    .set({
+      'syncing': false,
+      'deleted': true
+    })
     .where('user_id', '=', userId)
     .where('id', '=', accountId)
     .executeTakeFirstOrThrow();

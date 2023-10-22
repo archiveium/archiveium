@@ -1,15 +1,16 @@
 import * as accountRepository from '$lib/server/repositories/accountRepository';
+import * as folderRepository from '$lib/server/repositories/folderRepository';
 import { NoResultError } from 'kysely';
 import { AccountExistsException, AccountNotFoundException } from '../../../exceptions/account';
 import type { Account, ValidatedAccount, ValidatedExistingAccount } from '../../../types/account';
 import { addAccountSchema, editAccountSchema } from '../schemas/accountSchemas';
-import * as accountService from '$lib/server/services/accountService';
 import * as folderService from '$lib/server/services/folderService';
 import * as providerService from '$lib/server/services/providerService';
 import * as imapService from '$lib/server/services/imapService';
 import { CacheKeyNotFoundException } from '../../../exceptions/cache';
 import { redis } from '../redis/connection';
 import { RecordDeleteFailedException } from '../../../exceptions/database';
+import { db } from '../database/connection';
 
 export async function updateAccountSyncingStatus(
 	userId: string,
@@ -44,10 +45,18 @@ export async function isAccountUnique(email: string, userId: string) {
 }
 
 export async function deleteAccountByUserId(userId: string, accountId: string): Promise<void> {
-    const result = await accountRepository.deleteAccountByUserId(userId, accountId);
-    if (Number(result.numDeletedRows) !== 1) {
-		throw new RecordDeleteFailedException(`Failed to delete account ${accountId} for user ${userId}`);
-	}
+	return db.transaction().execute(async (trx) => {
+		const deleteAccountResult = await accountRepository.deleteAccountByUserId(userId, accountId, trx);
+		if (Number(deleteAccountResult.numUpdatedRows) !== 1) {
+			throw new RecordDeleteFailedException(`Failed to delete account ${accountId} for user ${userId}`);
+		}
+
+		const deleteFolderResult = await folderRepository.deleteFolderByAccountId(userId, accountId, trx);
+		if (Number(deleteFolderResult.numUpdatedRows) === 0) {
+			throw new RecordDeleteFailedException(`Failed to delete folders for account ${accountId} & user ${userId}`);
+		}		
+	});
+
 }
 
 export async function validateExistingAccount(
@@ -101,7 +110,7 @@ export async function validateAccount(data: FormData, userId: string): Promise<V
 		password: data.get('password'),
 		provider_id: data.get('provider_id')
 	});
-	const accountUnique = await accountService.isAccountUnique(validatedData.email, userId);
+	const accountUnique = await isAccountUnique(validatedData.email, userId);
 	if (!accountUnique) {
 		throw new AccountExistsException(`${validatedData.email} has already been added.`);
 	}
