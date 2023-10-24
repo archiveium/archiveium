@@ -38,6 +38,7 @@ export interface EmailFolders {
   id: Generated<Int8>;
   email_id: Int8;
   folder_id: Int8;
+  has_source: boolean;
 }
 
 export interface Emails {

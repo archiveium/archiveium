@@ -27,6 +27,7 @@ export async function findEmailByAccountIdAndUserId(userId: string, accountId: s
         .where('e.user_id', '=', userId)
         .where('e.account_id', '=', accountId)
         .where('e.imported', '=', true)
+        .where('ef.has_source', '=', true)
         .orderBy('e.udate', 'desc')
         .offset(offset)
         .limit(limit)
@@ -44,6 +45,7 @@ export async function findEmailByUserId(userId: string, offset: number, limit: n
         .where('e.user_id', '=', userId)
         .where('e.imported', '=', true)
         .where('a.deleted', '!=', true)
+        .where('ef.has_source', '=', true)
         .orderBy('e.udate', 'desc')
         .offset(offset)
         .limit(limit)
@@ -57,6 +59,7 @@ export async function findEmailByIdAndUserId(userId: string, emailId: string) {
         .where('e.user_id', '=', userId)
         .where('e.id', '=', emailId)
         .where('e.imported', '=', true)
+        .where('ef.has_source', '=', true)
         .executeTakeFirstOrThrow();
 }
 
