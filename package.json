@@ -23,7 +23,7 @@
 	"dependencies": {
 		"@aws-sdk/client-s3": "3.256.0",
 		"@floating-ui/dom": "^1.4.5",
-		"@types/mailparser": "^3.4.0",
+		"bullmq": "^4.13.1",
 		"config": "^3.3.9",
 		"flowbite": "^1.7.0",
 		"flowbite-svelte": "^0.40.1",
@@ -32,11 +32,17 @@
 		"kysely": "^0.26.1",
 		"luxon": "^3.3.0",
 		"mailparser": "^3.6.4",
+		"nodemailer": "^6.9.1",
 		"pg": "^8.11.2",
+		"pino": "^8.16.1",
+		"pino-pretty": "^10.2.3",
 		"tailwind-merge": "^1.14.0",
+		"handlebars": "^4.7.7",
 		"zod": "^3.20.6"
 	},
 	"devDependencies": {
+		"@types/mailparser": "^3.4.0",
+		"@types/nodemailer": "^6.4.7",
 		"@playwright/test": "^1.28.1",
 		"@release-it/bumper": "^4.0.2",
 		"@sveltejs/adapter-auto": "^2.0.0",

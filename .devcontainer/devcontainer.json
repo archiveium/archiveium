@@ -16,7 +16,8 @@
 				"mtxr.sqltools-driver-pg",
 				"donjayamanne.githistory",
 				"svelte.svelte-vscode",
-				"eamodio.gitlens"
+				"eamodio.gitlens",
+				"ms-azuretools.vscode-docker"
 			]
 		}
 	},
