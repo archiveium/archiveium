@@ -16,6 +16,7 @@ export interface SessionConfig {
 }
 
 export interface AppConfig {
+	name: string,
 	url: string;
 	logLevel: string;
 }
@@ -28,4 +29,15 @@ export interface S3Config {
 		secretAccessKey: string;
 	};
 	forcePathStyle: boolean;
+}
+
+export interface MailConfig {
+    host: string;
+    port: number;
+    secure: boolean;
+    auth: {
+        user: string;
+        pass: string;
+    };
+    fromAddress: string;
 }
