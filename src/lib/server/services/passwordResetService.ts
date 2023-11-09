@@ -2,6 +2,12 @@ import * as passwordResetRepository from '$lib/server/repositories/passwordReset
 import { NoResultError } from 'kysely';
 import { RecordDeleteFailedException, RecordNotFoundException } from '../../../exceptions/database';
 import type { NewPasswordRequestRequest } from '../../../types/passwordReset';
+import config from 'config';
+import type { AppConfig, MailConfig } from '../../../types/config';
+import { readFile } from 'fs/promises';
+import { mailTransporter } from '$lib/mailTransport';
+import { logger } from '../../../utils/logger';
+import Handlebars from 'handlebars';
 
 export async function findPasswordResetRequestByEmail(email: string) {
     try {
@@ -40,4 +46,35 @@ export async function findPasswordResetRequestByTokenAndEmail(token: string, ema
         }
         throw error;
     }
+}
+
+export function findPendingPasswordResetRequests() {
+    return passwordResetRepository.findPendingPasswordResetRequests();
+}
+
+export async function sendPasswordResetEmail(email: string, token: string): Promise<void> {
+    const appConfig = config.get<AppConfig>('app');
+    const mailConfig = config.get<MailConfig>('mail');
+
+    const htmlTemplate = await readFile('./src/lib/mailTransport/templates/passwordReset.html', 'utf8');
+    const compiledTemplate = Handlebars.compile(htmlTemplate);
+
+    const templateDate = {
+        appName: appConfig.name,
+        appUrl: appConfig.url,
+        passwordResetUrl: `${appConfig.url}/reset-password?token=${token}&email=${email}`,
+    };
+
+    const info = await mailTransporter.sendMail({
+        from: `"${appConfig.name}" <${mailConfig.fromAddress}>`,
+        to: email,
+        subject: 'Reset Password Notification',
+        html: compiledTemplate(templateDate),
+    });
+
+    logger.info(`Sent email, message id: ${info.messageId}`);
+}
+
+export function updatePasswordResetRequestNotifiedDate(id: string) {
+    return passwordResetRepository.updatePasswordResetRequestNotifiedDate(id);
 }

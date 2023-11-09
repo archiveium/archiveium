@@ -2,12 +2,17 @@ import { Queue, Worker } from 'bullmq';
 import { logger } from "../../../utils/logger";
 import { userInvitation } from "./handlers/userInvitation";
 import { redis } from '../redis/connection';
+import { passwordReset } from './handlers/passwordReset';
 
 export class JobScheduler {
     private userInvitationQueue: Queue;
+    private passwordResetQueue: Queue;
 
     constructor() {
         this.userInvitationQueue = new Queue('UserInvitation', {
+            connection: redis,
+        });
+        this.passwordResetQueue = new Queue('PasswordReset', {
             connection: redis,
         });
     }
@@ -27,16 +32,28 @@ export class JobScheduler {
 
     private async startWorkers(): Promise<void> {
         logger.info('Starting workers');
-        const worker = new Worker('UserInvitation', userInvitation, { connection: redis });
+        let worker: Worker;
+        worker = new Worker('UserInvitation', userInvitation, { connection: redis });
         logger.info(`Started worker ${worker.name} (${worker.id})`);
+        worker = new Worker('PasswordReset', passwordReset, { connection: redis });
+        logger.info(`Started worker ${worker.name} (${worker.id})`);        
     }
 
     private async scheduleJobs(): Promise<void> {
         logger.info('Scheduling jobs');
 
-        // Repeat job every 10 seconds but no more than 100 times
         await this.userInvitationQueue.add(
             'processUserInvitation',
+            null,
+            {
+                repeat: {
+                    every: 60000, // 60 seconds
+                },
+                removeOnComplete: true,
+            },
+        );
+        await this.passwordResetQueue.add(
+            'passwordReset',
             null,
             {
                 repeat: {

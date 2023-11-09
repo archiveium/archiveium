@@ -24,7 +24,7 @@ export async function findAllInvitedUsers() {
 
 export async function updateInvitedUser(id: string) {
     return db.updateTable('user_invitations')
-        .set((eb) => ({
+        .set(() => ({
             notification_sent_at: sql<string>`NOW()`,
         }))
         .where('id', '=', id)
