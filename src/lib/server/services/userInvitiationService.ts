@@ -17,3 +17,11 @@ export async function findUserInvitationByEmail(email: string) {
         throw error;
     }
 }
+
+export async function findAllInvitedUsers() {
+    return userInvitationRepository.findAllInvitedUsers();
+}
+
+export async function updateInvitedUser(id: string) {
+    return userInvitationRepository.updateInvitedUser(id);
+}

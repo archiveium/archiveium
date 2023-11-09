@@ -1,9 +1,13 @@
-import type { AppConfig } from "../../../types/config";
+import type { AppConfig, MailConfig } from "../../../types/config";
 import SignUrl from "../../../utils/signedUrl";
 import config from 'config';
 import { formSchema, registrationSchema } from "../schemas/registrationSchema";
 import * as userInvitationService from '$lib/server/services/userInvitiationService';
 import type { RegistrationVerificationUrl, VerifyEmailParams } from "../../../types/registration";
+import { readFile } from 'fs/promises';
+import Handlebars from 'handlebars';
+import { mailTransporter } from "$lib/mailTransport";
+import { logger } from "../../../utils/logger";
 
 export async function registerForPreview(data: FormData): Promise<void> {
 	// TODO Throw error if email is present in users table
@@ -31,4 +35,26 @@ export async function verifyRegistrationUrl(params: VerifyEmailParams): Promise<
 			Number(validatedData.expires)
 		)
 	};
+}
+
+export async function sendUserInvitation(toEmail: string): Promise<void> {
+    const appConfig = config.get<AppConfig>('app');
+    const mailConfig = config.get<MailConfig>('mail');
+
+    const htmlTemplate = await readFile('./src/lib/mailTransport/templates/userInvitation.html', 'utf8');
+    const compiledTemplate = Handlebars.compile(htmlTemplate);
+    const templateDate = {
+        appName: appConfig.name,
+        appUrl: appConfig.url,
+        registerUrl: `${appConfig.url}/register`
+    };
+
+    const info = await mailTransporter.sendMail({
+        from: `"${appConfig.name}" <${mailConfig.fromAddress}>`,
+        to: toEmail,
+        subject: 'Invitation To Register For Closed Preview of Archiveium',
+        html: compiledTemplate(templateDate),
+    });
+
+    logger.info(`Sent email, message id: ${info.messageId}`);
 }
