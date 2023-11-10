@@ -3,16 +3,21 @@ import { logger } from "../../../utils/logger";
 import { userInvitation } from "./handlers/userInvitation";
 import { redis } from '../redis/connection';
 import { passwordReset } from './handlers/passwordReset';
+import { emailVerification } from './handlers/emailVerification';
 
 export class JobScheduler {
     private userInvitationQueue: Queue;
     private passwordResetQueue: Queue;
+    private emailVerificationQueue: Queue;
 
     constructor() {
         this.userInvitationQueue = new Queue('UserInvitation', {
             connection: redis,
         });
         this.passwordResetQueue = new Queue('PasswordReset', {
+            connection: redis,
+        });
+        this.emailVerificationQueue = new Queue('EmailVerification', {
             connection: redis,
         });
     }
@@ -36,7 +41,9 @@ export class JobScheduler {
         worker = new Worker('UserInvitation', userInvitation, { connection: redis });
         logger.info(`Started worker ${worker.name} (${worker.id})`);
         worker = new Worker('PasswordReset', passwordReset, { connection: redis });
-        logger.info(`Started worker ${worker.name} (${worker.id})`);        
+        logger.info(`Started worker ${worker.name} (${worker.id})`);
+        worker = new Worker('EmailVerification', emailVerification, { connection: redis });
+        logger.info(`Started worker ${worker.name} (${worker.id})`);
     }
 
     private async scheduleJobs(): Promise<void> {
@@ -54,6 +61,16 @@ export class JobScheduler {
         );
         await this.passwordResetQueue.add(
             'passwordReset',
+            null,
+            {
+                repeat: {
+                    every: 60000, // 60 seconds
+                },
+                removeOnComplete: true,
+            },
+        );
+        await this.emailVerificationQueue.add(
+            'emailVerification',
             null,
             {
                 repeat: {

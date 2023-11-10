@@ -62,7 +62,7 @@ export const actions = {
 				message: 'Email has already been verified. You can now login.'
 			});
 		} else if (verificationUrl.hasExpired && verificationUrl.signatureValid) {
-			await userService.resetUserNotificationDate(verificationUrl.userId);
+			await userService.setUserNotificationDate(verificationUrl.userId, undefined);
 			await saveFlashMessage(locals.sessionId, {
 				type: 'success',
 				message: 'Verification email has been sent.'
