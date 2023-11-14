@@ -1,10 +1,13 @@
-import type { GetObjectCommandInput } from '@aws-sdk/client-s3';
-import { GetObjectCommand } from '@aws-sdk/client-s3';
+import type { DeleteObjectCommandInput, GetObjectCommandInput, ListObjectsV2CommandInput } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import type { AddressObject } from 'mailparser';
 import { BUCKET_NAME } from '../constants/s3';
 import { parseEmail, parseEmailSubject } from '../../../utils/emailParser';
 import * as emailService from '$lib/server/services/emailService';
 import { s3Client } from '../s3/connection';
+import { logger } from '../../../utils/logger';
+
+const BUCKET = 'emails';
 
 export async function findEmailsByFolderIdAndUserId(
 	userId: string,
@@ -92,6 +95,39 @@ export async function findEmailByIdAndUserId(
 	return { ...email, html };
 }
 
+export async function deleteS3Objects(prefix: string): Promise<void> {
+    const listObjectParams: ListObjectsV2CommandInput = {
+        Bucket: BUCKET,
+        Prefix: prefix,
+        MaxKeys: 100,
+    };
+
+    let isTruncated = true;
+    try {
+        while (isTruncated) {
+            const results = await s3Client.send(new ListObjectsV2Command(listObjectParams));
+            const s3Objects = results.Contents;
+            const promises = s3Objects?.map(async (s3Object) => {
+                if (s3Object.Key) {
+                    return deleteS3Object(s3Object.Key);
+                }
+            });
+
+            if (promises) {
+                await Promise.all(promises);
+            }
+
+            isTruncated = results.IsTruncated ?? false;
+            if (isTruncated) {
+                listObjectParams.ContinuationToken = results.NextContinuationToken;
+            }
+        }
+    } catch (err) {
+        logger.error(JSON.stringify(err));
+        throw err;
+    }
+}
+
 // Private functions
 
 function getFromNameOrAddress(address?: AddressObject): string {
@@ -102,4 +138,18 @@ function getFromNameOrAddress(address?: AddressObject): string {
 		return addressValues[0].address;
 	}
 	return 'Not Available';
+}
+
+async function deleteS3Object(key: string): Promise<void> {
+    const params: DeleteObjectCommandInput = {
+        Bucket: BUCKET,
+        Key: key,
+    };
+
+    try {
+        await s3Client.send(new DeleteObjectCommand(params));
+    } catch (error) {
+        logger.error(JSON.stringify(error));
+        throw error;
+    }
 }

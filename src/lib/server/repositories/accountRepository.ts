@@ -69,3 +69,16 @@ export async function deleteAccountByUserId(userId: string, accountId: string, t
     .where('id', '=', accountId)
     .executeTakeFirstOrThrow();
 }
+
+export async function findDeletedAccounts() {
+  return db.selectFrom('accounts')
+    .select(['id', 'user_id', 'provider_id'])
+    .where('deleted', '=', true)
+    .execute();
+}
+
+export async function deleteAccount(id: string) {
+  return db.deleteFrom('accounts')
+    .where('id', '=', id)
+    .executeTakeFirst();
+}

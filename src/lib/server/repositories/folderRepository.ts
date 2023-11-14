@@ -23,3 +23,12 @@ export async function findFoldersByAccountIdAndUserId(userId: string, accountId:
     .where('deleted_remote', '=', false)
     .execute();
 }
+
+export async function findDeletedFoldersByUserAndAccount(userId: string, accountId: string) {
+  return db.selectFrom('folders')
+    .selectAll()
+    .where('user_id', '=', userId)
+    .where('account_id', '=', accountId)
+    .where('deleted', '=', true)
+    .execute();
+}

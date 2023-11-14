@@ -25,23 +25,23 @@ export async function findAccountsByUserId(userId: string) {
 }
 
 export async function findAccountByUserIdAndAccountId(userId: string, accountId: string) {
-    try {
-        return await accountRepository.findAccountByUserIdAndAccountId(userId, accountId);
-    } catch (error) {
-        if (error instanceof NoResultError) {
-            throw new AccountNotFoundException(`Account ${accountId} for user ${userId} does not exist`);
-        }
-        console.error(error);
-        throw error;
-    }
+	try {
+		return await accountRepository.findAccountByUserIdAndAccountId(userId, accountId);
+	} catch (error) {
+		if (error instanceof NoResultError) {
+			throw new AccountNotFoundException(`Account ${accountId} for user ${userId} does not exist`);
+		}
+		console.error(error);
+		throw error;
+	}
 }
 
 export async function findAllSyncingAccountCountByUserId(userId: string) {
-    return accountRepository.findAllSyncingAccountCountByUserId(userId);
+	return accountRepository.findAllSyncingAccountCountByUserId(userId);
 }
 
 export async function isAccountUnique(email: string, userId: string) {
-    return accountRepository.isAccountUnique(email, userId);
+	return accountRepository.isAccountUnique(email, userId);
 }
 
 export async function deleteAccountByUserId(userId: string, accountId: string): Promise<void> {
@@ -54,7 +54,7 @@ export async function deleteAccountByUserId(userId: string, accountId: string): 
 		const deleteFolderResult = await folderRepository.deleteFolderByAccountId(userId, accountId, trx);
 		if (Number(deleteFolderResult.numUpdatedRows) === 0) {
 			throw new RecordDeleteFailedException(`Failed to delete folders for account ${accountId} & user ${userId}`);
-		}		
+		}
 	});
 
 }
@@ -183,4 +183,15 @@ async function getCachedValidatedAccount<T>(userId: string, email: string): Prom
 		return JSON.parse(result);
 	}
 	throw new CacheKeyNotFoundException('Key does not exist');
+}
+
+export async function findDeletedAccounts() {
+	return accountRepository.findDeletedAccounts();
+}
+
+export async function deleteAccount(id: string) {
+    const deleteResult = await accountRepository.deleteAccount(id);
+    if (deleteResult.numDeletedRows < 1) {
+        throw new RecordDeleteFailedException(`Failed to delete account id: ${id}`);
+    }
 }

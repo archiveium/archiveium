@@ -116,3 +116,7 @@ export async function updateFoldersAndAccount(
 		}
 	});
 }
+
+export async function findDeletedFoldersByUserAndAccount(userId: string, accountId: string) {
+	return folderRepository.findDeletedFoldersByUserAndAccount(userId, accountId);
+}
