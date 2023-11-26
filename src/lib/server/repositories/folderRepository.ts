@@ -1,6 +1,7 @@
 import { db } from '$lib/server/database/connection';
 import type { Transaction, UpdateResult } from 'kysely';
 import type { DB } from '../database/types';
+import type { FolderUpdate } from '../database/wrappers';
 
 export async function deleteFolderByAccountId(userId: string, accountId: string, trx?: Transaction<DB>): Promise<UpdateResult> {
   const dbObject = trx ?? db;
@@ -24,11 +25,40 @@ export async function findFoldersByAccountIdAndUserId(userId: string, accountId:
     .execute();
 }
 
+export async function findFolderById(folderId: string) {
+  return db.selectFrom('folders')
+    .selectAll()
+    .where('id', '=', folderId)
+    .execute();
+}
+
 export async function findDeletedFoldersByUserAndAccount(userId: string, accountId: string) {
   return db.selectFrom('folders')
     .selectAll()
     .where('user_id', '=', userId)
     .where('account_id', '=', accountId)
     .where('deleted', '=', true)
+    .execute();
+}
+
+export async function updateFolder(folderId: string, folderUpdate: FolderUpdate) {
+  return db.updateTable('folders')
+    .set(folderUpdate)
+    .where('id', '=', folderId)
+    .executeTakeFirstOrThrow();
+}
+
+export async function findSyncingFoldersByUserAndAccount(
+  userId: string,
+  accountId: string,
+  remoteDeleted: boolean,
+) {
+  return db.selectFrom('folders')
+    .selectAll()
+    .where('user_id', '=', userId)
+    .where('account_id', '=', accountId)
+    .where('deleted', '=', false)
+    .where('deleted_remote', '=', remoteDeleted)
+    .where('syncing', '=', true)
     .execute();
 }

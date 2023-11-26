@@ -1,4 +1,10 @@
-import * as emailService from '$lib/server/repositories/emailRepository';
+import * as emailRepository from '$lib/server/repositories/emailRepository';
+import * as s3Service from '$lib/server/services/s3Service';
+import * as emailFolderService from '$lib/server/services/emailFolderService';
+import type { Folder } from '../../../types/folder';
+import type { ImapEmail } from '../../../types/imap';
+import { db } from '../database/connection';
+import { MultipleEmailWithSameEmailIdException } from '../../../exceptions/email';
 
 export async function findEmailByFolderIdAndUserId(
 	userId: string,
@@ -8,7 +14,7 @@ export async function findEmailByFolderIdAndUserId(
 ) {
 	const page = Number(currentPage);
 	const offset = page === 1 ? 0 : (page - 1) * resultsPerPage;
-    return emailService.findEmailByFolderIdAndUserId(userId, folderId, offset, resultsPerPage);
+    return emailRepository.findEmailByFolderIdAndUserId(userId, folderId, offset, resultsPerPage);
 }
 
 export async function findEmailByAccountIdAndUserId(
@@ -19,7 +25,7 @@ export async function findEmailByAccountIdAndUserId(
 ) {
 	const page = Number(currentPage);
 	const offset = page === 1 ? 0 : (page - 1) * resultsPerPage;
-    return emailService.findEmailByAccountIdAndUserId(userId, accountId, offset, resultsPerPage);
+    return emailRepository.findEmailByAccountIdAndUserId(userId, accountId, offset, resultsPerPage);
 }
 
 export async function findEmailByUserId(
@@ -29,25 +35,81 @@ export async function findEmailByUserId(
 ) {
 	const page = Number(currentPage);
 	const offset = page === 1 ? 0 : (page - 1) * resultsPerPage;
-    return emailService.findEmailByUserId(userId, offset, resultsPerPage);
+    return emailRepository.findEmailByUserId(userId, offset, resultsPerPage);
 }
 
 export async function findEmailByIdAndUserId(userId: string, emailId: string) {
-    return emailService.findEmailByIdAndUserId(userId, emailId);
+    return emailRepository.findEmailByIdAndUserId(userId, emailId);
 }
 
 export async function findEmailCountByFolderAndUserId(userId: string, folderId: string): Promise<number> {
-    return emailService.findEmailCountByFolderAndUserId(userId, folderId);
+    return emailRepository.findEmailCountByFolderAndUserId(userId, folderId);
 }
 
 export async function findEmailCountByAccountIdAndUserId(userId: string, accountId: string): Promise<number> {
-    return emailService.findEmailCountByAccountIdAndUserId(userId, accountId);
+    return emailRepository.findEmailCountByAccountIdAndUserId(userId, accountId);
 }
 
 export async function findEmailCountByUserId(userId: string): Promise<number> {
-    return emailService.findEmailCountByUserId(userId);
+    return emailRepository.findEmailCountByUserId(userId);
 }
 
 export async function findFailedEmailCountByUserId(userId: string): Promise<number> {
-    return emailService.findFailedEmailCountByUserId(userId);
+    return emailRepository.findFailedEmailCountByUserId(userId);
+}
+
+export async function findEmailByEmailId(emailId: string) {
+	const emails = await emailRepository.findEmailByEmailId(emailId);
+    if (emails.length > 1) {
+        throw new MultipleEmailWithSameEmailIdException(`Multiple emails exist for emailId ${emailId}`);
+    }
+    return emails[0];
+}
+
+export async function saveAndSyncWithS3(email: ImapEmail, folder: Folder, checkEmailId: boolean) {
+	return db.transaction().execute(async (trx) => {
+        let savedEmail;
+        let hasSource = false;
+        if (checkEmailId) {
+            savedEmail = await findEmailByEmailId(email.emailId);
+        }
+
+        // Save to emails table and S3 if no previous email has same emailId
+        let insertedEmailId;
+        if (savedEmail) {
+            insertedEmailId = savedEmail.id;
+        } else {
+            hasSource = true;
+            const insertedEmail = await emailRepository.insertEmail({
+                message_number: email.uid,
+                user_id: folder.user_id,
+                account_id: folder.account_id,
+                email_id: email.emailId,
+                imported: true,
+                has_attachments: email.hasAttachments,
+                udate: email.internalDate,
+                size_total: email.size_total,
+                size_without_attachments: email.size_without_attachments,
+            }, trx);
+			insertedEmailId = insertedEmail.id;
+        }
+
+        await emailFolderService.insertEmailFolder(
+			{
+				email_id: insertedEmailId,
+				folder_id: folder.id,
+				has_source: hasSource
+			},
+			trx
+		);
+
+		// Perform S3 save in the end so as to be able to rollback
+		// transaction if S3 save fails
+		if (hasSource) {
+			await s3Service.insertS3Object(
+				`${folder.user_id}/${folder.id}/${insertedEmailId}.eml`,
+				email.source,
+			);
+		}
+	});
 }

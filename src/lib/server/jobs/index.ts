@@ -1,4 +1,4 @@
-import { Queue, Worker } from 'bullmq';
+import { Queue, Worker, type Processor, type DefaultJobOptions } from 'bullmq';
 import { logger } from "../../../utils/logger";
 import { userInvitation } from "./handlers/userInvitation";
 import { redis } from '../redis/connection';
@@ -9,46 +9,66 @@ export class JobScheduler {
     private userInvitationQueue: Queue;
     private passwordResetQueue: Queue;
     private emailVerificationQueue: Queue;
+    private importEmailQueue: Queue;
+
+    static QUEUE_USER_INVITATION = 'UserInvitation';
+    static QUEUE_PASSWORD_RESET = 'PasswordReset';
+    static QUEUE_IMPORT_EMAIL = 'ImportEmail';
+    static QUEUE_EMAIL_VERIFICATION = 'EmailVerification';
 
     constructor() {
-        this.userInvitationQueue = new Queue('UserInvitation', {
-            connection: redis,
-        });
-        this.passwordResetQueue = new Queue('PasswordReset', {
-            connection: redis,
-        });
-        this.emailVerificationQueue = new Queue('EmailVerification', {
-            connection: redis,
+        this.userInvitationQueue = this.buildQueue(JobScheduler.QUEUE_USER_INVITATION);
+        this.passwordResetQueue = this.buildQueue(JobScheduler.QUEUE_PASSWORD_RESET);
+        this.emailVerificationQueue = this.buildQueue(JobScheduler.QUEUE_EMAIL_VERIFICATION);
+        this.importEmailQueue = this.buildQueue(JobScheduler.QUEUE_IMPORT_EMAIL, {
+            removeOnComplete: true,
+            attempts: 3,
+            backoff: {
+                type: 'exponential',
+                delay: 60000 * 2,   // 2 minutes
+            }            
         });
     }
 
     async initialize() {
         logger.info('Initializing scheduler');
-
         // remove completed jobs
         // await this.userInvitationQueue.clean(0, 1000, 'completed');
-
-        // schedule jobs
         await this.scheduleJobs();
-
-        // start worker to process scheduled jobs
         await this.startWorkers();
+    }
+
+    async addJobToExistingQueue(queue: string, data: unknown) {
+        switch (queue) {
+            case JobScheduler.QUEUE_IMPORT_EMAIL:
+                return this.importEmailQueue.add('importEmail', data);
+            default:
+                // TODO Throw exception
+                break;
+        }
+    }
+
+    private buildQueue(queueName: string, defaultJobOptions?: DefaultJobOptions): Queue {
+        return new Queue(queueName, {
+            connection: redis,
+            defaultJobOptions
+        });
     }
 
     private async startWorkers(): Promise<void> {
         logger.info('Starting workers');
-        let worker: Worker;
-        worker = new Worker('UserInvitation', userInvitation, { connection: redis });
-        logger.info(`Started worker ${worker.name} (${worker.id})`);
-        worker = new Worker('PasswordReset', passwordReset, { connection: redis });
-        logger.info(`Started worker ${worker.name} (${worker.id})`);
-        worker = new Worker('EmailVerification', emailVerification, { connection: redis });
-        logger.info(`Started worker ${worker.name} (${worker.id})`);
+        await this.startWorker(JobScheduler.QUEUE_USER_INVITATION, userInvitation);
+        await this.startWorker(JobScheduler.QUEUE_PASSWORD_RESET, passwordReset);
+        await this.startWorker(JobScheduler.QUEUE_EMAIL_VERIFICATION, emailVerification);
+    }
+
+    private async startWorker(workerName: string, processor: Processor): Promise<void> {
+        const worker = new Worker(workerName, processor, { connection: redis });
+        logger.info(`Started worker ${worker.name} (${worker.id})`);        
     }
 
     private async scheduleJobs(): Promise<void> {
         logger.info('Scheduling jobs');
-
         await this.userInvitationQueue.add(
             'processUserInvitation',
             null,

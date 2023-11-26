@@ -1,5 +1,5 @@
-import type { DeleteObjectCommandInput, GetObjectCommandInput, ListObjectsV2CommandInput } from '@aws-sdk/client-s3';
-import { DeleteObjectCommand, GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
+import type { DeleteObjectCommandInput, GetObjectCommandInput, ListObjectsV2CommandInput, PutObjectCommandInput, PutObjectCommandOutput } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, GetObjectCommand, ListObjectsV2Command, PutObjectCommand } from '@aws-sdk/client-s3';
 import type { AddressObject } from 'mailparser';
 import { BUCKET_NAME } from '../constants/s3';
 import { parseEmail, parseEmailSubject } from '../../../utils/emailParser';
@@ -122,6 +122,21 @@ export async function deleteS3Objects(prefix: string): Promise<void> {
                 listObjectParams.ContinuationToken = results.NextContinuationToken;
             }
         }
+    } catch (err) {
+        logger.error(JSON.stringify(err));
+        throw err;
+    }
+}
+
+export async function insertS3Object(key: string, body: string): Promise<PutObjectCommandOutput> {
+    const params: PutObjectCommandInput = {
+        Bucket: BUCKET,
+        Key: key,
+        Body: body,
+    };
+    try {
+        const results = await s3Client.send(new PutObjectCommand(params));
+        return results;
     } catch (err) {
         logger.error(JSON.stringify(err));
         throw err;

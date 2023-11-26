@@ -1,7 +1,7 @@
 import * as accountRepository from '$lib/server/repositories/accountRepository';
 import * as folderRepository from '$lib/server/repositories/folderRepository';
 import { NoResultError } from 'kysely';
-import { AccountExistsException, AccountNotFoundException } from '../../../exceptions/account';
+import { AccountDeletedException, AccountExistsException, AccountNotFoundException, AccountSyncingPausedException } from '../../../exceptions/account';
 import type { Account, ValidatedAccount, ValidatedExistingAccount } from '../../../types/account';
 import { addAccountSchema, editAccountSchema } from '../schemas/accountSchemas';
 import * as folderService from '$lib/server/services/folderService';
@@ -36,8 +36,30 @@ export async function findAccountByUserIdAndAccountId(userId: string, accountId:
 	}
 }
 
+export async function findAccountWithProviderByUserIdAndAccountId(userId: string, accountId: string) {
+	try {
+		const account = await accountRepository.findAccountWithProviderByUserIdAndAccountId(userId, accountId);
+		if (account.deleted) {
+			throw new AccountDeletedException(`Account ${accountId} was deleted`);
+		} else if (!account.syncing) {
+			throw new AccountSyncingPausedException(`Account syncing ${accountId} was paused`);
+		}
+		return account;
+	} catch (error) {
+		if (error instanceof NoResultError) {
+			throw new AccountNotFoundException(`Account ${accountId} for user ${userId} does not exist`);
+		}
+		console.error(error);
+		throw error;
+	}
+}
+
 export async function findAllSyncingAccountCountByUserId(userId: string) {
 	return accountRepository.findAllSyncingAccountCountByUserId(userId);
+}
+
+export async function findAllSyncingAccounts() {
+	return accountRepository.findAllSyncingAccounts();
 }
 
 export async function isAccountUnique(email: string, userId: string) {
@@ -190,8 +212,8 @@ export async function findDeletedAccounts() {
 }
 
 export async function deleteAccount(id: string) {
-    const deleteResult = await accountRepository.deleteAccount(id);
-    if (deleteResult.numDeletedRows < 1) {
-        throw new RecordDeleteFailedException(`Failed to delete account id: ${id}`);
-    }
+	const deleteResult = await accountRepository.deleteAccount(id);
+	if (deleteResult.numDeletedRows < 1) {
+		throw new RecordDeleteFailedException(`Failed to delete account id: ${id}`);
+	}
 }

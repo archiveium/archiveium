@@ -39,6 +39,16 @@ export async function findAccountByUserIdAndAccountId(userId: string, accountId:
     .executeTakeFirstOrThrow();
 }
 
+export async function findAccountWithProviderByUserIdAndAccountId(userId: string, accountId: string) {
+  return db.selectFrom('accounts as a')
+    .innerJoin('providers as p', 'p.id', 'a.provider_id')
+    .select(['a.id', 'a.email', 'a.password', 'a.deleted', 'a.syncing',
+            'p.host as provider_host', 'p.check_email_id as provider_check_email_id'])
+    .where('a.user_id', '=', userId)
+    .where('a.id', '=', accountId)
+    .executeTakeFirstOrThrow();
+}
+
 export async function findAllSyncingAccountCountByUserId(userId: string) {
   const result = await db.selectFrom('accounts')
     .select((eb) => eb.fn('count', ['id']).as('count'))
@@ -46,6 +56,15 @@ export async function findAllSyncingAccountCountByUserId(userId: string) {
     .where('syncing', '=', true)
     .executeTakeFirstOrThrow();
   return result.count as number;
+}
+
+export async function findAllSyncingAccounts() {
+  return db.selectFrom('accounts as a')
+    .innerJoin('providers as p', 'p.id', 'a.provider_id')
+    .select(['a.id', 'a.email', 'a.password', 'a.user_id', 'p.host as provider_host', 'p.name as provider_name'])
+    .where('a.deleted', '=', false)
+    .where('a.syncing', '=', true)
+    .execute();
 }
 
 export async function isAccountUnique(email: string, userId: string): Promise<boolean> {

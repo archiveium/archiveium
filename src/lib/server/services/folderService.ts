@@ -1,15 +1,35 @@
 import * as folderRepository from '$lib/server/repositories/folderRepository';
+import { FolderDeleted, FolderDeletedOnRemote, FolderNotFound, FolderNotSyncingException } from '../../../exceptions/folder';
 import type { NewAccount, ValidatedAccount, ValidatedExistingAccount } from '../../../types/account';
 import type { Folder, FolderInsert } from '../../../types/folder';
 import { db } from '../database/connection';
+import type { FolderUpdate } from '../database/wrappers';
 
 export async function findFoldersByAccountIdAndUserId(userId: string, accountId: string) {
 	const folders = await folderRepository.findFoldersByAccountIdAndUserId(userId, accountId);
 	return folders.map((folder) => {
 		const query = new URLSearchParams({ accountId, folderId: folder.id });
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore TODO Accommodate href property in return type
 		folder.href = `?${query.toString()}`;
 		return folder;
 	});
+}
+
+export async function findFolderById(folderId: string) {
+	const folders = await folderRepository.findFolderById(folderId);
+    if (folders.length > 0) {
+        const folder = folders[0];
+        if (folder.deleted) {
+            throw new FolderDeleted(`Folder ${folderId} was deleted`);
+        } else if (folder.deleted_remote) {
+            throw new FolderDeletedOnRemote(`Folder ${folderId} was deleted on remote`);
+        } else if (!folder.syncing) {
+            throw new FolderNotSyncingException(`Folder ${folderId} has syncing = false`);
+        }
+        return folder;
+    }
+    throw new FolderNotFound(`Folder ${folderId} was not found`);
 }
 
 export async function insertFoldersAndAccount(
@@ -26,9 +46,9 @@ export async function insertFoldersAndAccount(
 			user_id: userId
 		};
 		const insertedAccount = await trx.insertInto('accounts')
-		  .values(newAccount)
-		  .returning('id')
-		  .executeTakeFirstOrThrow()
+			.values(newAccount)
+			.returning('id')
+			.executeTakeFirstOrThrow()
 
 		const foldersToSave: FolderInsert[] = [];
 		selectedRemoteFolders.forEach((selectedFolder) => {
@@ -47,9 +67,9 @@ export async function insertFoldersAndAccount(
 		});
 
 		return await trx.insertInto('folders')
-		  .values(foldersToSave)
-		  .executeTakeFirst()
-	  });
+			.values(foldersToSave)
+			.executeTakeFirst()
+	});
 }
 
 export async function updateFoldersAndAccount(
@@ -66,7 +86,7 @@ export async function updateFoldersAndAccount(
 				password: validatedExistingAccount.account.password
 			})
 			.where('id', '=', validatedExistingAccount.account.account_id)
-		  	.executeTakeFirstOrThrow();
+			.executeTakeFirstOrThrow();
 
 		const folderIdsToUpdate: string[] = [];
 		const foldersToSave: FolderInsert[] = [];
@@ -96,7 +116,7 @@ export async function updateFoldersAndAccount(
 			.set({ syncing: false })
 			.where('user_id', '=', userId)
 			.where('account_id', '=', validatedExistingAccount.account.account_id)
-		  	.executeTakeFirstOrThrow();
+			.executeTakeFirstOrThrow();
 
 		// enable syncing for all selected folders
 		if (folderIdsToUpdate.length > 0) {
@@ -119,4 +139,16 @@ export async function updateFoldersAndAccount(
 
 export async function findDeletedFoldersByUserAndAccount(userId: string, accountId: string) {
 	return folderRepository.findDeletedFoldersByUserAndAccount(userId, accountId);
+}
+
+export async function findSyncingFoldersByUserAndAccount(
+	userId: string,
+	accountId: string,
+	remoteDeleted: boolean,
+) {
+	return folderRepository.findSyncingFoldersByUserAndAccount(userId, accountId, remoteDeleted);
+}
+
+export async function updateFolder(folderId: string, folderUpdate: FolderUpdate) {
+	return folderRepository.updateFolder(folderId, folderUpdate);
 }

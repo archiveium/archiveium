@@ -5,7 +5,7 @@ import * as folderService from '$lib/server/services/folderService';
 import * as s3Service from '$lib/server/services/s3Service';
 
 export async function deleteAccount(job: Job): Promise<void> {
-    logger.info('Started running deletor');
+    logger.info(`Running ${job.name} job`);
 
     const allDeletedAccounts = await accountService.findDeletedAccounts();
     allDeletedAccounts.forEach(async (deletedAccount) => {

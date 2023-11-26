@@ -1,5 +1,7 @@
 import { db } from '$lib/server/database/connection';
-import { sql } from 'kysely';
+import { Transaction, sql } from 'kysely';
+import type { EmailInsert } from '../database/wrappers';
+import type { DB } from '../database/types';
 
 export async function findEmailByFolderIdAndUserId(userId: string, folderId: string, offset: number, limit: number) {
     return db.selectFrom('emails')
@@ -63,6 +65,13 @@ export async function findEmailByIdAndUserId(userId: string, emailId: string) {
         .executeTakeFirstOrThrow();
 }
 
+export async function findEmailByEmailId(emailId: string) {
+    return db.selectFrom('emails')
+        .select(['id', 'user_id', 'email_id', 'imported'])
+        .where('email_id', '=', emailId)
+        .execute();
+}
+
 export async function findEmailCountByFolderAndUserId(userId: string, folderId: string): Promise<number> {
     const result = await db.selectFrom('emails')
         .innerJoin('email_folders', 'email_folders.email_id', 'emails.id')
@@ -100,4 +109,12 @@ export async function findFailedEmailCountByUserId(userId: string): Promise<numb
         .where('imported', '=', false)
         .executeTakeFirstOrThrow();
     return result.count as number;
+}
+
+export async function insertEmail(email: EmailInsert, trx?: Transaction<DB>) {
+    const dbObject = trx ?? db;
+    return dbObject.insertInto('emails')
+        .values(email)
+        .returningAll()
+        .executeTakeFirstOrThrow();
 }
