@@ -5,6 +5,7 @@ import { redis } from '../redis/connection';
 import { passwordReset } from './handlers/passwordReset';
 import { emailVerification } from './handlers/emailVerification';
 import { syncAccount } from './handlers/syncAccount';
+import { syncFolder } from './handlers/syncFolder';
 
 export class JobScheduler {
     private userInvitationQueue: Queue;
@@ -12,18 +13,21 @@ export class JobScheduler {
     private emailVerificationQueue: Queue;
     private importEmailQueue: Queue;
     private syncAccountQueue: Queue;
+    private syncFolderQueue: Queue;
 
     static QUEUE_USER_INVITATION = 'UserInvitation';
     static QUEUE_PASSWORD_RESET = 'PasswordReset';
     static QUEUE_IMPORT_EMAIL = 'ImportEmail';
     static QUEUE_EMAIL_VERIFICATION = 'EmailVerification';
     static QUEUE_SYNC_ACCOUNT = 'SyncAccount';
+    static QUEUE_SYNC_FOLDER = 'SyncFolder';
 
     constructor() {
         this.userInvitationQueue = this.buildQueue(JobScheduler.QUEUE_USER_INVITATION);
         this.passwordResetQueue = this.buildQueue(JobScheduler.QUEUE_PASSWORD_RESET);
         this.emailVerificationQueue = this.buildQueue(JobScheduler.QUEUE_EMAIL_VERIFICATION);
         this.syncAccountQueue = this.buildQueue(JobScheduler.QUEUE_SYNC_ACCOUNT);
+        this.syncFolderQueue = this.buildQueue(JobScheduler.QUEUE_SYNC_FOLDER);
         this.importEmailQueue = this.buildQueue(JobScheduler.QUEUE_IMPORT_EMAIL, {
             removeOnComplete: true,
             attempts: 3,
@@ -40,6 +44,7 @@ export class JobScheduler {
         // await this.userInvitationQueue.clean(0, 1000, 'completed');
         await this.scheduleJobs();
         await this.startWorkers();
+        logger.info('Finished initializing scheduler');
     }
 
     async addJobToExistingQueue(queue: string, data: unknown) {
@@ -65,6 +70,7 @@ export class JobScheduler {
         await this.startWorker(JobScheduler.QUEUE_PASSWORD_RESET, passwordReset);
         await this.startWorker(JobScheduler.QUEUE_EMAIL_VERIFICATION, emailVerification);
         await this.startWorker(JobScheduler.QUEUE_SYNC_ACCOUNT, syncAccount);
+        await this.startWorker(JobScheduler.QUEUE_SYNC_FOLDER, syncFolder);
     }
 
     private async startWorker(workerName: string, processor: Processor): Promise<void> {
@@ -106,6 +112,16 @@ export class JobScheduler {
         );
         await this.syncAccountQueue.add(
             'syncAccount',
+            null,
+            {
+                repeat: {
+                    every: 60000, // 60 seconds
+                },
+                removeOnComplete: true,
+            },
+        );
+        await this.syncFolderQueue.add(
+            'syncFolder',
             null,
             {
                 repeat: {

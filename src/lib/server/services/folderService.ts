@@ -1,12 +1,20 @@
 import * as folderRepository from '$lib/server/repositories/folderRepository';
-import { FolderDeleted, FolderDeletedOnRemote, FolderNotFound, FolderNotSyncingException } from '../../../exceptions/folder';
+import { FolderDeletedException, FolderDeletedOnRemoteException, FolderNotFoundException, FolderNotSyncingException } from '../../../exceptions/folder';
 import type { NewAccount, ValidatedAccount, ValidatedExistingAccount } from '../../../types/account';
 import type { Folder, FolderInsert } from '../../../types/folder';
 import { db } from '../database/connection';
 import type { FolderUpdate } from '../database/wrappers';
 
-export async function findFoldersByAccountIdAndUserId(userId: string, accountId: string) {
-	const folders = await folderRepository.findFoldersByAccountIdAndUserId(userId, accountId);
+export async function findFoldersWithDeletedFilterByAccountIdAndUserId(
+	userId: string,
+	accountId: string,
+	deletedRemote: boolean,
+) {
+	const folders = await folderRepository.findFoldersWithDeletedFilterByAccountIdAndUserId(
+		userId,
+		accountId,
+		deletedRemote
+	);
 	return folders.map((folder) => {
 		const query = new URLSearchParams({ accountId, folderId: folder.id });
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -16,20 +24,30 @@ export async function findFoldersByAccountIdAndUserId(userId: string, accountId:
 	});
 }
 
+export async function findFoldersWithoutDeletedFilterByAccountIdAndUserId(
+	userId: string,
+	accountId: string,
+) {
+	return folderRepository.findFoldersWithoutDeletedFilterByAccountIdAndUserId(
+		userId,
+		accountId,
+	);
+}
+
 export async function findFolderById(folderId: string) {
 	const folders = await folderRepository.findFolderById(folderId);
     if (folders.length > 0) {
         const folder = folders[0];
         if (folder.deleted) {
-            throw new FolderDeleted(`Folder ${folderId} was deleted`);
+            throw new FolderDeletedException(`Folder ${folderId} was deleted`);
         } else if (folder.deleted_remote) {
-            throw new FolderDeletedOnRemote(`Folder ${folderId} was deleted on remote`);
+            throw new FolderDeletedOnRemoteException(`Folder ${folderId} was deleted on remote`);
         } else if (!folder.syncing) {
             throw new FolderNotSyncingException(`Folder ${folderId} has syncing = false`);
         }
         return folder;
     }
-    throw new FolderNotFound(`Folder ${folderId} was not found`);
+    throw new FolderNotFoundException(`Folder ${folderId} was not found`);
 }
 
 export async function insertFoldersAndAccount(
@@ -151,4 +169,8 @@ export async function findSyncingFoldersByUserAndAccount(
 
 export async function updateFolder(folderId: string, folderUpdate: FolderUpdate) {
 	return folderRepository.updateFolder(folderId, folderUpdate);
+}
+
+export async function insertFolder(folderInsert: FolderInsert) {
+	return folderRepository.insertFolder(folderInsert);
 }

@@ -13,6 +13,15 @@ export interface Account {
 	updated_at: Date;
 }
 
+export interface SyncingAccount {
+    id: string;
+    email: string;
+    password: string;
+    user_id: string;
+    provider_name: string;
+    provider_host: string;
+}
+
 export interface NewAccount {
 	name: string;
 	email: string;

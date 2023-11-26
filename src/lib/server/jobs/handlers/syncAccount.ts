@@ -6,11 +6,8 @@ import { logger } from '../../../../utils/logger';
 import type { ImapFlow } from 'imapflow';
 import { buildClient } from '$lib/server/services/imapService';
 import { 
-    IMAPAuthenticationFailed,
-    IMAPGenericException,
-    IMAPTooManyRequests,
-    IMAPUidValidityChanged,
-    IMAPUserAuthenticatedNotConnected 
+    IMAPAuthenticationFailedException,
+    IMAPGenericException, IMAPTooManyRequestsException, IMAPUidValidityChangedException, IMAPUserAuthenticatedNotConnectedException,
 } from '../../../../exceptions/imap';
 import type { Folder } from '../../../../types/folder';
 import type { ImapFolderStatus, MessageNumber } from '../../../../types/imap';
@@ -34,18 +31,18 @@ export async function syncAccount(job: Job): Promise<void> {
                 syncingAccount.provider_host
             );
         } catch (error) {
-            if (error instanceof IMAPTooManyRequests) {
+            if (error instanceof IMAPTooManyRequestsException) {
                 logger.error(`Too many requests for Account ID: ${syncingAccount.id}`);
                 // TODO Add logic to backoff for a while before attempting again
                 throw error;
-            } else if (error instanceof IMAPAuthenticationFailed) {
+            } else if (error instanceof IMAPAuthenticationFailedException) {
                 logger.error(`Authentication failed for Account ID ${syncingAccount.id}. Disabling account syncing`);
                 await accountService.updateAccountSyncingStatus(syncingAccount.user_id, syncingAccount.id, false);
                 // TODO send notification to user
                 return;
             } else if (
                 error instanceof IMAPGenericException ||
-                error instanceof IMAPUserAuthenticatedNotConnected
+                error instanceof IMAPUserAuthenticatedNotConnectedException
             ) {
                 logger.error(`${error.message} for Account ID: ${syncingAccount.id}`);
                 // TODO Add logic to backoff for a while before attempting again
@@ -63,11 +60,11 @@ export async function syncAccount(job: Job): Promise<void> {
             try {
                 await processAccount(accountFolder, imapClient, jobScheduler);
             } catch (error) {
-                if (error instanceof IMAPTooManyRequests) {
+                if (error instanceof IMAPTooManyRequestsException) {
                     logger.error(`Too many requests for Account ID: ${accountFolder.account_id}`);
                     // TODO Add logic to backoff for a while before attempting again
                     throw error;
-                } else if (error instanceof IMAPAuthenticationFailed) {
+                } else if (error instanceof IMAPAuthenticationFailedException) {
                     logger.error(`Authentication failed for Account ID ${accountFolder.id}. Disabling account syncing`);
                     await accountService.updateAccountSyncingStatus(syncingAccount.user_id, syncingAccount.id, false);
                     // TODO send notification to user
@@ -92,7 +89,7 @@ export async function syncAccount(job: Job): Promise<void> {
 }
 
 async function processAccount(accountFolder: Folder, imapClient: ImapFlow, jobScheduler: JobScheduler): Promise<void> {
-    const folders = await folderService.findFoldersByAccountIdAndUserId(accountFolder.user_id, accountFolder.id);
+    const folders = await folderService.findFoldersByAccountIdAndUserId(accountFolder.user_id, accountFolder.id, false);
     // TODO Check if there can be multiple folders for a given account and user
     const folder = folders[0];
     const imapFolderStatus = await imapService.getFolderStatusByName(imapClient, folder.name);
@@ -121,7 +118,7 @@ async function processAccount(accountFolder: Folder, imapClient: ImapFlow, jobSc
         if (folder.status_uidvalidity != imapFolderStatus.uidValidity) {
             logger.warn(`FolderId ${accountFolder.id} uidvalidity changed.
             This error should fix itself after scanner job runs`);
-            throw new IMAPUidValidityChanged(`FolderId ${accountFolder.id} uidvalidity changed`);
+            throw new IMAPUidValidityChangedException(`FolderId ${accountFolder.id} uidvalidity changed`);
         } else if (imapFolderStatus.messages == 0) {
             logger.info(`FolderId ${accountFolder.id} has 0 messages to sync`);
         } else if (folder.last_updated_msgno == imapFolderLastUid) {

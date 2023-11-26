@@ -1,7 +1,12 @@
 import * as accountRepository from '$lib/server/repositories/accountRepository';
 import * as folderRepository from '$lib/server/repositories/folderRepository';
 import { NoResultError } from 'kysely';
-import { AccountDeletedException, AccountExistsException, AccountNotFoundException, AccountSyncingPausedException } from '../../../exceptions/account';
+import {
+	AccountDeletedException,
+	AccountExistsException,
+	AccountNotFoundException,
+	AccountSyncingPausedException
+} from '../../../exceptions/account';
 import type { Account, ValidatedAccount, ValidatedExistingAccount } from '../../../types/account';
 import { addAccountSchema, editAccountSchema } from '../schemas/accountSchemas';
 import * as folderService from '$lib/server/services/folderService';
@@ -97,7 +102,7 @@ export async function validateExistingAccount(
 			: account.password;
 	const imapClient = await imapService.buildClient(account.email, updatedPassword, provider.host);
 	const remoteFolders = await imapService.getAllIMAPFolders(imapClient);
-	const selectedFolders = await folderService.findFoldersByAccountIdAndUserId(userId, account.id);
+	const selectedFolders = await folderService.findFoldersWithDeletedFilterByAccountIdAndUserId(userId, account.id, false);
 
 	const validatedProvider = {
 		account: {
@@ -178,7 +183,7 @@ export async function updateAccount(
 ): Promise<void> {
 	const cachedProvider = await getCachedValidatedAccount<ValidatedExistingAccount>(userId, email);
 	const selectedRemoteFolders = formDataSelectedRemoteFolders ?? [];
-	const existingFolders = await folderService.findFoldersByAccountIdAndUserId(userId, accountId);
+	const existingFolders = await folderService.findFoldersWithDeletedFilterByAccountIdAndUserId(userId, accountId, false);
 
 	await folderService.updateFoldersAndAccount(userId, cachedProvider, selectedRemoteFolders, existingFolders);
 }

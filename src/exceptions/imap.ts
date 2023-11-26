@@ -1,4 +1,4 @@
-export class IMAPAuthenticationFailed extends Error {
+export class IMAPAuthenticationFailedException extends Error {
 	constructor(message: string) {
 		super(message);
 
@@ -10,7 +10,7 @@ export class IMAPAuthenticationFailed extends Error {
 	}
 }
 
-export class IMAPUidValidityChanged extends Error {
+export class IMAPUidValidityChangedException extends Error {
 	constructor(message: string) {
 		super(message);
 
@@ -22,7 +22,7 @@ export class IMAPUidValidityChanged extends Error {
 	}
 }
 
-export class IMAPTooManyRequests extends Error {
+export class IMAPTooManyRequestsException extends Error {
 	constructor(message: string) {
 		super(message);
 
@@ -46,7 +46,7 @@ export class IMAPGenericException extends Error {
 	}
 }
 
-export class IMAPUserAuthenticatedNotConnected extends Error {
+export class IMAPUserAuthenticatedNotConnectedException extends Error {
 	constructor(message: string) {
 		super(message);
 

@@ -10,7 +10,12 @@ import { first, last } from "lodash";
 import { MissingStartEndSeqException } from "../../../../exceptions/job";
 import type { ImapEmail } from "../../../../types/imap";
 import {  FolderDeletedException, FolderDeletedOnRemoteException, FolderNotFoundException, FolderNotSyncingException } from "../../../../exceptions/folder";
-import { IMAPAuthenticationFailed, IMAPGenericException, IMAPTooManyRequests, IMAPUserAuthenticatedNotConnected } from "../../../../exceptions/imap";
+import { 
+    IMAPAuthenticationFailedException,
+    IMAPGenericException,
+    IMAPTooManyRequestsException,
+    IMAPUserAuthenticatedNotConnectedException
+} from "../../../../exceptions/imap";
 
 // TODO Add a progress bar to show how many emails have been imported for each account
 export async function importEmail(job: Job): Promise<void> {
@@ -59,17 +64,17 @@ export async function importEmail(job: Job): Promise<void> {
                 folderId: jobData.folderId,
                 accountId: jobData.accountId
             });
-        } else if (error instanceof IMAPTooManyRequests) {
+        } else if (error instanceof IMAPTooManyRequestsException) {
             // This will retry job as per configured attemps and backoff
             logger.warn(`Too many requests for Job ID: ${job.id}`);
             throw error;
-        } else if (error instanceof IMAPAuthenticationFailed) {
+        } else if (error instanceof IMAPAuthenticationFailedException) {
             // TODO send notification to user
             logger.error(`Authentication failed for Account ID ${jobData.accountId}. Disabling syncing`);
             await accountService.updateAccountSyncingStatus(jobData.userId, jobData.accountId, false);
         } else if (
             error instanceof IMAPGenericException ||
-            error instanceof IMAPUserAuthenticatedNotConnected
+            error instanceof IMAPUserAuthenticatedNotConnectedException
         ) {
             logger.error(`${error.message} for Job ID: ${job.id}`);
             throw error;
