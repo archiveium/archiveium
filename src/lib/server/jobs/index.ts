@@ -4,22 +4,26 @@ import { userInvitation } from "./handlers/userInvitation";
 import { redis } from '../redis/connection';
 import { passwordReset } from './handlers/passwordReset';
 import { emailVerification } from './handlers/emailVerification';
+import { syncAccount } from './handlers/syncAccount';
 
 export class JobScheduler {
     private userInvitationQueue: Queue;
     private passwordResetQueue: Queue;
     private emailVerificationQueue: Queue;
     private importEmailQueue: Queue;
+    private syncAccountQueue: Queue;
 
     static QUEUE_USER_INVITATION = 'UserInvitation';
     static QUEUE_PASSWORD_RESET = 'PasswordReset';
     static QUEUE_IMPORT_EMAIL = 'ImportEmail';
     static QUEUE_EMAIL_VERIFICATION = 'EmailVerification';
+    static QUEUE_SYNC_ACCOUNT = 'SyncAccount';
 
     constructor() {
         this.userInvitationQueue = this.buildQueue(JobScheduler.QUEUE_USER_INVITATION);
         this.passwordResetQueue = this.buildQueue(JobScheduler.QUEUE_PASSWORD_RESET);
         this.emailVerificationQueue = this.buildQueue(JobScheduler.QUEUE_EMAIL_VERIFICATION);
+        this.syncAccountQueue = this.buildQueue(JobScheduler.QUEUE_SYNC_ACCOUNT);
         this.importEmailQueue = this.buildQueue(JobScheduler.QUEUE_IMPORT_EMAIL, {
             removeOnComplete: true,
             attempts: 3,
@@ -60,6 +64,7 @@ export class JobScheduler {
         await this.startWorker(JobScheduler.QUEUE_USER_INVITATION, userInvitation);
         await this.startWorker(JobScheduler.QUEUE_PASSWORD_RESET, passwordReset);
         await this.startWorker(JobScheduler.QUEUE_EMAIL_VERIFICATION, emailVerification);
+        await this.startWorker(JobScheduler.QUEUE_SYNC_ACCOUNT, syncAccount);
     }
 
     private async startWorker(workerName: string, processor: Processor): Promise<void> {
@@ -91,6 +96,16 @@ export class JobScheduler {
         );
         await this.emailVerificationQueue.add(
             'emailVerification',
+            null,
+            {
+                repeat: {
+                    every: 60000, // 60 seconds
+                },
+                removeOnComplete: true,
+            },
+        );
+        await this.syncAccountQueue.add(
+            'syncAccount',
             null,
             {
                 repeat: {
