@@ -16,6 +16,7 @@ import {
     IMAPTooManyRequestsException,
     IMAPUserAuthenticatedNotConnectedException
 } from "../../../../exceptions/imap";
+import pLimit from "p-limit";
 
 // TODO Add a progress bar to show how many emails have been imported for each account
 export async function importEmail(job: Job): Promise<void> {
@@ -46,8 +47,10 @@ export async function importEmail(job: Job): Promise<void> {
             logger.info(`Processing job ${JSON.stringify(jobData)}`);
             const emails = await imapService.getEmails(imapClient, folder, startSeq, endSeq);
 
-            const promises = emails.map((email: ImapEmail) => {
-                return emailService.saveAndSyncWithS3(email, folder, account.provider_check_email_id);
+            const promisesLimit = pLimit(10);
+            const promises: Promise<void>[] = [];
+            emails.forEach((email: ImapEmail) => {
+                promisesLimit(() => emailService.saveAndSyncWithS3(email, folder, account.provider_check_email_id));
             });
             await Promise.all(promises);
         }
