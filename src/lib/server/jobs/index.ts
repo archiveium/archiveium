@@ -7,6 +7,7 @@ import { emailVerification } from './handlers/emailVerification';
 import { syncAccount } from './handlers/syncAccount';
 import { syncFolder } from './handlers/syncFolder';
 import { importEmail } from './handlers/importEmail';
+import { deleteAccount } from './handlers/deleteAccount';
 
 export class JobScheduler {
     private userInvitationQueue: Queue;
@@ -15,6 +16,7 @@ export class JobScheduler {
     private importEmailQueue: Queue;
     private syncAccountQueue: Queue;
     private syncFolderQueue: Queue;
+    private deleteAccountQueue: Queue;
 
     static QUEUE_USER_INVITATION = 'UserInvitation';
     static QUEUE_PASSWORD_RESET = 'PasswordReset';
@@ -22,6 +24,7 @@ export class JobScheduler {
     static QUEUE_EMAIL_VERIFICATION = 'EmailVerification';
     static QUEUE_SYNC_ACCOUNT = 'SyncAccount';
     static QUEUE_SYNC_FOLDER = 'SyncFolder';
+    static QUEUE_DELETE_ACCOUNT = 'DeleteAccount';
 
     constructor() {
         this.userInvitationQueue = this.buildQueue(JobScheduler.QUEUE_USER_INVITATION);
@@ -29,6 +32,7 @@ export class JobScheduler {
         this.emailVerificationQueue = this.buildQueue(JobScheduler.QUEUE_EMAIL_VERIFICATION);
         this.syncAccountQueue = this.buildQueue(JobScheduler.QUEUE_SYNC_ACCOUNT);
         this.syncFolderQueue = this.buildQueue(JobScheduler.QUEUE_SYNC_FOLDER);
+        this.deleteAccountQueue = this.buildQueue(JobScheduler.QUEUE_DELETE_ACCOUNT);
         this.importEmailQueue = this.buildQueue(JobScheduler.QUEUE_IMPORT_EMAIL, {
             removeOnComplete: true,
             attempts: 3,
@@ -72,6 +76,7 @@ export class JobScheduler {
         await this.startWorker(JobScheduler.QUEUE_SYNC_ACCOUNT, syncAccount);
         await this.startWorker(JobScheduler.QUEUE_SYNC_FOLDER, syncFolder);
         await this.startWorker(JobScheduler.QUEUE_IMPORT_EMAIL, importEmail);
+        await this.startWorker(JobScheduler.QUEUE_DELETE_ACCOUNT, deleteAccount);
     }
 
     private async startWorker(workerName: string, processor: Processor): Promise<void> {
@@ -124,6 +129,16 @@ export class JobScheduler {
         );
         await this.syncFolderQueue.add(
             'syncFolder',
+            null,
+            {
+                repeat: {
+                    every: 60000, // 60 seconds
+                },
+                removeOnComplete: true,
+            },
+        );
+        await this.deleteAccountQueue.add(
+            'deleteAccount',
             null,
             {
                 repeat: {
