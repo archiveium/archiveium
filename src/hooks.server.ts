@@ -25,9 +25,17 @@ export const handle = (async ({ event, resolve }) => {
 	return response;
 }) satisfies Handle;
 
+// Monkey patch
+// As per https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt#use_within_json
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore 
+BigInt.prototype.toJSON = function () {
+	return this.toString();
+};
+
 async function initScheduler() {
 	const jobScheduler = new JobScheduler();
-    await jobScheduler.initialize();
+	await jobScheduler.initialize();
 }
 
 await initScheduler();

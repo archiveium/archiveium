@@ -89,9 +89,8 @@ export async function syncAccount(job: Job): Promise<void> {
 }
 
 async function processAccount(accountFolder: Folder, imapClient: ImapFlow, jobScheduler: JobScheduler): Promise<void> {
-    const folders = await folderService.findFoldersByAccountIdAndUserId(accountFolder.user_id, accountFolder.id, false);
     // TODO Check if there can be multiple folders for a given account and user
-    const folder = folders[0];
+    const folder = await folderService.findFolderById(accountFolder.id);
     const imapFolderStatus = await imapService.getFolderStatusByName(imapClient, folder.name);
     const imapFolderLastUid = imapFolderStatus.uidNext - 1;
 

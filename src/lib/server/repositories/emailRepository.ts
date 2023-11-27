@@ -4,16 +4,16 @@ import type { EmailInsert } from '../database/wrappers';
 import type { DB } from '../database/types';
 
 export async function findEmailByFolderIdAndUserId(userId: string, folderId: string, offset: number, limit: number) {
-    return db.selectFrom('emails')
-        .innerJoin('email_folders', 'email_folders.email_id', 'emails.id')
+    return db.selectFrom('emails as e')
+        .innerJoin('email_folders as ef', 'ef.email_id', 'e.id')
         .select([
-            'emails.id', 'emails.has_attachments', 'emails.message_number',
-            sql<string>`to_char(emails.udate, 'Mon DD, YYYY')`.as('formatted_date')
+            'e.id', 'e.has_attachments', 'e.message_number', 'e.email_id', 'e.udate',
+            sql<string>`to_char(e.udate, 'Mon DD, YYYY')`.as('formatted_date')
         ])
-        .where('emails.user_id', '=', userId)
-        .where('email_folders.folder_id', '=', folderId)
-        .where('emails.imported', '=', true)
-        .orderBy('emails.udate', 'desc')
+        .where('e.user_id', '=', userId)
+        .where('ef.folder_id', '=', folderId)
+        .where('e.imported', '=', true)
+        .orderBy('e.udate', 'desc')
         .offset(offset)
         .limit(limit)
         .execute();

@@ -67,13 +67,13 @@ export async function findEmailByEmailId(emailId: string) {
 }
 
 export async function saveAndSyncWithS3(email: ImapEmail, folder: Folder, checkEmailId: boolean) {
-	return db.transaction().execute(async (trx) => {
-        let savedEmail;
-        let hasSource = false;
-        if (checkEmailId) {
-            savedEmail = await findEmailByEmailId(email.emailId);
-        }
+    let savedEmail: { id: string; user_id: string; email_id: string | null; imported: boolean; };
+    let hasSource = false;
+    if (checkEmailId) {
+        savedEmail = await findEmailByEmailId(email.emailId);
+    }
 
+    return db.transaction().execute(async (trx) => {
         // Save to emails table and S3 if no previous email has same emailId
         let insertedEmailId;
         if (savedEmail) {

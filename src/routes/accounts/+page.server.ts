@@ -63,7 +63,7 @@ async function buildPageData(
 
 	let folders;
 	if (selectedAccount) {
-		folders = await folderService.findFoldersByAccountIdAndUserId(userId, selectedAccount.id);
+		folders = await folderService.findFoldersWithDeletedFilterByAccountIdAndUserId(userId, selectedAccount.id, true);
 		// do not remove folders not syncing
 		// we need them to be discoverable since they might have emails
 		// that user might want to see

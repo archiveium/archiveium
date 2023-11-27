@@ -6,6 +6,7 @@ import { passwordReset } from './handlers/passwordReset';
 import { emailVerification } from './handlers/emailVerification';
 import { syncAccount } from './handlers/syncAccount';
 import { syncFolder } from './handlers/syncFolder';
+import { importEmail } from './handlers/importEmail';
 
 export class JobScheduler {
     private userInvitationQueue: Queue;
@@ -65,17 +66,18 @@ export class JobScheduler {
     }
 
     private async startWorkers(): Promise<void> {
-        logger.info('Starting workers');
         await this.startWorker(JobScheduler.QUEUE_USER_INVITATION, userInvitation);
         await this.startWorker(JobScheduler.QUEUE_PASSWORD_RESET, passwordReset);
         await this.startWorker(JobScheduler.QUEUE_EMAIL_VERIFICATION, emailVerification);
         await this.startWorker(JobScheduler.QUEUE_SYNC_ACCOUNT, syncAccount);
         await this.startWorker(JobScheduler.QUEUE_SYNC_FOLDER, syncFolder);
+        await this.startWorker(JobScheduler.QUEUE_IMPORT_EMAIL, importEmail);
     }
 
     private async startWorker(workerName: string, processor: Processor): Promise<void> {
+        logger.info(`Starting worker ${workerName}`);
         const worker = new Worker(workerName, processor, { connection: redis });
-        logger.info(`Started worker ${worker.name} (${worker.id})`);        
+        logger.info(`Started worker ${worker.name} (${worker.id})`);
     }
 
     private async scheduleJobs(): Promise<void> {
@@ -130,5 +132,6 @@ export class JobScheduler {
                 removeOnComplete: true,
             },
         );
+        logger.info('Finishes scheduling jobs');
     }
 }
