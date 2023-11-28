@@ -6,7 +6,7 @@ import * as accountService from '$lib/server/services/accountService';
 import * as imapService from '$lib/server/services/imapService';
 import * as emailService from '$lib/server/services/emailService';
 import { AccountDeletedException, AccountSyncingPausedException } from "../../../../exceptions/account";
-import { first, last } from "lodash";
+import _ from "lodash";
 import { MissingStartEndSeqException } from "../../../../exceptions/job";
 import type { ImapEmail } from "../../../../types/imap";
 import {  FolderDeletedException, FolderDeletedOnRemoteException, FolderNotFoundException, FolderNotSyncingException } from "../../../../exceptions/folder";
@@ -37,8 +37,8 @@ export async function importEmail(job: Job): Promise<void> {
         const imapClient = await imapService.buildClient(account.email, account.password, account.provider_host);
 
         // TODO Pass startSeq and endSeq from scheduler
-        const startSeq = first(jobData.messageNumbers)?.uid;
-        const endSeq = last(jobData.messageNumbers)?.uid;
+        const startSeq = _.first(jobData.messageNumbers)?.uid;
+        const endSeq = _.last(jobData.messageNumbers)?.uid;
 
         if (startSeq === undefined || endSeq === undefined) {
             logger.error('Flagging job as failed');

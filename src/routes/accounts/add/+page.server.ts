@@ -1,10 +1,10 @@
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 import { ZodError } from 'zod';
 import { AccountExistsException } from '../../../exceptions/account.js';
-import { IMAPAuthenticationFailed } from '../../../exceptions/imap.js';
 import * as providerService from '$lib/server/services/providerService.js';
 import * as accountService from '$lib/server/services/accountService.js';
 import { requireUserId, saveFlashMessage } from '../../../utils/auth.js';
+import { IMAPAuthenticationFailedException } from '../../../exceptions/imap.js';
 
 export const load = async ({ locals }) => {
 	requireUserId(false, locals.user);
@@ -54,7 +54,7 @@ export const actions = {
 					error: undefined,
 					fieldErrors: error.flatten().fieldErrors
 				});
-			} else if (error instanceof IMAPAuthenticationFailed) {
+			} else if (error instanceof IMAPAuthenticationFailedException) {
 				return fail(400, {
 					error: 'Provided credentials are invalid.',
 					fieldErrors: undefined

@@ -12,7 +12,7 @@ import {
 } from '../../../../exceptions/imap';
 import { providerFactory } from '../providerFactory';
 import type { FolderSelect } from '$lib/server/database/wrappers';
-import { pullAllBy } from 'lodash';
+import _ from 'lodash';
 
 export async function syncFolder(job: Job): Promise<void> {
     logger.info(`Running ${job.name} job`);
@@ -102,7 +102,7 @@ async function syncAccount(account: SyncingAccount): Promise<void> {
         }
     }
 
-    const remoteFolderDeletes = pullAllBy(localFolders, processedFolders);
+    const remoteFolderDeletes = _.pullAllBy(localFolders, processedFolders);
     remoteFolderDeletes?.map(async deletedFolder => {
         if (!deletedFolder.deleted_remote) {
             await folderService.updateFolder(deletedFolder.id, { deleted_remote: true });

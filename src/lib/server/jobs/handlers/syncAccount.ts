@@ -12,7 +12,7 @@ import {
 import type { Folder } from '../../../../types/folder';
 import type { ImapFolderStatus, MessageNumber } from '../../../../types/imap';
 import { JobScheduler } from '..';
-import { isNull, sortBy } from 'lodash';
+import _ from 'lodash';
 import { FolderDeletedOnRemoteException } from '../../../../exceptions/folder';
 
 const BATCH_SIZE = 200;
@@ -94,7 +94,7 @@ async function processAccount(accountFolder: Folder, imapClient: ImapFlow, jobSc
     const imapFolderStatus = await imapService.getFolderStatusByName(imapClient, folder.name);
     const imapFolderLastUid = imapFolderStatus.uidNext - 1;
 
-    if (isNull(folder.last_updated_msgno)) {
+    if (_.isNull(folder.last_updated_msgno)) {
         if (imapFolderStatus.messages > 0) {
             const messageNumbers = await buildMessageNumbers(
                 imapClient,
@@ -177,6 +177,6 @@ async function buildMessageNumbers(
     imapFolderLastUid: number
 ): Promise<MessageNumber[]> {
     let messageNumbers = await imapService.getMessageNumbers(imapClient, folderName, lastUpdatedMsgNo, imapFolderLastUid);
-    messageNumbers = sortBy(messageNumbers, ['uid']);
+    messageNumbers = _.sortBy(messageNumbers, ['uid']);
     return messageNumbers.slice(0, BATCH_SIZE);
 }
