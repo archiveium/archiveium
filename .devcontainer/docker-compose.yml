@@ -23,12 +23,21 @@ services:
       - frontend
   redis:
     image: 'redis:7.0.10-alpine'
-    mem_limit: 128M
     ports:
       - '6379:6379'
-    command: redis-server --maxmemory-policy allkeys-lru --maxmemory 100M
+    command: redis-server --maxmemory-policy noeviction --appendonly yes --maxmemory 200M
     volumes:
       - 'cache:/data'
+    networks:
+      - frontend
+  mailpit:
+    image: 'axllent/mailpit:v1.9.10'
+    environment:
+      - MP_SMTP_BIND_ADDR=0.0.0.0:1029
+      - MP_UI_BIND_ADDR=0.0.0.0:8029
+    ports:
+      - 1029:1029
+      - 8029:8029
     networks:
       - frontend
 
