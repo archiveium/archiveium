@@ -17,12 +17,12 @@ done
 
 if [[ -n "$app" ]]; then
     echo 'Replacing frontend version'
-    sed -i "s/archiveium\/frontend.*/archiveium\/frontend:$app/g" docker-compose.yml
+    sed -i "s/archiveium\/frontend.*/archiveium\/frontend:$app/g" ./docker/docker-compose.yml
 fi
 
 # if [[ -n "$jobber" ]]; then
 #     echo 'Replacing jobber version'
-#     sed -i "s/archiveium\/jobber.*/archiveium\/jobber:$jobber/g" docker-compose.yml
+#     sed -i "s/archiveium\/jobber.*/archiveium\/jobber:$jobber/g" ./docker/docker-compose.yml
 # fi
 
 echo 'Setting up github user for auto-commit'
@@ -30,6 +30,6 @@ git config user.name github-actions
 git config user.email github-actions@github.com
 
 echo 'Commit docker-compose.yml'
-git add docker-compose.yml
-git commit -m "chore: Bump version" docker-compose.yml
+git add ./docker/docker-compose.yml
+git commit -m "chore: Bump version" ./docker/docker-compose.yml
 git push
