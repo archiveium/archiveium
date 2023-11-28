@@ -3,10 +3,8 @@
 import ImapFlow from 'imapflow';
 import type { ListResponse } from 'imapflow';
 import {
-	IMAPAuthenticationFailed,
-	IMAPGenericException,
-	IMAPTooManyRequests,
-	IMAPUserAuthenticatedNotConnected
+    IMAPAuthenticationFailedException,
+	IMAPGenericException, IMAPTooManyRequestsException, IMAPUserAuthenticatedNotConnectedException,
 } from '../../../exceptions/imap';
 import type { ImapEmail, ImapFolderStatus, MessageNumber } from '../../../types/imap';
 import { logger } from '../../../utils/logger';
@@ -34,14 +32,14 @@ export async function buildClient(
 		await client.connect();
 	} catch (error: any) {
 		if (error.response && error.response.includes('Too many simultaneous connections')) {
-			throw new IMAPTooManyRequests(error.response);
+			throw new IMAPTooManyRequestsException(error.response);
 		} else if (
 			error.response &&
 			error.response.includes('User is authenticated but not connected')
 		) {
-			throw new IMAPUserAuthenticatedNotConnected(error.response);
+			throw new IMAPUserAuthenticatedNotConnectedException(error.response);
 		} else if (error.authenticationFailed) {
-			throw new IMAPAuthenticationFailed(error.response);
+			throw new IMAPAuthenticationFailedException(error.response);
 		} else if (error instanceof Error) {
 			console.log(error);
 			throw new IMAPGenericException(error.message);
