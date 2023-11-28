@@ -2,7 +2,8 @@
 	"app": {
 		"name": "Archiveium",
 		"url": "",
-		"logLevel": ""
+		"logLevel": "",
+		"useAsCronProcessor": false
 	},
 	"database": {
 		"user": "",

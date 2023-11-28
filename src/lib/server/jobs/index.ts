@@ -8,6 +8,7 @@ import { syncAccount } from './handlers/syncAccount';
 import { syncFolder } from './handlers/syncFolder';
 import { importEmail } from './handlers/importEmail';
 import { deleteAccount } from './handlers/deleteAccount';
+import config from 'config';
 
 export class JobScheduler {
     private userInvitationQueue: Queue;
@@ -43,13 +44,19 @@ export class JobScheduler {
         });
     }
 
-    async initialize() {
-        logger.info('Initializing scheduler');
-        // remove completed jobs
-        // await this.userInvitationQueue.clean(0, 1000, 'completed');
-        await this.scheduleJobs();
-        await this.startWorkers();
-        logger.info('Finished initializing scheduler');
+    async initialize(): Promise<void> {
+        const useAsCronProcessor = config.get<string>('app.useAsCronProcessor');
+        if (useAsCronProcessor === 'true') {
+            logger.info('Initializing scheduler');
+            // remove completed jobs
+            // await this.userInvitationQueue.clean(0, 1000, 'completed');
+            await this.scheduleJobs();
+            await this.startWorkers();
+            logger.info('Finished initializing scheduler');
+            return;
+        }
+
+        logger.warn('Skipping initialization of scheduler');
     }
 
     async addJobToExistingQueue(queue: string, data: unknown) {

@@ -1,0 +1,5 @@
+{
+	"app": {
+		"useAsCronProcessor": "USE_AS_CRON_PROCESSOR"
+	}
+}
