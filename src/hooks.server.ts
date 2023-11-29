@@ -2,6 +2,7 @@ import type { Handle } from '@sveltejs/kit';
 import { redis } from '$lib/server/redis/connection';
 import { createUserSession, deleteFlashMessage } from './utils/auth';
 import { JobScheduler } from '$lib/server/jobs';
+import { runMigrations } from '$lib/server/database/migration';
 
 export const handle = (async ({ event, resolve }) => {
 	const sessionId = event.cookies.get('sessionId');
@@ -33,9 +34,12 @@ BigInt.prototype.toJSON = function () {
 	return this.toString();
 };
 
+// Run migrations
+await runMigrations();
+
+// Initialize cron jobs
 async function initScheduler() {
 	const jobScheduler = new JobScheduler();
 	await jobScheduler.initialize();
 }
-
 await initScheduler();
