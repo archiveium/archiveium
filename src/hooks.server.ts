@@ -4,6 +4,7 @@ import { createUserSession, deleteFlashMessage } from './utils/auth';
 import { JobScheduler } from '$lib/server/jobs';
 import { runMigrations } from '$lib/server/database/migration';
 import { seedDatabase } from '$lib/server/database/seed';
+import { building } from '$app/environment';
 
 export const handle = (async ({ event, resolve }) => {
 	const sessionId = event.cookies.get('sessionId');
@@ -35,14 +36,16 @@ BigInt.prototype.toJSON = function () {
 	return this.toString();
 };
 
-// Run migrations
-await runMigrations();
-// Seed database
-await seedDatabase();
-
-// Initialize cron jobs
 async function initScheduler() {
 	const jobScheduler = new JobScheduler();
 	await jobScheduler.initialize();
 }
-await initScheduler();
+
+if (!building) {
+	// Run migrations
+	await runMigrations();
+	// Seed database
+	await seedDatabase();
+	// Initialize cron jobs
+	await initScheduler();
+}
