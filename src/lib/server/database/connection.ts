@@ -20,7 +20,8 @@ export const db = new Kysely<DB>({
   dialect,
   log(event) {
     if (event.level === 'query' && logLevel === 'verbose') {
-      logger.info({ sql: event.query.sql, parameters: JSON.stringify(event.query.parameters) });
+      logger.info(event.query.sql);
+      logger.info(JSON.stringify(event.query.parameters));
     }
   }
 });

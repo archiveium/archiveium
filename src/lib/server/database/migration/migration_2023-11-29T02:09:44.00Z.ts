@@ -23,7 +23,7 @@ export async function up(db: Kysely<any>): Promise<void> {
         .addColumn('id', 'bigserial', (col) => col.primaryKey())
         .addColumn('name', 'varchar(255)', (col) => col.notNull())
         .addColumn('host', 'varchar(255)', (col) => col.notNull())
-        .addColumn('post', 'int4', (col) => col.notNull())
+        .addColumn('port', 'int4', (col) => col.notNull())
         .addColumn('secure', 'boolean', (col) => col.notNull())
         .addColumn('is_default', 'boolean', (col) => col.notNull())
         .addColumn('check_email_id', 'boolean', (col) => col.notNull())
