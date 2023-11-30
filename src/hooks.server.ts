@@ -3,6 +3,7 @@ import { redis } from '$lib/server/redis/connection';
 import { createUserSession, deleteFlashMessage } from './utils/auth';
 import { JobScheduler } from '$lib/server/jobs';
 import { runMigrations } from '$lib/server/database/migration';
+import { seedDatabase } from '$lib/server/database/seed';
 
 export const handle = (async ({ event, resolve }) => {
 	const sessionId = event.cookies.get('sessionId');
@@ -36,6 +37,8 @@ BigInt.prototype.toJSON = function () {
 
 // Run migrations
 await runMigrations();
+// Seed database
+await seedDatabase();
 
 // Initialize cron jobs
 async function initScheduler() {
