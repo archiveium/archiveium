@@ -1,6 +1,6 @@
 {
 	"name": "archiveium-frontend",
-	"version": "0.0.15",
+	"version": "0.0.16",
 	"private": true,
 	"scripts": {
 		"dev": "export USE_AS_CRON_PROCESSOR=true && vite dev",
