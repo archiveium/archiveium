@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: archiveium/frontend:0.0.17
+    image: archiveium/frontend:0.0.18
     ports:
       - 5292:3000
     volumes:
@@ -32,7 +32,7 @@ services:
     #   - "traefik.http.services.archiveium.loadbalancer.server.port=3000"
 
   cron:
-    image: archiveium/frontend:0.0.17
+    image: archiveium/frontend:0.0.18
     volumes:
       - ./frontend.json:/app/config/production-0.json
     environment:
