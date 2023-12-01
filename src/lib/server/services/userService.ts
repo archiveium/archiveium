@@ -11,6 +11,7 @@ import crypto from 'crypto';
 import { mailTransporter } from '$lib/mailTransport';
 import { logger } from '../../../utils/logger';
 import SignUrl from '../../../utils/signedUrl';
+import { buildHtmlTemplatePath } from '../../../utils/emailHelper';
 
 export async function createUser(user: CreateUser): Promise<InsertResult> {
     return userRepository.createUser({
@@ -66,7 +67,7 @@ export async function sendUserVerificationEmail(email: string, id: string): Prom
     const appConfig = config.get<AppConfig>('app');
     const mailConfig = config.get<MailConfig>('mail');
 
-    const htmlTemplate = await readFile('./src/lib/mailTransport/templates/userVerification.html', 'utf8');
+    const htmlTemplate = await readFile(buildHtmlTemplatePath('userVerification.html'), 'utf8');
     const compiledTemplate = Handlebars.compile(htmlTemplate);
 
     const hashedEmail = crypto.createHash('sha1').update(email).digest('hex');

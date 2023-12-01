@@ -2,7 +2,7 @@ import type { DeleteObjectCommandInput, GetObjectCommandInput, ListObjectsV2Comm
 import { DeleteObjectCommand, GetObjectCommand, ListObjectsV2Command, PutObjectCommand } from '@aws-sdk/client-s3';
 import type { AddressObject } from 'mailparser';
 import { BUCKET_NAME } from '../constants/s3';
-import { parseEmail, parseEmailSubject } from '../../../utils/emailParser';
+import { parseEmail, parseEmailSubject } from '../../../utils/emailHelper';
 import * as emailService from '$lib/server/services/emailService';
 import { s3Client } from '../s3/connection';
 import { logger } from '../../../utils/logger';

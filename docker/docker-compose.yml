@@ -11,7 +11,7 @@ services:
       TZ: 'America/Toronto'   # Change timezone as needed
       NODE_APP_INSTANCE: 0
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/login"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/login"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -31,7 +31,7 @@ services:
     #   - "traefik.http.routers.archiveium.tls.certresolver=cloudflare"
     #   - "traefik.http.services.archiveium.loadbalancer.server.port=3000"
 
-  cron-processor:
+  cron:
     image: archiveium/frontend:0.0.16
     volumes:
       - ./frontend.json:/app/config/production-0.json
@@ -40,7 +40,7 @@ services:
       NODE_APP_INSTANCE: 0
       USE_AS_CRON_PROCESSOR: true # Needed to run container as cron job processor
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/login"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/login"]
       interval: 30s
       timeout: 5s
       retries: 3

@@ -8,6 +8,7 @@ import { readFile } from 'fs/promises';
 import { mailTransporter } from '$lib/mailTransport';
 import { logger } from '../../../utils/logger';
 import Handlebars from 'handlebars';
+import { buildHtmlTemplatePath } from '../../../utils/emailHelper';
 
 export async function findPasswordResetRequestByEmail(email: string) {
     try {
@@ -56,7 +57,7 @@ export async function sendPasswordResetEmail(email: string, token: string): Prom
     const appConfig = config.get<AppConfig>('app');
     const mailConfig = config.get<MailConfig>('mail');
 
-    const htmlTemplate = await readFile('./src/lib/mailTransport/templates/passwordReset.html', 'utf8');
+    const htmlTemplate = await readFile(buildHtmlTemplatePath('passwordReset.html'), 'utf8');
     const compiledTemplate = Handlebars.compile(htmlTemplate);
 
     const templateDate = {

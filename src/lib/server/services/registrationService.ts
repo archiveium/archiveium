@@ -8,6 +8,7 @@ import { readFile } from 'fs/promises';
 import Handlebars from 'handlebars';
 import { mailTransporter } from "$lib/mailTransport";
 import { logger } from "../../../utils/logger";
+import { buildHtmlTemplatePath } from "../../../utils/emailHelper";
 
 export async function registerForPreview(data: FormData): Promise<void> {
 	// TODO Throw error if email is present in users table
@@ -41,7 +42,8 @@ export async function sendUserInvitation(toEmail: string): Promise<void> {
     const appConfig = config.get<AppConfig>('app');
     const mailConfig = config.get<MailConfig>('mail');
 
-    const htmlTemplate = await readFile('./src/lib/mailTransport/templates/userInvitation.html', 'utf8');
+
+    const htmlTemplate = await readFile(buildHtmlTemplatePath('userInvitation.html'), 'utf8');
     const compiledTemplate = Handlebars.compile(htmlTemplate);
     const templateDate = {
         appName: appConfig.name,
