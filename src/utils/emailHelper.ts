@@ -1,7 +1,7 @@
 import type { ParsedMail } from 'mailparser';
 import { simpleParser } from 'mailparser';
 import { EmailSourceUndefinedException } from '../exceptions/emailParser';
-import { building } from '$app/environment';
+import { dev } from '$app/environment';
 
 const MAX_SUBJECT_LENGTH = 60;
 
@@ -23,8 +23,8 @@ export function parseEmailSubject(source?: string): string {
 }
 
 export function buildHtmlTemplatePath(filename: string): string {
-	if (building) {
-		return `./templates/${filename}`;
+	if (dev) {
+		return `./src/lib/mailTransport/templates/${filename}`;
 	}
-	return `./src/lib/mailTransport/templates/${filename}`;
+	return `./templates/${filename}`;
 }
