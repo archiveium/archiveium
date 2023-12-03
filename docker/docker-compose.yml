@@ -6,7 +6,7 @@ services:
     ports:
       - 5292:3000
     volumes:
-      - ./frontend.json:/app/config/production-0.json
+      - ./config.json:/app/config/production-0.json
     environment:
       TZ: 'America/Toronto'   # Change timezone as needed
       NODE_APP_INSTANCE: 0
@@ -34,7 +34,7 @@ services:
   cron:
     image: archiveium/frontend:0.0.19
     volumes:
-      - ./frontend.json:/app/config/production-0.json
+      - ./config.json:/app/config/production-0.json
     environment:
       TZ: 'America/Toronto'       # Change timezone as needed
       NODE_APP_INSTANCE: 0

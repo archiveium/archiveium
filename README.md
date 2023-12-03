@@ -1,14 +1,36 @@
-# Archiveium Frontend
+# Getting Started
 
-This repository contains code for the frontend of Archiveium, portion responsible for interaction with user via a website.
+In order to self-host Archiveium, you'll need [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/). Deployment of Archiveium involves 2 services (same container serving 2 different purposes),
 
-## Self Hosting
+- As frontend app - responsible for interaction with user via a website.
+- As cron scheduler - responsible for running background jobs eg. downloading emails from IMAP server.
 
-Please refer to [instructions given in deployer](https://github.com/archiveium/deployer#getting-started) for self-hosting.
+In order to deploy the above mentioned components, follow the steps mentioned below,
 
-## Contributing
+1. In a terminal window, clone the repository and enter the directory.
 
-### Preparing
+    ```sh
+    git clone git@github.com:archiveium/archiveium.git
+    cd archiveium/docker
+    ```
+
+1. Create a `config.json` file within `archiveium/docker` directory based on values from [default.json](https://github.com/archiveium/archiveium/blob/main/config/default.json). Adjust `config.json` as required.
+1. Update following placeholders in `docker-compose.yml` with values matching those provided in  `config.json`
+    - `$DB_PASSWORD`
+    - `$DB_DATABASE`
+    - `$DB_USERNAME`
+    - `$MINIO_USER`
+    - `$MINIO_PASSWORD`
+1. Bring up the stack by running `docker-compose up -d`
+
+## Notes
+
+- `docker-compose.yml` in this repository is constantly updated with latest available version.
+- Please refrain from mixing and matching versions 2 services. While in an ideal world, things should work correctly regardless of versions used, however, since I **do not** test combination of different versions, the same cannot be guaranteed as of now.
+
+# Contributing
+
+## Preparing
 
 1. Clone this repository
 1. Create `development.json` under config directory and add values based on `default.json`. For further reference on how configs are loaded refer to [config package](https://github.com/node-config/node-config#readme).
@@ -28,7 +50,7 @@ npm run dev
 npm run dev -- --open
 ```
 
-### Building
+## Building
 
 To create a production version of your app:
 
