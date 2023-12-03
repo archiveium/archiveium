@@ -8,8 +8,7 @@ export async function deleteAccount(job: Job): Promise<void> {
     logger.info(`Running ${job.name} job`);
 
     const allDeletedAccounts = await accountService.findDeletedAccounts();
-    allDeletedAccounts.forEach(async (deletedAccount) => {
-        logger.info(`Running ${job.name} job`);
+    for (const deletedAccount of allDeletedAccounts) {
         // TODO Can there be a case wherein account is flagged for deletion
         // folders are flagged as well but new one's still get added?
         const folders = await folderService.findDeletedFoldersByUserAndAccount(deletedAccount.user_id, deletedAccount.id);
@@ -25,6 +24,7 @@ export async function deleteAccount(job: Job): Promise<void> {
         logger.info('Started deleting account, folder & emails');
         await accountService.deleteAccount(deletedAccount.id);
         logger.info('Finished deleting account, folder & emails');
-    });
+    }
+
     logger.info(`Finished running ${job.name} job`);
 }

@@ -22,7 +22,7 @@ export async function syncAccount(job: Job): Promise<void> {
 
     const jobScheduler = new JobScheduler();
     const allSyncingAccounts = await accountService.findAllSyncingAccounts();
-    allSyncingAccounts.forEach(async (syncingAccount) => {
+    for (const syncingAccount of allSyncingAccounts) {
         let imapClient: ImapFlow;
         try {
             imapClient = await buildClient(
@@ -83,7 +83,7 @@ export async function syncAccount(job: Job): Promise<void> {
 
         await Promise.all(promises);
         await imapClient.logout();
-    });
+    }
 
     logger.info(`Finished running ${job.name} job`);
 }
