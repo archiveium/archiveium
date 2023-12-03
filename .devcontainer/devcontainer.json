@@ -1,7 +1,7 @@
 {
-	"name": "Archiveium Frontend",
+	"name": "Archiveium",
 	"dockerComposeFile": "docker-compose.yml",
-	"service": "frontend",
+	"service": "archiveium",
 	"workspaceFolder": "/workspace",
 	"customizations": {
 		"vscode": {
@@ -26,6 +26,6 @@
 		8002 // for livereload to work
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "npm install",
+	"postCreateCommand": "npm install",
 	"remoteUser": "node"
 }

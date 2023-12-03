@@ -16,8 +16,8 @@ do
 done
 
 if [[ -n "$app" ]]; then
-    echo 'Replacing frontend version'
-    sed -i "s/archiveium\/frontend.*/archiveium\/frontend:$app/g" ./docker/docker-compose.yml
+    echo 'Replacing app version'
+    sed -i "s/archiveium\/archiveium.*/archiveium\/archiveium:$app/g" ./docker/docker-compose.yml
 fi
 
 # if [[ -n "$jobber" ]]; then

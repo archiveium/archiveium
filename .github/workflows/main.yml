@@ -137,7 +137,7 @@ jobs:
             linux/arm64
           file: Dockerfile
           push: true
-          tags: archiveium/frontend:${{ env.RELEASE_VERSION }}
+          tags: archiveium/archiveium:${{ env.RELEASE_VERSION }}
 
   docker-prod:
     name: Build & Push Prod Docker Image
@@ -172,7 +172,7 @@ jobs:
             linux/arm64
           file: Dockerfile
           push: true
-          tags: archiveium/frontend:${{ env.RELEASE_VERSION }},archiveium/frontend:latest
+          tags: archiveium/archiveium:${{ env.RELEASE_VERSION }},archiveium/archiveium:latest
 
   update-docker-compose:
     name: Update Docker Compose
