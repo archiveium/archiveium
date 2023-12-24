@@ -3,20 +3,32 @@ import SignUrl from "../../../utils/signedUrl";
 import config from 'config';
 import { formSchema, registrationSchema } from "../schemas/registrationSchema";
 import * as userInvitationService from '$lib/server/services/userInvitiationService';
+import * as userService from '$lib/server/services/userService';
 import type { RegistrationVerificationUrl, VerifyEmailParams } from "../../../types/registration";
 import { readFile } from 'fs/promises';
 import Handlebars from 'handlebars';
 import { mailTransporter } from "$lib/mailTransport";
 import { logger } from "../../../utils/logger";
 import { buildHtmlTemplatePath } from "../../../utils/emailHelper";
+import { RecordNotFoundException } from "../../../exceptions/database";
+import { UserAlreadyRegisteredException } from "../../../exceptions/auth";
 
 export async function registerForPreview(data: FormData): Promise<void> {
-	// TODO Throw error if email is present in users table
 	// TODO Add honeypot spam protection
 	const validatedData = formSchema.parse({
 		email: data.get('email')
 	});
-	await userInvitationService.insertUserInvitation(validatedData.email);
+
+	// make sure user isn't already registered
+	try {
+		await userService.findUserByEmail(validatedData.email);
+	} catch (error) {
+		if (error instanceof RecordNotFoundException) {
+			await userInvitationService.insertUserInvitation(validatedData.email);
+			return;
+		}
+	}
+	throw new UserAlreadyRegisteredException(`Email ${validatedData.email} is already registered`);
 }
 
 export async function verifyRegistrationUrl(params: VerifyEmailParams): Promise<RegistrationVerificationUrl> {
