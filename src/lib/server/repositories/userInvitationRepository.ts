@@ -15,10 +15,12 @@ export async function findUserInvitationByEmail(email: string) {
 }
 
 export async function findAllInvitedUsers() {
-    return db.selectFrom('user_invitations')
-        .select(['id', 'username'])
-        .where('accepted', '=', true)
-        .where('notification_sent_at', 'is', null)
+    return db.selectFrom('user_invitations as ui')
+        .select(['ui.id', 'ui.username'])
+        .leftJoin('users as u', 'u.email', 'ui.username')
+        .where('ui.accepted', '=', true)
+        .where('ui.notification_sent_at', 'is', null)
+        .where('u.id', 'is', null)
         .execute();
 }
 

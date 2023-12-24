@@ -1,15 +1,15 @@
 import * as userInvitationService from '$lib/server/services/userInvitiationService';
-import * as registerationService from '$lib/server/services/registrationService';
+import * as registrationService from '$lib/server/services/registrationService';
 import { logger } from "../../../../utils/logger";
 import type { Job } from "bullmq";
 
 export async function userInvitation(job: Job): Promise<void> {
     logger.info(`Running ${job.name} job`);
     try {
-        const allInvitedUSers = await userInvitationService.findAllInvitedUsers();
-        const promises = allInvitedUSers.map(async (invitedUser) => {
+        const allInvitedUsers = await userInvitationService.findAllInvitedUsers();
+        const promises = allInvitedUsers.map(async (invitedUser) => {
             logger.info(`Processing user ${invitedUser.username}`);
-            await registerationService.sendUserInvitation(invitedUser.username);
+            await registrationService.sendUserInvitation(invitedUser.username);
             await userInvitationService.updateInvitedUser(invitedUser.id);
             logger.info(`Finished processing user ${invitedUser.username}`);
         });
