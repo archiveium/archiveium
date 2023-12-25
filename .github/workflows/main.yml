@@ -40,6 +40,7 @@ jobs:
   test:
     name: Test
     needs: build
+    if: github.event_name == 'push' && github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -53,7 +54,7 @@ jobs:
       - run: npm run test:unit
       - run: npm run test:coverage
       - name: Coverage Report
-        if: always() # generate the report if tests are failing
+        if: always() # generate the report even if tests are failing
         uses: davelosert/vitest-coverage-report-action@v1
 
   release-prod:
