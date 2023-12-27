@@ -6,18 +6,6 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
 
 export type Int8 = ColumnType<string, string | number | bigint, string | number | bigint>;
 
-export type Json = ColumnType<JsonValue, string, string>;
-
-export type JsonArray = JsonValue[];
-
-export type JsonObject = {
-  [K in string]?: JsonValue;
-};
-
-export type JsonPrimitive = boolean | null | number | string;
-
-export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
-
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export interface Accounts {
@@ -36,15 +24,15 @@ export interface Accounts {
 
 export interface EmailFolders {
   id: Generated<Int8>;
-  email_id: Int8;
-  folder_id: Int8;
+  email_id: Generated<Int8>;
+  folder_id: Generated<Int8>;
   has_source: boolean;
 }
 
 export interface Emails {
   id: Generated<Int8>;
-  user_id: Int8;
-  account_id: Int8;
+  user_id: Generated<Int8>;
+  account_id: Generated<Int8>;
   email_id: Int8 | null;
   message_number: number;
   udate: Timestamp;
@@ -58,8 +46,8 @@ export interface Emails {
 
 export interface Folders {
   id: Generated<Int8>;
-  user_id: Int8;
-  account_id: Int8;
+  user_id: Generated<Int8>;
+  account_id: Generated<Int8>;
   name: string;
   status_uidvalidity: number;
   last_updated_msgno: number | null;
@@ -70,28 +58,12 @@ export interface Folders {
   updated_at: Generated<Timestamp | null>;
 }
 
-export interface Jobs {
-  id: Generated<Int8>;
-  queue: string;
-  payload: Json;
-  attempts: number;
-  reserved_at: number | null;
-  available_at: number;
-  created_at: number;
-}
-
 export interface PasswordResets {
   id: Generated<Int8>;
   email: string;
   password_reset_token: string;
   email_notified_at: Timestamp | null;
   created_at: Generated<Timestamp | null>;
-}
-
-export interface Pgmigrations {
-  id: Generated<number>;
-  name: string;
-  run_on: Timestamp;
 }
 
 export interface Providers {
@@ -123,6 +95,7 @@ export interface Users {
   email_notified_at: Timestamp | null;
   created_at: Generated<Timestamp | null>;
   updated_at: Generated<Timestamp | null>;
+  deleted: Generated<boolean | null>;
 }
 
 export interface DB {
@@ -130,9 +103,7 @@ export interface DB {
   email_folders: EmailFolders;
   emails: Emails;
   folders: Folders;
-  jobs: Jobs;
   password_resets: PasswordResets;
-  pgmigrations: Pgmigrations;
   providers: Providers;
   user_invitations: UserInvitations;
   users: Users;

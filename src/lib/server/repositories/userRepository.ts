@@ -17,7 +17,7 @@ export async function findUserById(id: string) {
 
 export async function findUserByEmail(email: string) {
     return db.selectFrom('users')
-        .select(['id', 'name', 'email', 'password', 'email_notified_at', 'email_verified_at'])
+        .select(['id', 'name', 'email', 'password', 'deleted', 'email_notified_at', 'email_verified_at'])
         .where('email', '=', email)
         .executeTakeFirstOrThrow();
 }

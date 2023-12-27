@@ -12,6 +12,7 @@ import { mailTransporter } from '$lib/mailTransport';
 import { logger } from '../../../utils/logger';
 import SignUrl from '../../../utils/signedUrl';
 import { buildHtmlTemplatePath } from '../../../utils/emailHelper';
+import { UserDeletedException } from '../../../exceptions/auth';
 
 export async function createUser(user: CreateUser): Promise<InsertResult> {
     return userRepository.createUser({
@@ -37,6 +38,9 @@ export async function findUserById(id: string) {
 export async function findUserByEmail(email: string) {
     try {
         const user = await userRepository.findUserByEmail(email);
+        if (user.deleted) {
+            throw new UserDeletedException(`Account has been marked for deletion`);
+        }
         return user;
     } catch (error) {
         if (error instanceof NoResultError) {

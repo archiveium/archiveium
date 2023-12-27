@@ -1,6 +1,6 @@
 import type { Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
-import { UserNotVerifiedException } from '../../exceptions/auth';
+import { UserDeletedException, UserNotVerifiedException } from '../../exceptions/auth';
 import { createUserSession, getUserId } from '../../utils/auth';
 import * as authService from '$lib/server/services/authService';
 
@@ -23,7 +23,10 @@ export const actions = {
 			const user = await authService.loginUser(data);
 			await createUserSession(cookies, user);
 		} catch (error) {
-			if (error instanceof UserNotVerifiedException) {
+			if (
+				error instanceof UserNotVerifiedException ||
+				error instanceof UserDeletedException
+			) {
 				return fail(400, { error: error.message });
 			}
 
