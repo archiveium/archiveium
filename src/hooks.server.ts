@@ -1,6 +1,6 @@
 import type { Handle } from '@sveltejs/kit';
 import { redis } from '$lib/server/redis/connection';
-import { createUserSession, deleteFlashMessage } from './utils/auth';
+import { buildSessionCacheKey, createGuestSession, deleteFlashMessage } from './utils/auth';
 import { JobScheduler } from '$lib/server/jobs';
 import { runMigrations } from '$lib/server/database/migration';
 import { seedDatabase } from '$lib/server/database/seed';
@@ -9,7 +9,7 @@ import { building } from '$app/environment';
 export const handle = (async ({ event, resolve }) => {
 	const sessionId = event.cookies.get('sessionId');
 	if (sessionId) {
-		const result = await redis.get(`session:${sessionId}`);
+		const result = await redis.get(buildSessionCacheKey(sessionId));
 		if (result) {
 			const sessionData = JSON.parse(result);
 			if (sessionData.flashMessage) {
@@ -19,8 +19,7 @@ export const handle = (async ({ event, resolve }) => {
 		}
 		event.locals.sessionId = sessionId;
 	} else {
-		// temporary session
-		event.locals.sessionId = await createUserSession(event.cookies);
+		event.locals.sessionId = await createGuestSession(event.cookies);
 	}
 
 	const response = await resolve(event);
