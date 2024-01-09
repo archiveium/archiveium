@@ -6,7 +6,8 @@ import { forgotPasswordFormSchema, loginFormSchema, passwordResetFormSchema, reg
 import * as userService from '$lib/server/services/userService';
 import * as passwordResetService from '$lib/server/services/passwordResetService';
 import * as userInvitationService from '$lib/server/services/userInvitiationService';
-import { deleteUserSession } from '../../../utils/auth';
+import { buildSessionId, deleteUserSession } from '../../../utils/auth';
+import type { Cookies } from '@sveltejs/kit';
 
 export async function createPasswordResetRequest(data: FormData): Promise<void> {
 	const validatedData = forgotPasswordFormSchema.parse({ email: data.get('email') });
@@ -58,8 +59,11 @@ export async function loginUser(credentials: FormData) {
 	throw new UserNotVerifiedException('Please verify your email address before logging in.');
 }
 
-export async function logoutUser(sessionId: string): Promise<void> {
+export async function logoutUser(sessionId: string, cookies: Cookies): Promise<string> {
 	await deleteUserSession(sessionId);
+	const guestSessionId = buildSessionId();
+	cookies.set('sessionId', guestSessionId);
+	return guestSessionId;
 }
 
 export async function registerUser(data: FormData) {

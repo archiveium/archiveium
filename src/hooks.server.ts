@@ -17,7 +17,13 @@ export const handle = (async ({ event, resolve }) => {
 			}
 			event.locals = sessionData;
 		}
-		event.locals.sessionId = sessionId;
+		// if sessionId represents a logged in user's session
+		// and redis has no session data, replace it with guest session
+		else if (sessionId.includes(':')) {
+			event.locals.sessionId = await createGuestSession(event.cookies);
+		} else {
+			event.locals.sessionId = sessionId;
+		}
 	} else {
 		event.locals.sessionId = await createGuestSession(event.cookies);
 	}

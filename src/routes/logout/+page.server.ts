@@ -4,10 +4,10 @@ import * as authService from '$lib/server/services/authService';
 import { saveFlashMessage } from '../../utils/auth';
 
 export const actions = {
-	default: async ({ locals }) => {
+	default: async ({ locals, cookies }) => {
 		try {
-			await authService.logoutUser(locals.sessionId);
-			await saveFlashMessage(locals.sessionId, {
+			const guestSessionId = await authService.logoutUser(locals.sessionId, cookies);
+			await saveFlashMessage(guestSessionId, {
 				type: 'success',
 				message: 'You have been logged out.'
 			});

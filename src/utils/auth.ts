@@ -5,7 +5,7 @@ import { redis } from '$lib/server/redis/connection';
 import type { FlashMessage, SessionData } from '../types/session';
 import type { User } from '../types/user';
 
-function buildSessionId(cookieSessionId?: string, userId?: number): string {
+export function buildSessionId(cookieSessionId?: string, userId?: number): string {
 	let sessionId = cookieSessionId ?? crypto.randomUUID();
 	if (userId && !sessionId.startsWith(`${userId}:`)) {
 		sessionId = `${userId}:${sessionId}`;
@@ -24,7 +24,7 @@ export function hashPassword(rawPassword: string): string {
 }
 
 export async function createGuestSession(cookies: Cookies): Promise<string> {
-	const sessionId = buildSessionId(cookies.get('sessionId'));
+	const sessionId = buildSessionId();
 	const sessionExpiry = 60 * 60 * 24 * 7; // one week
 	const result = await redis.setex(
 		buildSessionCacheKey(sessionId),
@@ -75,6 +75,21 @@ export async function deleteUserSession(sessionId: string): Promise<void> {
 	if (result < 1) {
 		throw new CacheDeleteFailedException(`Failed to delete session`);
 	}
+}
+
+export async function deleteAllUserSessions(userId: string): Promise<void> {
+	// TODO Alternatively, try using scanStream with a count of 10 to avoid
+	// overloading redis with too many delete requests
+	let cursor = '0';
+	do {
+		const scanResult = await redis.scan(cursor, 'MATCH', `session:${userId}:*`);
+		cursor = scanResult[0];
+		const keys = scanResult[1];
+		if (keys.length > 0) {
+			const promises = keys.map((key) => { return redis.del(key); });
+			await Promise.all(promises);
+		}
+	} while (cursor !== '0');
 }
 
 export async function saveFlashMessage(
