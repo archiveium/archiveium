@@ -63,7 +63,7 @@ export const actions = {
 					});
 					break;
 				case 'deleteAccount':
-					await accountService.deleteAccountByUserId(userId, selectedAccount.id);
+					await accountService.softDeleteAccountByUserId(userId, selectedAccount.id);
 					await saveFlashMessage(locals.sessionId, {
 						type: 'success',
 						message: 'Account has been deleted successfully.'

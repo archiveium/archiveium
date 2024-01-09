@@ -3,7 +3,7 @@ import type { Transaction, UpdateResult } from 'kysely';
 import type { DB } from '../database/types';
 import type { FolderInsert, FolderUpdate } from '../database/wrappers';
 
-export async function deleteFolderByAccountId(userId: string, accountId: string, trx?: Transaction<DB>): Promise<UpdateResult> {
+export async function softDeleteFolderByAccountId(userId: string, accountId: string, trx?: Transaction<DB>): Promise<UpdateResult> {
   const dbObject = trx ?? db;
   return dbObject.updateTable('folders')
     .set({

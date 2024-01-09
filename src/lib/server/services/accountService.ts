@@ -71,14 +71,14 @@ export async function isAccountUnique(email: string, userId: string) {
 	return accountRepository.isAccountUnique(email, userId);
 }
 
-export async function deleteAccountByUserId(userId: string, accountId: string): Promise<void> {
+export async function softDeleteAccountByUserId(userId: string, accountId: string): Promise<void> {
 	return db.transaction().execute(async (trx) => {
-		const deleteAccountResult = await accountRepository.deleteAccountByUserId(userId, accountId, trx);
+		const deleteAccountResult = await accountRepository.softDeleteAccountByUserId(userId, accountId, trx);
 		if (Number(deleteAccountResult.numUpdatedRows) !== 1) {
 			throw new RecordDeleteFailedException(`Failed to delete account ${accountId} for user ${userId}`);
 		}
 
-		const deleteFolderResult = await folderRepository.deleteFolderByAccountId(userId, accountId, trx);
+		const deleteFolderResult = await folderRepository.softDeleteFolderByAccountId(userId, accountId, trx);
 		if (Number(deleteFolderResult.numUpdatedRows) === 0) {
 			throw new RecordDeleteFailedException(`Failed to delete folders for account ${accountId} & user ${userId}`);
 		}

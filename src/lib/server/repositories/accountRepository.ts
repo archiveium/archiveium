@@ -77,7 +77,7 @@ export async function isAccountUnique(email: string, userId: string): Promise<bo
   return result.count as number == 0;
 }
 
-export async function deleteAccountByUserId(userId: string, accountId: string, trx?: Transaction<DB>): Promise<UpdateResult> {
+export async function softDeleteAccountByUserId(userId: string, accountId: string, trx?: Transaction<DB>): Promise<UpdateResult> {
   const dbObject = trx ?? db;
   return dbObject.updateTable('accounts')
     .set({
