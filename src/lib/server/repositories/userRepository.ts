@@ -1,10 +1,17 @@
 import { db } from '$lib/server/database/connection';
-import { sql, type InsertResult } from 'kysely';
+import { sql, type InsertResult, DeleteResult } from 'kysely';
 import type { CreateUser } from '../../../types/user';
 
 export async function createUser(user: CreateUser): Promise<InsertResult> {
     return db.insertInto('users')
         .values(user)
+        .executeTakeFirstOrThrow();
+}
+
+export async function deleteUser(userId: string): Promise<DeleteResult> {
+    return db.deleteFrom('users')
+        .where('id', '=', userId)
+        .where('deleted', '=', true)
         .executeTakeFirstOrThrow();
 }
 
@@ -54,5 +61,13 @@ export async function findUnverifiedUsers() {
     return db.selectFrom('users')
         .select(['id', 'email'])
         .where('email_notified_at', 'is', null)
+        .where('deleted', '=', false)
+        .execute();
+}
+
+export async function findDeletedUsers() {
+    return db.selectFrom('users')
+        .select(['id'])
+        .where('deleted', '=', true)
         .execute();
 }

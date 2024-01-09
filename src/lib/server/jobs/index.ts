@@ -9,6 +9,7 @@ import { syncFolder } from './handlers/syncFolder';
 import { importEmail } from './handlers/importEmail';
 import { deleteAccount } from './handlers/deleteAccount';
 import config from 'config';
+import { deleteUser } from './handlers/deleteUser';
 
 export class JobScheduler {
     private userInvitationQueue: Queue;
@@ -18,6 +19,7 @@ export class JobScheduler {
     private syncAccountQueue: Queue;
     private syncFolderQueue: Queue;
     private deleteAccountQueue: Queue;
+    private deleteUserQueue: Queue;
 
     static QUEUE_USER_INVITATION = 'UserInvitation';
     static QUEUE_PASSWORD_RESET = 'PasswordReset';
@@ -26,6 +28,7 @@ export class JobScheduler {
     static QUEUE_SYNC_ACCOUNT = 'SyncAccount';
     static QUEUE_SYNC_FOLDER = 'SyncFolder';
     static QUEUE_DELETE_ACCOUNT = 'DeleteAccount';
+    static QUEUE_DELETE_USER = 'DeleteUser';
 
     constructor() {
         this.userInvitationQueue = this.buildQueue(JobScheduler.QUEUE_USER_INVITATION);
@@ -34,6 +37,7 @@ export class JobScheduler {
         this.syncAccountQueue = this.buildQueue(JobScheduler.QUEUE_SYNC_ACCOUNT);
         this.syncFolderQueue = this.buildQueue(JobScheduler.QUEUE_SYNC_FOLDER);
         this.deleteAccountQueue = this.buildQueue(JobScheduler.QUEUE_DELETE_ACCOUNT);
+        this.deleteUserQueue = this.buildQueue(JobScheduler.QUEUE_DELETE_USER);
         this.importEmailQueue = this.buildQueue(JobScheduler.QUEUE_IMPORT_EMAIL, {
             removeOnComplete: true,
             attempts: 3,
@@ -84,6 +88,7 @@ export class JobScheduler {
         await this.startWorker(JobScheduler.QUEUE_SYNC_FOLDER, syncFolder);
         await this.startWorker(JobScheduler.QUEUE_IMPORT_EMAIL, importEmail);
         await this.startWorker(JobScheduler.QUEUE_DELETE_ACCOUNT, deleteAccount);
+        await this.startWorker(JobScheduler.QUEUE_DELETE_USER, deleteUser);
     }
 
     private async startWorker(workerName: string, processor: Processor): Promise<void> {
@@ -146,6 +151,16 @@ export class JobScheduler {
         );
         await this.deleteAccountQueue.add(
             'deleteAccount',
+            null,
+            {
+                repeat: {
+                    every: 60000, // 60 seconds
+                },
+                removeOnComplete: true,
+            },
+        );
+        await this.deleteUserQueue.add(
+            'deleteUser',
             null,
             {
                 repeat: {

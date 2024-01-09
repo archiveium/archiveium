@@ -67,6 +67,14 @@ export async function findUnverifiedUsers() {
     return userRepository.findUnverifiedUsers();
 }
 
+export async function findDeletedUsers() {
+    return userRepository.findDeletedUsers();
+}
+
+export async function deleteUser(userId: string) {
+    return userRepository.deleteUser(userId);
+}
+
 export async function sendUserVerificationEmail(email: string, id: string): Promise<void> {
     const appConfig = config.get<AppConfig>('app');
     const mailConfig = config.get<MailConfig>('mail');

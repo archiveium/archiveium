@@ -1,5 +1,7 @@
 {
     "cSpell.words": [
+        "backoff",
+        "bigserial",
         "bullmq",
         "kysely"
     ]
