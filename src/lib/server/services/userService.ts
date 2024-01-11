@@ -39,7 +39,7 @@ export async function findUserByEmail(email: string) {
     try {
         const user = await userRepository.findUserByEmail(email);
         if (user.deleted) {
-            throw new UserDeletedException(`Account has been marked for deletion`);
+            throw new UserDeletedException(`User has been marked for deletion`);
         }
         return user;
     } catch (error) {
