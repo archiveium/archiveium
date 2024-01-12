@@ -15,7 +15,7 @@ export const handle = (async ({ event, resolve }) => {
 			if (sessionData.flashMessage) {
 				await deleteFlashMessage(sessionId);
 			}
-			event.locals = sessionData;
+			event.locals = { ...sessionData, sessionId };
 		}
 		// if sessionId represents a logged in user's session
 		// and redis has no session data, replace it with guest session

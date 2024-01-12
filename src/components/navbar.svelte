@@ -39,16 +39,16 @@
 				<Avatar class="acs">{ initials }</Avatar>
 			</button>
 			<!-- Dropdown menu -->
-			<Dropdown triggeredBy=".acs">
+			<Dropdown>
 				<div slot="header" class="px-4 py-2">
 					<span class="block text-sm text-gray-900 dark:text-white">{ username }</span>
 					<span class="block truncate text-sm font-medium">{ email }</span>
 				</div>
-				<DropdownItem>
-					<form method="post" action="/logout" use:enhance>
-						<button>Logout</button>
-					</form>					
+				<form method="post" action="/logout" use:enhance>
+				<DropdownItem type="submit">
+					Logout
 				</DropdownItem>
+				</form>					
 			</Dropdown>
 		</div>
 	</div>
