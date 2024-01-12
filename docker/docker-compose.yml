@@ -86,13 +86,13 @@ services:
     entrypoint: sh
     command: -c 'mkdir -p /data/minio/emails && minio server /data/minio'
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "mc", "ready", "local"]
       retries: 3
       timeout: 5s
 
   redis:
     image: 'redis:7.0.10-alpine'
-    mem_limit: 128M
+    mem_limit: 256M
 #    ports:
 #      - '6379:6379'
     command: redis-server --maxmemory-policy noeviction --appendonly yes --maxmemory 200M
