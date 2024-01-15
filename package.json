@@ -1,6 +1,6 @@
 {
 	"name": "archiveium",
-	"version": "0.0.20",
+	"version": "0.0.21",
 	"private": true,
 	"scripts": {
 		"dev": "export USE_AS_CRON_PROCESSOR=true && vite dev",
