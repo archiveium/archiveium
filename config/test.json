@@ -1,7 +1,9 @@
 {
 	"app": {
 		"url": "",
-		"logLevel": ""
+		"logLevel": "",
+		"adminEmail": "",
+		"adminPassword": ""		
 	},
 	"database": {
 		"user": "",

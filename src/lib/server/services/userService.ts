@@ -13,6 +13,26 @@ import { logger } from '../../../utils/logger';
 import SignUrl from '../../../utils/signedUrl';
 import { buildHtmlTemplatePath } from '../../../utils/emailHelper';
 import { UserDeletedException } from '../../../exceptions/auth';
+import { registerFormSchema } from '../schemas/authSchema';
+
+export async function findAdminUserCount(): Promise<number> {
+    const result = await userRepository.findAdminUserCount();
+    return result.count as number;
+}
+
+export async function createAdminUser(adminEmail: string, adminPassword: string) {
+    const validatedData = registerFormSchema.parse({
+        name: 'Admin',
+        email: adminEmail,
+        password: adminPassword,
+        passwordConfirm: adminPassword
+    });
+    return userRepository.createAdminUser(
+        validatedData.name,
+        validatedData.email,
+        hashPassword(validatedData.password),
+    );
+}
 
 export async function createUser(user: CreateUser): Promise<InsertResult> {
     return userRepository.createUser({

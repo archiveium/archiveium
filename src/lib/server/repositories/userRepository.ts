@@ -71,3 +71,22 @@ export async function findDeletedUsers() {
         .where('deleted', '=', true)
         .execute();
 }
+
+export async function findAdminUserCount() {
+    return db.selectFrom('users')
+        .select((eb) => eb.fn('count', ['id']).as('count'))
+        .where('admin', '=', true)
+        .executeTakeFirstOrThrow();
+}
+
+export async function createAdminUser(name: string, adminEmail: string, hashedAdminPassword: string) {
+    return db.insertInto('users')
+        .values({
+            name,
+            email: adminEmail,
+            password: hashedAdminPassword,
+            admin: true,
+        })
+        .onConflict((oc) => oc.columns(['email']).doUpdateSet({ admin: true }))
+        .executeTakeFirstOrThrow();
+}

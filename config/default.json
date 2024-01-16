@@ -3,7 +3,9 @@
 		"name": "Archiveium",
 		"url": "",
 		"logLevel": "",
-		"useAsCronProcessor": false
+		"useAsCronProcessor": false,
+		"adminEmail": "",
+		"adminPassword": ""
 	},
 	"database": {
 		"user": "",

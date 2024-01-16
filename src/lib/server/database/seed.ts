@@ -1,6 +1,9 @@
+import { ZodError } from "zod";
 import { logger } from "../../../utils/logger";
 import { db } from "./connection";
 import type { ProviderInsert } from "./wrappers";
+import config from 'config';
+import * as userService from '$lib/server/services/userService';
 
 const providers: Array<ProviderInsert> = [
     {
@@ -39,6 +42,25 @@ export async function seedDatabase() {
         logger.info(`Inserted ${insertResult.length} rows in providers table`);
     } catch (error) {
         logger.error(error);
+        throw error;
+    }
+}
+
+export async function createAdminUser() {
+    const adminEmail = config.get<string>('app.adminEmail');
+    const adminPassword = config.get<string>('app.adminPassword');
+    try {
+        const adminUserCount = await userService.findAdminUserCount();
+        if (adminUserCount > 0) {
+            logger.info('Skipping admin user creation. Already exists.');
+        } else {
+            await userService.createAdminUser(adminEmail, adminPassword);
+            logger.info('Created admin user successfully.');
+        }
+    } catch (error) {
+        if (error instanceof ZodError) {
+            logger.error(`Encountered following errors while creating admin user: ${JSON.stringify(error.flatten().fieldErrors)}`);
+        }
         throw error;
     }
 }

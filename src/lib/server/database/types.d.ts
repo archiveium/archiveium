@@ -96,6 +96,7 @@ export interface Users {
   created_at: Generated<Timestamp | null>;
   updated_at: Generated<Timestamp | null>;
   deleted: Generated<boolean | null>;
+  admin: Generated<boolean | null>;
 }
 
 export interface DB {
