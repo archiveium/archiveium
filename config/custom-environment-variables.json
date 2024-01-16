@@ -1,5 +1,7 @@
 {
 	"app": {
-		"useAsCronProcessor": "USE_AS_CRON_PROCESSOR"
+		"useAsCronProcessor": "USE_AS_CRON_PROCESSOR",
+		"adminEmail": "APP_ADMIN_EMAIL",
+		"adminPassword": "APP_ADMIN_PASSWORD"
 	}
 }

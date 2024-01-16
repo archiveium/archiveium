@@ -8,8 +8,10 @@ services:
     volumes:
       - ./config.json:/app/config/production-0.json
     environment:
-      TZ: 'America/Toronto'   # Change timezone as needed
-      NODE_APP_INSTANCE: 0
+      TZ: 'America/Toronto'           # Change timezone as needed
+      NODE_APP_INSTANCE: 0            # Do not change this
+      APP_ADMIN_EMAIL: <EMAIL>        # Admin Email address
+      APP_ADMIN_PASSWORD: <PASSWORD>  # Admin Password
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/login"]
       interval: 30s

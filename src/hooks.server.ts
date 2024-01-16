@@ -3,7 +3,7 @@ import { redis } from '$lib/server/redis/connection';
 import { buildSessionCacheKey, createGuestSession, deleteFlashMessage } from './utils/auth';
 import { JobScheduler } from '$lib/server/jobs';
 import { runMigrations } from '$lib/server/database/migration';
-import { seedDatabase } from '$lib/server/database/seed';
+import { createAdminUser, seedDatabase } from '$lib/server/database/seed';
 import { building } from '$app/environment';
 
 export const handle = (async ({ event, resolve }) => {
@@ -51,6 +51,8 @@ if (!building) {
 	await runMigrations();
 	// Seed database
 	await seedDatabase();
+	// Create admin user
+	await createAdminUser();
 	// Initialize cron jobs
 	await initScheduler();
 }
