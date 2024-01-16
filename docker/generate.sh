@@ -20,11 +20,6 @@ if [[ -n "$app" ]]; then
     sed -i "s/archiveium\/archiveium.*/archiveium\/archiveium:$app/g" ./docker/docker-compose.yml
 fi
 
-# if [[ -n "$jobber" ]]; then
-#     echo 'Replacing jobber version'
-#     sed -i "s/archiveium\/jobber.*/archiveium\/jobber:$jobber/g" ./docker/docker-compose.yml
-# fi
-
 echo 'Setting up github user for auto-commit'
 git config user.name github-actions
 git config user.email github-actions@github.com
