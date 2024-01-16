@@ -86,6 +86,7 @@ export async function createAdminUser(name: string, adminEmail: string, hashedAd
             email: adminEmail,
             password: hashedAdminPassword,
             admin: true,
+            email_verified_at: sql<string>`NOW()`,
         })
         .onConflict((oc) => oc.columns(['email']).doUpdateSet({ admin: true }))
         .executeTakeFirstOrThrow();
