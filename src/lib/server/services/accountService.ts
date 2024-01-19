@@ -39,7 +39,6 @@ export async function findAccountByUserIdAndAccountId(userId: string, accountId:
 		if (error instanceof NoResultError) {
 			throw new AccountNotFoundException(`Account ${accountId} for user ${userId} does not exist`);
 		}
-		console.error(error);
 		throw error;
 	}
 }
@@ -57,7 +56,6 @@ export async function findAccountWithProviderByUserIdAndAccountId(userId: string
 		if (error instanceof NoResultError) {
 			throw new AccountNotFoundException(`Account ${accountId} for user ${userId} does not exist`);
 		}
-		console.error(error);
 		throw error;
 	}
 }
