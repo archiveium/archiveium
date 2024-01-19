@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import config from 'config';
+import { DecryptException } from '../exceptions/encrypter';
 
 const algorithm = 'aes-192-cbc';
 
@@ -20,11 +21,18 @@ export function encrypt(clearText: string): string {
 
 export function decrypt(encryptedText: string): string {
     const [encrypted, iv] = encryptedText.split('|');
-    if (!iv) throw new Error('IV not found');
-    const decipher = crypto.createDecipheriv(
-        algorithm,
-        buildKey(),
-        Buffer.from(iv, 'hex')
-    );
-    return decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
+    if (!iv) {
+        throw new DecryptException('Unable to decrypt. Missing IV');
+    }
+
+    try {
+        const decipher = crypto.createDecipheriv(
+            algorithm,
+            buildKey(),
+            Buffer.from(iv, 'hex')
+        );
+        return decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
+    } catch (error) {
+        throw new DecryptException('Unable to decrypt. Key error.');
+    }
 }
