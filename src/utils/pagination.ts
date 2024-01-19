@@ -1,4 +1,4 @@
-import type { LinkType } from "flowbite-svelte/dist/types";
+import type { LinkType } from 'flowbite-svelte/dist/types';
 
 interface Link {
 	href: string;
@@ -61,7 +61,7 @@ export function GeneratePagination(
 		nextLink,
 		pages,
 		resultCount,
-		resultsPerPage,
+		resultsPerPage
 	};
 }
 

@@ -42,7 +42,11 @@ export const actions = {
 		try {
 			switch (data.get('step')) {
 				case 'addAccountStep1': {
-					const validatedProvider = await accountService.validateExistingAccount(data, selectedAccount, userId);
+					const validatedProvider = await accountService.validateExistingAccount(
+						data,
+						selectedAccount,
+						userId
+					);
 					return {
 						remoteFolders: validatedProvider.remoteFolders,
 						steps: {

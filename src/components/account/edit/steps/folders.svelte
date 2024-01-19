@@ -10,7 +10,7 @@
 		TableBodyRow,
 		TableHead,
 		TableHeadCell,
-		Button,
+		Button
 	} from 'flowbite-svelte';
 
 	export let form: ActionData;

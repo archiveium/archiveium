@@ -5,9 +5,12 @@ import type { Job } from 'bullmq';
 import { logger } from '../../../../utils/logger';
 import type { ImapFlow } from 'imapflow';
 import { buildClient } from '$lib/server/services/imapService';
-import { 
-    IMAPAuthenticationFailedException,
-    IMAPGenericException, IMAPTooManyRequestsException, IMAPUidValidityChangedException, IMAPUserAuthenticatedNotConnectedException,
+import {
+	IMAPAuthenticationFailedException,
+	IMAPGenericException,
+	IMAPTooManyRequestsException,
+	IMAPUidValidityChangedException,
+	IMAPUserAuthenticatedNotConnectedException
 } from '../../../../exceptions/imap';
 import type { Folder } from '../../../../types/folder';
 import type { ImapFolderStatus, MessageNumber } from '../../../../types/imap';
@@ -19,166 +22,186 @@ import { decrypt } from '../../../../utils/encrypter';
 const BATCH_SIZE = 200;
 
 export async function syncAccount(job: Job): Promise<void> {
-    logger.info(`Running ${job.name} job`);
+	logger.info(`Running ${job.name} job`);
 
-    const jobScheduler = new JobScheduler();
-    const allSyncingAccounts = await accountService.findAllSyncingAccounts();
-    for (const syncingAccount of allSyncingAccounts) {
-        let imapClient: ImapFlow;
-        const decryptedPassword = decrypt(syncingAccount.password);
-        try {
-            imapClient = await buildClient(
-                syncingAccount.email,
-                decryptedPassword,
-                syncingAccount.provider_host
-            );
-        } catch (error) {
-            if (error instanceof IMAPTooManyRequestsException) {
-                logger.error(`Too many requests for Account ID: ${syncingAccount.id}`);
-                // TODO Add logic to backoff for a while before attempting again
-                throw error;
-            } else if (error instanceof IMAPAuthenticationFailedException) {
-                logger.error(`Authentication failed for Account ID ${syncingAccount.id}. Disabling account syncing`);
-                await accountService.updateAccountSyncingStatus(syncingAccount.user_id, syncingAccount.id, false);
-                // TODO send notification to user
-                return;
-            } else if (
-                error instanceof IMAPGenericException ||
-                error instanceof IMAPUserAuthenticatedNotConnectedException
-            ) {
-                logger.error(`${error.message} for Account ID: ${syncingAccount.id}`);
-                // TODO Add logic to backoff for a while before attempting again
-                throw error;
-            }
-            throw error;
-        }
+	const jobScheduler = new JobScheduler();
+	const allSyncingAccounts = await accountService.findAllSyncingAccounts();
+	for (const syncingAccount of allSyncingAccounts) {
+		let imapClient: ImapFlow;
+		const decryptedPassword = decrypt(syncingAccount.password);
+		try {
+			imapClient = await buildClient(
+				syncingAccount.email,
+				decryptedPassword,
+				syncingAccount.provider_host
+			);
+		} catch (error) {
+			if (error instanceof IMAPTooManyRequestsException) {
+				logger.error(`Too many requests for Account ID: ${syncingAccount.id}`);
+				// TODO Add logic to backoff for a while before attempting again
+				throw error;
+			} else if (error instanceof IMAPAuthenticationFailedException) {
+				logger.error(
+					`Authentication failed for Account ID ${syncingAccount.id}. Disabling account syncing`
+				);
+				await accountService.updateAccountSyncingStatus(
+					syncingAccount.user_id,
+					syncingAccount.id,
+					false
+				);
+				// TODO send notification to user
+				return;
+			} else if (
+				error instanceof IMAPGenericException ||
+				error instanceof IMAPUserAuthenticatedNotConnectedException
+			) {
+				logger.error(`${error.message} for Account ID: ${syncingAccount.id}`);
+				// TODO Add logic to backoff for a while before attempting again
+				throw error;
+			}
+			throw error;
+		}
 
-        const accountFolders = await folderService.findSyncingFoldersByUserAndAccount(
-            syncingAccount.user_id,
-            syncingAccount.id,
-            false
-        );
-        const promises = accountFolders.map(async (accountFolder) => {
-            try {
-                await processAccount(accountFolder, imapClient, jobScheduler);
-            } catch (error) {
-                if (error instanceof IMAPTooManyRequestsException) {
-                    logger.error(`Too many requests for Account ID: ${accountFolder.account_id}`);
-                    // TODO Add logic to backoff for a while before attempting again
-                    throw error;
-                } else if (error instanceof IMAPAuthenticationFailedException) {
-                    logger.error(`Authentication failed for Account ID ${accountFolder.id}. Disabling account syncing`);
-                    await accountService.updateAccountSyncingStatus(syncingAccount.user_id, syncingAccount.id, false);
-                    // TODO send notification to user
-                } else if (error instanceof FolderDeletedOnRemoteException) {
-                    logger.warn(`Folder ID ${accountFolder.id} was deleted on remote. Skipping account`);
-                } else if (error instanceof IMAPGenericException) {
-                    logger.error(`${error.message} for Account ID: ${accountFolder.id}`);
-                    // TODO Add logic to backoff for a while before attempting again
-                    throw error;
-                } else {
-                    logger.error(`[schedule]` + JSON.stringify(error));
-                    throw error;
-                }
-            }
-        });
+		const accountFolders = await folderService.findSyncingFoldersByUserAndAccount(
+			syncingAccount.user_id,
+			syncingAccount.id,
+			false
+		);
+		const promises = accountFolders.map(async (accountFolder) => {
+			try {
+				await processAccount(accountFolder, imapClient, jobScheduler);
+			} catch (error) {
+				if (error instanceof IMAPTooManyRequestsException) {
+					logger.error(`Too many requests for Account ID: ${accountFolder.account_id}`);
+					// TODO Add logic to backoff for a while before attempting again
+					throw error;
+				} else if (error instanceof IMAPAuthenticationFailedException) {
+					logger.error(
+						`Authentication failed for Account ID ${accountFolder.id}. Disabling account syncing`
+					);
+					await accountService.updateAccountSyncingStatus(
+						syncingAccount.user_id,
+						syncingAccount.id,
+						false
+					);
+					// TODO send notification to user
+				} else if (error instanceof FolderDeletedOnRemoteException) {
+					logger.warn(`Folder ID ${accountFolder.id} was deleted on remote. Skipping account`);
+				} else if (error instanceof IMAPGenericException) {
+					logger.error(`${error.message} for Account ID: ${accountFolder.id}`);
+					// TODO Add logic to backoff for a while before attempting again
+					throw error;
+				} else {
+					logger.error(`[schedule]` + JSON.stringify(error));
+					throw error;
+				}
+			}
+		});
 
-        await Promise.all(promises);
-        await imapClient.logout();
-    }
+		await Promise.all(promises);
+		await imapClient.logout();
+	}
 
-    logger.info(`Finished running ${job.name} job`);
+	logger.info(`Finished running ${job.name} job`);
 }
 
-async function processAccount(accountFolder: Folder, imapClient: ImapFlow, jobScheduler: JobScheduler): Promise<void> {
-    // TODO Check if there can be multiple folders for a given account and user
-    const folder = await folderService.findFolderById(accountFolder.id);
-    const imapFolderStatus = await imapService.getFolderStatusByName(imapClient, folder.name);
-    const imapFolderLastUid = imapFolderStatus.uidNext - 1;
+async function processAccount(
+	accountFolder: Folder,
+	imapClient: ImapFlow,
+	jobScheduler: JobScheduler
+): Promise<void> {
+	// TODO Check if there can be multiple folders for a given account and user
+	const folder = await folderService.findFolderById(accountFolder.id);
+	const imapFolderStatus = await imapService.getFolderStatusByName(imapClient, folder.name);
+	const imapFolderLastUid = imapFolderStatus.uidNext - 1;
 
-    if (_.isNull(folder.last_updated_msgno)) {
-        if (imapFolderStatus.messages > 0) {
-            const messageNumbers = await buildMessageNumbers(
-                imapClient,
-                folder.name,
-                1,
-                imapFolderLastUid,
-            );
-            await processMessageNumbers(
-                messageNumbers,
-                folder.user_id,
-                folder.account_id,
-                folder.id,
-                imapFolderStatus,
-                jobScheduler
-            );
-        } else {
-            logger.info(`FolderId ${accountFolder.id} has 0 messages to sync`);
-        }
-    } else {
-        if (folder.status_uidvalidity != imapFolderStatus.uidValidity) {
-            logger.warn(`FolderId ${accountFolder.id} uidvalidity changed.
+	if (_.isNull(folder.last_updated_msgno)) {
+		if (imapFolderStatus.messages > 0) {
+			const messageNumbers = await buildMessageNumbers(
+				imapClient,
+				folder.name,
+				1,
+				imapFolderLastUid
+			);
+			await processMessageNumbers(
+				messageNumbers,
+				folder.user_id,
+				folder.account_id,
+				folder.id,
+				imapFolderStatus,
+				jobScheduler
+			);
+		} else {
+			logger.info(`FolderId ${accountFolder.id} has 0 messages to sync`);
+		}
+	} else {
+		if (folder.status_uidvalidity != imapFolderStatus.uidValidity) {
+			logger.warn(`FolderId ${accountFolder.id} uidvalidity changed.
             This error should fix itself after scanner job runs`);
-            throw new IMAPUidValidityChangedException(`FolderId ${accountFolder.id} uidvalidity changed`);
-        } else if (imapFolderStatus.messages == 0) {
-            logger.info(`FolderId ${accountFolder.id} has 0 messages to sync`);
-        } else if (folder.last_updated_msgno == imapFolderLastUid) {
-            logger.info(`FolderId ${accountFolder.id} has no new messages to sync`);
-        } else {
-            const messageNumbers = await buildMessageNumbers(
-                imapClient,
-                folder.name,
-                folder.last_updated_msgno ? folder.last_updated_msgno + 1 : 1,
-                imapFolderLastUid,
-            );
-            await processMessageNumbers(
-                messageNumbers,
-                folder.user_id,
-                folder.account_id,
-                folder.id,
-                imapFolderStatus,
-                jobScheduler
-            );
-        }
-    }
+			throw new IMAPUidValidityChangedException(`FolderId ${accountFolder.id} uidvalidity changed`);
+		} else if (imapFolderStatus.messages == 0) {
+			logger.info(`FolderId ${accountFolder.id} has 0 messages to sync`);
+		} else if (folder.last_updated_msgno == imapFolderLastUid) {
+			logger.info(`FolderId ${accountFolder.id} has no new messages to sync`);
+		} else {
+			const messageNumbers = await buildMessageNumbers(
+				imapClient,
+				folder.name,
+				folder.last_updated_msgno ? folder.last_updated_msgno + 1 : 1,
+				imapFolderLastUid
+			);
+			await processMessageNumbers(
+				messageNumbers,
+				folder.user_id,
+				folder.account_id,
+				folder.id,
+				imapFolderStatus,
+				jobScheduler
+			);
+		}
+	}
 }
 
 async function processMessageNumbers(
-    messageNumbers: MessageNumber[],
-    userId: string,
-    accountId: string,
-    folderId: string,
-    imapFolderStatus: ImapFolderStatus,
-    jobScheduler: JobScheduler,
+	messageNumbers: MessageNumber[],
+	userId: string,
+	accountId: string,
+	folderId: string,
+	imapFolderStatus: ImapFolderStatus,
+	jobScheduler: JobScheduler
 ): Promise<void> {
-    if (messageNumbers.length > 0) {
-        const job = await jobScheduler.addJobToExistingQueue(
-            JobScheduler.QUEUE_IMPORT_EMAIL,
-            { userId, accountId, folderId, messageNumbers },
-        );
-        logger.info(`Created job ${job?.id} to process ${messageNumbers.length} emails`);
+	if (messageNumbers.length > 0) {
+		const job = await jobScheduler.addJobToExistingQueue(JobScheduler.QUEUE_IMPORT_EMAIL, {
+			userId,
+			accountId,
+			folderId,
+			messageNumbers
+		});
+		logger.info(`Created job ${job?.id} to process ${messageNumbers.length} emails`);
 
-        const updateResult = await folderService.updateFolder(
-            folderId,
-            {
-                status_uidvalidity: imapFolderStatus.uidValidity,
-                last_updated_msgno: messageNumbers[messageNumbers.length - 1].uid,
-            }
-        );
+		const updateResult = await folderService.updateFolder(folderId, {
+			status_uidvalidity: imapFolderStatus.uidValidity,
+			last_updated_msgno: messageNumbers[messageNumbers.length - 1].uid
+		});
 
-        if (Number(updateResult.numUpdatedRows) != 1) {
-            logger.error(`Updated inadequate no. of rows updated: ${updateResult.numUpdatedRows}`);
-        }
-    }
+		if (Number(updateResult.numUpdatedRows) != 1) {
+			logger.error(`Updated inadequate no. of rows updated: ${updateResult.numUpdatedRows}`);
+		}
+	}
 }
 
 async function buildMessageNumbers(
-    imapClient: ImapFlow,
-    folderName: string,
-    lastUpdatedMsgNo: number,
-    imapFolderLastUid: number
+	imapClient: ImapFlow,
+	folderName: string,
+	lastUpdatedMsgNo: number,
+	imapFolderLastUid: number
 ): Promise<MessageNumber[]> {
-    let messageNumbers = await imapService.getMessageNumbers(imapClient, folderName, lastUpdatedMsgNo, imapFolderLastUid);
-    messageNumbers = _.sortBy(messageNumbers, ['uid']);
-    return messageNumbers.slice(0, BATCH_SIZE);
+	let messageNumbers = await imapService.getMessageNumbers(
+		imapClient,
+		folderName,
+		lastUpdatedMsgNo,
+		imapFolderLastUid
+	);
+	messageNumbers = _.sortBy(messageNumbers, ['uid']);
+	return messageNumbers.slice(0, BATCH_SIZE);
 }

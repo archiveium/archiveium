@@ -43,9 +43,15 @@ export async function findAccountByUserIdAndAccountId(userId: string, accountId:
 	}
 }
 
-export async function findAccountWithProviderByUserIdAndAccountId(userId: string, accountId: string) {
+export async function findAccountWithProviderByUserIdAndAccountId(
+	userId: string,
+	accountId: string
+) {
 	try {
-		const account = await accountRepository.findAccountWithProviderByUserIdAndAccountId(userId, accountId);
+		const account = await accountRepository.findAccountWithProviderByUserIdAndAccountId(
+			userId,
+			accountId
+		);
 		if (account.deleted) {
 			throw new AccountDeletedException(`Account ${accountId} was deleted`);
 		} else if (!account.syncing) {
@@ -74,17 +80,28 @@ export async function isAccountUnique(email: string, userId: string) {
 
 export async function softDeleteAccountByUserId(userId: string, accountId: string): Promise<void> {
 	return db.transaction().execute(async (trx) => {
-		const deleteAccountResult = await accountRepository.softDeleteAccountByUserId(userId, accountId, trx);
+		const deleteAccountResult = await accountRepository.softDeleteAccountByUserId(
+			userId,
+			accountId,
+			trx
+		);
 		if (Number(deleteAccountResult.numUpdatedRows) !== 1) {
-			throw new RecordDeleteFailedException(`Failed to delete account ${accountId} for user ${userId}`);
+			throw new RecordDeleteFailedException(
+				`Failed to delete account ${accountId} for user ${userId}`
+			);
 		}
 
-		const deleteFolderResult = await folderRepository.softDeleteFolderByAccountId(userId, accountId, trx);
+		const deleteFolderResult = await folderRepository.softDeleteFolderByAccountId(
+			userId,
+			accountId,
+			trx
+		);
 		if (Number(deleteFolderResult.numUpdatedRows) === 0) {
-			throw new RecordDeleteFailedException(`Failed to delete folders for account ${accountId} & user ${userId}`);
+			throw new RecordDeleteFailedException(
+				`Failed to delete folders for account ${accountId} & user ${userId}`
+			);
 		}
 	});
-
 }
 
 export async function validateExistingAccount(
@@ -103,7 +120,11 @@ export async function validateExistingAccount(
 			: account.password;
 	const imapClient = await imapService.buildClient(account.email, updatedPassword, provider.host);
 	const remoteFolders = await imapService.getAllIMAPFolders(imapClient);
-	const selectedFolders = await folderService.findFoldersWithDeletedFilterByAccountIdAndUserId(userId, account.id, false);
+	const selectedFolders = await folderService.findFoldersWithDeletedFilterByAccountIdAndUserId(
+		userId,
+		account.id,
+		false
+	);
 
 	const validatedProvider = {
 		account: {
@@ -144,7 +165,11 @@ export async function validateAccount(data: FormData, userId: string): Promise<V
 	}
 
 	const provider = await providerService.findProviderById(validatedData.provider_id);
-	const imapClient = await imapService.buildClient(validatedData.email, validatedData.password, provider.host);
+	const imapClient = await imapService.buildClient(
+		validatedData.email,
+		validatedData.password,
+		provider.host
+	);
 	const remoteFolders = await imapService.getAllIMAPFolders(imapClient);
 
 	const validatedProvider = {
@@ -184,9 +209,18 @@ export async function updateAccount(
 ): Promise<void> {
 	const cachedProvider = await getCachedValidatedAccount<ValidatedExistingAccount>(userId, email);
 	const selectedRemoteFolders = formDataSelectedRemoteFolders ?? [];
-	const existingFolders = await folderService.findFoldersWithDeletedFilterByAccountIdAndUserId(userId, accountId, false);
+	const existingFolders = await folderService.findFoldersWithDeletedFilterByAccountIdAndUserId(
+		userId,
+		accountId,
+		false
+	);
 
-	await folderService.updateFoldersAndAccount(userId, cachedProvider, selectedRemoteFolders, existingFolders);
+	await folderService.updateFoldersAndAccount(
+		userId,
+		cachedProvider,
+		selectedRemoteFolders,
+		existingFolders
+	);
 }
 
 // Private functions

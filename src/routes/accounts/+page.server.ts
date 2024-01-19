@@ -46,10 +46,7 @@ export const actions = {
 	}
 } satisfies Actions;
 
-async function buildPageData(
-	userId: string,
-	url: URL
-) {
+async function buildPageData(userId: string, url: URL) {
 	const folderId = url.searchParams.get('folderId');
 	const accountId = url.searchParams.get('accountId');
 	const page = url.searchParams.get('page') ?? '1';
@@ -63,7 +60,11 @@ async function buildPageData(
 
 	let folders;
 	if (selectedAccount) {
-		folders = await folderService.findFoldersWithDeletedFilterByAccountIdAndUserId(userId, selectedAccount.id, false);
+		folders = await folderService.findFoldersWithDeletedFilterByAccountIdAndUserId(
+			userId,
+			selectedAccount.id,
+			false
+		);
 		// do not remove folders not syncing
 		// we need them to be discoverable since they might have emails
 		// that user might want to see
@@ -75,12 +76,12 @@ async function buildPageData(
 
 	let emailsWithS3Data: Email[];
 	let emailCount: number;
-	if (selectedFolder) {	
+	if (selectedFolder) {
 		emailsWithS3Data = await s3Service.findEmailsByFolderIdAndUserId(
 			userId,
 			selectedFolder.id,
 			page,
-			RESULTS_PER_PAGE,
+			RESULTS_PER_PAGE
 		);
 		emailCount = await emailService.findEmailCountByFolderAndUserId(userId, selectedFolder.id);
 	} else {
@@ -89,20 +90,25 @@ async function buildPageData(
 				userId,
 				selectedAccount.id,
 				page,
-				RESULTS_PER_PAGE,
+				RESULTS_PER_PAGE
 			);
-			emailCount = await emailService.findEmailCountByAccountIdAndUserId(userId, selectedAccount.id);
-		} else {
-			emailsWithS3Data = await s3Service.findEmailsByUserId(
+			emailCount = await emailService.findEmailCountByAccountIdAndUserId(
 				userId,
-				page,
-				RESULTS_PER_PAGE,
+				selectedAccount.id
 			);
+		} else {
+			emailsWithS3Data = await s3Service.findEmailsByUserId(userId, page, RESULTS_PER_PAGE);
 			emailCount = await emailService.findEmailCountByUserId(userId);
 		}
 	}
 
-	const paginator = GeneratePagination(emailCount, RESULTS_PER_PAGE, page, selectedFolder?.id, selectedAccount?.id);
+	const paginator = GeneratePagination(
+		emailCount,
+		RESULTS_PER_PAGE,
+		page,
+		selectedFolder?.id,
+		selectedAccount?.id
+	);
 
 	return {
 		accounts: {

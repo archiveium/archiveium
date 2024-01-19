@@ -23,10 +23,7 @@ export const actions = {
 			const user = await authService.loginUser(data);
 			await createUserSession(cookies, user);
 		} catch (error) {
-			if (
-				error instanceof UserNotVerifiedException ||
-				error instanceof UserDeletedException
-			) {
+			if (error instanceof UserNotVerifiedException || error instanceof UserDeletedException) {
 				return fail(400, { error: error.message });
 			}
 

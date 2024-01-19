@@ -11,8 +11,7 @@
 
 	<Card class="w-full">
 		<P class="mb-4">
-			Unfortunately your email verification url has expired. Use the button below to resend
-			email.
+			Unfortunately your email verification url has expired. Use the button below to resend email.
 		</P>
 		<form method="post" class="flex flex-col space-y-6" autocomplete="off" use:enhance>
 			<Button type="submit" class="w-full">Resend Verification Email</Button>

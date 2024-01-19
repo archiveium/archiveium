@@ -62,18 +62,21 @@
 								{/each}
 							</Dropdown>
 							{#if value.folders.all && value.accounts.selected}
-							<Button color="alternative" size="sm" class="mr-2">
-								<Chevron>Folders</Chevron>
-							</Button>							
-							<Dropdown placement="bottom-start" class="w-48 overflow-y-auto py-1 h-48">
-								{#each value.folders.all as folder}
-								<DropdownItem href={`?accountId=${value.accounts.selected.id}&folderId=${folder.id}`} class="flex items-center">
-									<Checkbox checked={folder.id === value.folders?.selected?.id}>
-										{folder.name}
-									</Checkbox>
-								</DropdownItem>
-								{/each}
-							</Dropdown>
+								<Button color="alternative" size="sm" class="mr-2">
+									<Chevron>Folders</Chevron>
+								</Button>
+								<Dropdown placement="bottom-start" class="w-48 overflow-y-auto py-1 h-48">
+									{#each value.folders.all as folder}
+										<DropdownItem
+											href={`?accountId=${value.accounts.selected.id}&folderId=${folder.id}`}
+											class="flex items-center"
+										>
+											<Checkbox checked={folder.id === value.folders?.selected?.id}>
+												{folder.name}
+											</Checkbox>
+										</DropdownItem>
+									{/each}
+								</Dropdown>
 							{/if}
 						</div>
 						<div class="flex items-center lg:order-2">
@@ -90,24 +93,24 @@
 								</div>
 							</form> -->
 							{#if value.accounts.selected}
-							<MenuButton vertical />
-							<Dropdown placement="bottom-start" class="w-36">
-								<DropdownItem href="/accounts/edit/{value.accounts.selected.id}">
-									Edit
-								</DropdownItem>
-								<DropdownItem>
-									<form method="post" use:enhance>
-										<input name="accountId" value={value.accounts.selected.id} hidden readonly />
-										{#if value.accounts.selected.syncing}
-											<input name="syncing" value="false" hidden readonly />
-											<button type="submit">Pause Syncing</button>
-										{:else}
-											<input name="syncing" value="true" hidden readonly />
-											<button type="submit">Resume Syncing</button>
-										{/if}
-									</form>
-								</DropdownItem>
-							</Dropdown>
+								<MenuButton vertical />
+								<Dropdown placement="bottom-start" class="w-36">
+									<DropdownItem href="/accounts/edit/{value.accounts.selected.id}">
+										Edit
+									</DropdownItem>
+									<DropdownItem>
+										<form method="post" use:enhance>
+											<input name="accountId" value={value.accounts.selected.id} hidden readonly />
+											{#if value.accounts.selected.syncing}
+												<input name="syncing" value="false" hidden readonly />
+												<button type="submit">Pause Syncing</button>
+											{:else}
+												<input name="syncing" value="true" hidden readonly />
+												<button type="submit">Resume Syncing</button>
+											{/if}
+										</form>
+									</DropdownItem>
+								</Dropdown>
 							{/if}
 						</div>
 					</div>

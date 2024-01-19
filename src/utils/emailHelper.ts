@@ -17,7 +17,8 @@ export async function parseEmail(source?: string): Promise<ParsedMail> {
 export function parseEmailSubject(source?: string): string {
 	let subject = 'Not Available';
 	if (source) {
-		subject = source.length > MAX_SUBJECT_LENGTH ? `${source.slice(0, MAX_SUBJECT_LENGTH - 3)}...` : source;
+		subject =
+			source.length > MAX_SUBJECT_LENGTH ? `${source.slice(0, MAX_SUBJECT_LENGTH - 3)}...` : source;
 	}
 	return subject;
 }

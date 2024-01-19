@@ -104,7 +104,9 @@
 			make sure you have a backup before proceeding.
 		</p>
 		<form method="post" use:enhance>
-			<Button color="alternative" type="submit" name="step" value="deleteAccount">Yes, I'm Sure</Button>
+			<Button color="alternative" type="submit" name="step" value="deleteAccount"
+				>Yes, I'm Sure</Button
+			>
 		</form>
 	</div>
 </Modal>

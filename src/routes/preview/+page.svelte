@@ -24,9 +24,9 @@
 
 	<Card class="w-full">
 		<P class="mb-4" weight="light" color="text-gray-500 dark:text-gray-400" size="sm">
-			After you have submitted email address, an email will be sent once we are ready to
-			register your account.
-		</P>		
+			After you have submitted email address, an email will be sent once we are ready to register
+			your account.
+		</P>
 		<form method="post" class="flex flex-col space-y-6" autocomplete="off" use:enhance>
 			<Label class="space-y-2">
 				<span>Email</span>

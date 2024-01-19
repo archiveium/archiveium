@@ -9,23 +9,25 @@ In order to deploy the above mentioned components, follow the steps mentioned be
 
 1. In a terminal window, clone the repository and enter the directory.
 
-    ```sh
-    git clone git@github.com:archiveium/archiveium.git
-    cd archiveium/docker
-    ```
+   ```sh
+   git clone git@github.com:archiveium/archiveium.git
+   cd archiveium/docker
+   ```
 
 1. Create a `config.json` file within `archiveium/docker` directory based on values from [default.json](https://github.com/archiveium/archiveium/blob/main/config/default.json). Adjust `config.json` as required.
 1. Update following placeholders in `docker-compose.yml` with values matching those provided in `config.json`
-    - `$DB_PASSWORD`
-    - `$DB_DATABASE`
-    - `$DB_USERNAME`
-    - `$MINIO_USER`
-    - `$MINIO_PASSWORD`
+   - `$DB_PASSWORD`
+   - `$DB_DATABASE`
+   - `$DB_USERNAME`
+   - `$MINIO_USER`
+   - `$MINIO_PASSWORD`
 1. Create admin user by updating `docker-compose.yml` and setting following environment variables,
-    - `APP_ADMIN_EMAIL`
-    - `APP_ADMIN_PASSWORD` (password is hashed before storing in database)
-    
-    Note that creation of only 1 admin user is allowed. If after creating an admin user, the above mentioned variable are changed then those values are ignored. Also, changing password isn't allowed by changing `APP_ADMIN_PASSWORD` only.
+
+   - `APP_ADMIN_EMAIL`
+   - `APP_ADMIN_PASSWORD` (password is hashed before storing in database)
+
+   Note that creation of only 1 admin user is allowed. If after creating an admin user, the above mentioned variable are changed then those values are ignored. Also, changing password isn't allowed by changing `APP_ADMIN_PASSWORD` only.
+
 1. For other available environment variables, please refer to [docker-compose.yml](https://github.com/archiveium/archiveium/blob/main/docker/docker-compose.yml) file.
 1. Bring up the stack by running `docker-compose up -d`
 

@@ -6,12 +6,12 @@ const mailConfig = config.get<MailConfig>('mail');
 let transporter;
 
 if (config.util.getEnv('NODE_ENV').toString() === 'development') {
-    transporter = nodemailer.createTransport({
-        host: mailConfig.host,
-        port: mailConfig.port
-    });
+	transporter = nodemailer.createTransport({
+		host: mailConfig.host,
+		port: mailConfig.port
+	});
 } else {
-    transporter = nodemailer.createTransport(mailConfig);
+	transporter = nodemailer.createTransport(mailConfig);
 }
 
 export const mailTransporter = transporter;
