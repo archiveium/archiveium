@@ -1,5 +1,3 @@
-// TODO Pull this and the same implemention in jobber to a separate library
-// for reduced duplication
 import ImapFlow from 'imapflow';
 import type { ListResponse } from 'imapflow';
 import {
