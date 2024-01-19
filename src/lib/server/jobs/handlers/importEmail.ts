@@ -17,6 +17,7 @@ import {
     IMAPUserAuthenticatedNotConnectedException
 } from "../../../../exceptions/imap";
 import pLimit from "p-limit";
+import { decrypt } from "../../../../utils/encrypter";
 
 // TODO Add a progress bar to show how many emails have been imported for each account
 export async function importEmail(job: Job): Promise<void> {
@@ -34,7 +35,8 @@ export async function importEmail(job: Job): Promise<void> {
             throw new AccountSyncingPausedException(`Account syncing ${folder.account_id} was paused`);
         }
 
-        const imapClient = await imapService.buildClient(account.email, account.password, account.provider_host);
+        const decryptedPassword = decrypt(account.password);
+        const imapClient = await imapService.buildClient(account.email, decryptedPassword, account.provider_host);
 
         // TODO Pass startSeq and endSeq from scheduler
         const startSeq = _.first(jobData.messageNumbers)?.uid;
@@ -68,7 +70,7 @@ export async function importEmail(job: Job): Promise<void> {
                 accountId: jobData.accountId
             });
         } else if (error instanceof IMAPTooManyRequestsException) {
-            // This will retry job as per configured attemps and backoff
+            // This will retry job as per configured attempts and backoff
             logger.warn(`Too many requests for Job ID: ${job.id}`);
             throw error;
         } else if (error instanceof IMAPAuthenticationFailedException) {

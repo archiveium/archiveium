@@ -3,7 +3,8 @@
 		"url": "",
 		"logLevel": "",
 		"adminEmail": "",
-		"adminPassword": ""		
+		"adminPassword": "",
+		"encryptionKey": ""
 	},
 	"database": {
 		"user": "",

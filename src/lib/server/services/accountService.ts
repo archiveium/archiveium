@@ -16,6 +16,7 @@ import { CacheKeyNotFoundException } from '../../../exceptions/cache';
 import { redis } from '../redis/connection';
 import { RecordDeleteFailedException } from '../../../exceptions/database';
 import { db } from '../database/connection';
+import { decrypt } from '../../../utils/encrypter';
 
 export async function updateAccountSyncingStatus(
 	userId: string,
@@ -31,7 +32,9 @@ export async function findAccountsByUserId(userId: string) {
 
 export async function findAccountByUserIdAndAccountId(userId: string, accountId: string) {
 	try {
-		return await accountRepository.findAccountByUserIdAndAccountId(userId, accountId);
+		const account = await accountRepository.findAccountByUserIdAndAccountId(userId, accountId);
+		account.password = decrypt(account.password);
+		return account;
 	} catch (error) {
 		if (error instanceof NoResultError) {
 			throw new AccountNotFoundException(`Account ${accountId} for user ${userId} does not exist`);

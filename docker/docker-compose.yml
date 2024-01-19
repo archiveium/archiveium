@@ -12,6 +12,9 @@ services:
       NODE_APP_INSTANCE: 0            # Do not change this
       APP_ADMIN_EMAIL: <EMAIL>        # Admin Email address
       APP_ADMIN_PASSWORD: <PASSWORD>  # Admin Password
+      APP_ENCRYPTION_KEY: <KEY>       # Key used for encrypting email account passwords
+                                      # changing this key will invalidate all added accounts
+                                      # and they'll have to reauthorized again
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/login"]
       interval: 30s

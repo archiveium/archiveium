@@ -2,6 +2,7 @@ import * as folderRepository from '$lib/server/repositories/folderRepository';
 import { FolderDeletedException, FolderDeletedOnRemoteException, FolderNotFoundException, FolderNotSyncingException } from '../../../exceptions/folder';
 import type { NewAccount, ValidatedAccount, ValidatedExistingAccount } from '../../../types/account';
 import type { Folder, FolderInsert } from '../../../types/folder';
+import { encrypt } from '../../../utils/encrypter';
 import { db } from '../database/connection';
 import type { FolderUpdate } from '../database/wrappers';
 
@@ -56,10 +57,11 @@ export async function insertFoldersAndAccount(
 	selectedRemoteFolders: FormDataEntryValue[]) {
 	return db.transaction().execute(async (trx) => {
 		const account = validatedAccount.account;
+		const encryptedPassword = encrypt(account.password);
 		const newAccount: NewAccount = {
 			name: account.name,
 			email: account.email,
-			password: account.password,
+			password: encryptedPassword,
 			provider_id: account.provider_id,
 			user_id: userId
 		};
@@ -98,10 +100,11 @@ export async function updateFoldersAndAccount(
 ) {
 	return db.transaction().execute(async (trx) => {
 		// update account
+		const encryptedPassword = encrypt(validatedExistingAccount.account.password);
 		await trx.updateTable('accounts')
 			.set({
 				name: validatedExistingAccount.account.name,
-				password: validatedExistingAccount.account.password
+				password: encryptedPassword
 			})
 			.where('id', '=', validatedExistingAccount.account.account_id)
 			.executeTakeFirstOrThrow();
@@ -120,7 +123,8 @@ export async function updateFoldersAndAccount(
 				} else {
 					// new folder that needs to be added
 					foldersToSave.push({
-						...remoteFolder,
+						name: remoteFolder.name,
+						status_uidvalidity: remoteFolder.status_uidvalidity,
 						user_id: userId,
 						account_id: validatedExistingAccount.account.account_id,
 						syncing: true
