@@ -13,6 +13,7 @@ import {
 import { providerFactory } from '../providerFactory';
 import type { FolderSelect } from '$lib/server/database/wrappers';
 import _ from 'lodash';
+import { decrypt } from '../../../../utils/encrypter';
 
 export async function syncFolder(job: Job): Promise<void> {
     logger.info(`Running ${job.name} job`);
@@ -26,13 +27,14 @@ export async function syncFolder(job: Job): Promise<void> {
     logger.info(`Finished running ${job.name} job`);
 }
 
-// TEST Add a test case where one of the localfolder isn't processed
+// TEST Add a test case where one of the local folder isn't processed
 async function syncAccount(account: SyncingAccount): Promise<void> {
     logger.info(`Syncing Account ID ${account.id}`);
 
     let imapClient: ImapFlow;
+    const decryptedPassword = decrypt(account.password);
     try {
-        imapClient = await imapService.buildClient(account.email, account.password, account.provider_host);
+        imapClient = await imapService.buildClient(account.email, decryptedPassword, account.provider_host);
     } catch (error) {
         if (error instanceof IMAPTooManyRequestsException) {
             logger.warn(`Too many requests, skipping account id ${account.id}. Error: ${error.message}`);

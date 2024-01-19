@@ -24,7 +24,9 @@ In order to deploy the above mentioned components, follow the steps mentioned be
 1. Create admin user by updating `docker-compose.yml` and setting following environment variables,
     - `APP_ADMIN_EMAIL`
     - `APP_ADMIN_PASSWORD` (password is hashed before storing in database)
+    
     Note that creation of only 1 admin user is allowed. If after creating an admin user, the above mentioned variable are changed then those values are ignored. Also, changing password isn't allowed by changing `APP_ADMIN_PASSWORD` only.
+1. For other available environment variables, please refer to [docker-compose.yml](https://github.com/archiveium/archiveium/blob/main/docker/docker-compose.yml) file.
 1. Bring up the stack by running `docker-compose up -d`
 
 ## Notes

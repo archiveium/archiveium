@@ -5,7 +5,8 @@
 		"logLevel": "",
 		"useAsCronProcessor": false,
 		"adminEmail": "",
-		"adminPassword": ""
+		"adminPassword": "",
+		"encryptionKey": ""
 	},
 	"database": {
 		"user": "",

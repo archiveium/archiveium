@@ -14,6 +14,7 @@ import type { ImapFolderStatus, MessageNumber } from '../../../../types/imap';
 import { JobScheduler } from '..';
 import _ from 'lodash';
 import { FolderDeletedOnRemoteException } from '../../../../exceptions/folder';
+import { decrypt } from '../../../../utils/encrypter';
 
 const BATCH_SIZE = 200;
 
@@ -24,10 +25,11 @@ export async function syncAccount(job: Job): Promise<void> {
     const allSyncingAccounts = await accountService.findAllSyncingAccounts();
     for (const syncingAccount of allSyncingAccounts) {
         let imapClient: ImapFlow;
+        const decryptedPassword = decrypt(syncingAccount.password);
         try {
             imapClient = await buildClient(
                 syncingAccount.email,
-                syncingAccount.password,
+                decryptedPassword,
                 syncingAccount.provider_host
             );
         } catch (error) {
