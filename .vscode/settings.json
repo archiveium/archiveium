@@ -1,8 +1,4 @@
 {
-    "cSpell.words": [
-        "backoff",
-        "bigserial",
-        "bullmq",
-        "kysely"
-    ]
+	"cSpell.words": ["backoff", "bigserial", "bullmq", "kysely"],
+	"eslint.validate": ["javascript", "javascriptreact", "svelte"]
 }

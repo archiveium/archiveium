@@ -11,7 +11,7 @@
 	{/if}
 
 	<!-- Content -->
-	<main class={ $page.data.showNavbar ? 'p-4 h-auto pt-20' : '' }>
+	<main class={$page.data.showNavbar ? 'p-4 h-auto pt-20' : ''}>
 		<slot />
 	</main>
 </div>

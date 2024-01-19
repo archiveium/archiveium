@@ -1,9 +1,9 @@
-import type { Insertable, Selectable, Updateable } from "kysely";
-import type { DB, EmailFolders, Emails, Folders, Providers } from "./types";
+import type { Insertable, Selectable, Updateable } from 'kysely';
+import type { DB, EmailFolders, Emails, Folders, Providers } from './types';
 
 type DBSelect = {
-  [K in keyof DB]: Selectable<DB[K]>
-}
+	[K in keyof DB]: Selectable<DB[K]>;
+};
 
 export type FolderUpdate = Updateable<Folders>;
 export type FolderInsert = Insertable<Folders>;

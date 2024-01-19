@@ -37,28 +37,28 @@
 				<Input type="text" name="name" required />
 				{#if form?.fieldErrors?.name}
 					<Helper color="red">{form?.fieldErrors?.name}</Helper>
-				{/if}				
+				{/if}
 			</Label>
 			<Label class="space-y-2">
 				<span>Email</span>
 				<Input type="email" name="email" required />
 				{#if form?.fieldErrors?.email}
 					<Helper color="red">{form?.fieldErrors?.email}</Helper>
-				{/if}				
+				{/if}
 			</Label>
 			<Label class="space-y-2">
 				<span>Password</span>
 				<Input type="password" name="password" required />
 				{#if form?.fieldErrors?.password}
 					<Helper color="red">{form?.fieldErrors?.password}</Helper>
-				{/if}				
+				{/if}
 			</Label>
 			<Label class="space-y-2">
 				<span>Confirm Password</span>
 				<Input type="password" name="passwordConfirm" required />
 				{#if form?.fieldErrors?.passwordConfirm}
 					<Helper color="red">{form?.fieldErrors?.passwordConfirm}</Helper>
-				{/if}				
+				{/if}
 			</Label>
 			<Button type="submit" class="w-full">Register</Button>
 		</form>

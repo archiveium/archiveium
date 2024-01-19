@@ -42,7 +42,7 @@
 			</Label>
 			<div class="flex items-start">
 				<A href="/forgot-password" aClass="ml-auto text-sm hover:underline">Forgot password</A>
-		</div>
+			</div>
 			<Button type="submit" class="w-full">Login</Button>
 			<div class="text-sm font-medium text-gray-500 dark:text-gray-300">
 				Don't have account yet? Enroll in <A href="/preview">closed preview</A>

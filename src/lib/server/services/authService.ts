@@ -1,8 +1,18 @@
 import crypto from 'crypto';
 import { DateTime } from 'luxon';
-import { InvalidPasswordException, PasswordResetRequestTokenExpiredException, UserNotAcceptedException, UserNotVerifiedException } from "../../../exceptions/auth";
+import {
+	InvalidPasswordException,
+	PasswordResetRequestTokenExpiredException,
+	UserNotAcceptedException,
+	UserNotVerifiedException
+} from '../../../exceptions/auth';
 import { RecordNotFoundException } from '../../../exceptions/database';
-import { forgotPasswordFormSchema, loginFormSchema, passwordResetFormSchema, registerFormSchema } from '../schemas/authSchema';
+import {
+	forgotPasswordFormSchema,
+	loginFormSchema,
+	passwordResetFormSchema,
+	registerFormSchema
+} from '../schemas/authSchema';
 import * as userService from '$lib/server/services/userService';
 import * as passwordResetService from '$lib/server/services/passwordResetService';
 import * as userInvitationService from '$lib/server/services/userInvitiationService';
@@ -17,9 +27,7 @@ export async function createPasswordResetRequest(data: FormData): Promise<void> 
 	try {
 		user = await userService.findUserByEmail(validatedData.email);
 		if (!user.email_verified_at) {
-			throw new UserNotVerifiedException(
-				'Please verify your email before resetting password.'
-			);
+			throw new UserNotVerifiedException('Please verify your email before resetting password.');
 		}
 	} catch (error) {
 		// if it doesn't do nothing
@@ -31,7 +39,9 @@ export async function createPasswordResetRequest(data: FormData): Promise<void> 
 
 	// if there's an existing token, delete that and generate new one
 	try {
-		const passwordResetRequest = await passwordResetService.findPasswordResetRequestByEmail(user.email);
+		const passwordResetRequest = await passwordResetService.findPasswordResetRequestByEmail(
+			user.email
+		);
 		await passwordResetService.deletePasswordResetRequestById(passwordResetRequest.id);
 	} catch (error) {
 		if (!(error instanceof RecordNotFoundException)) {
@@ -42,7 +52,10 @@ export async function createPasswordResetRequest(data: FormData): Promise<void> 
 	// insert password_reset_token and expiry in users table
 	const resetToken = crypto.randomBytes(32).toString('hex');
 	const hashedResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-	await passwordResetService.createPasswordResetRequest({ email: user.email, password_reset_token: hashedResetToken });
+	await passwordResetService.createPasswordResetRequest({
+		email: user.email,
+		password_reset_token: hashedResetToken
+	});
 }
 
 export async function loginUser(credentials: FormData) {
@@ -84,7 +97,10 @@ export async function registerUser(data: FormData) {
 }
 
 export async function validatePasswordResetToken(token: string, email: string): Promise<void> {
-	const passwordRequestRequest = await passwordResetService.findPasswordResetRequestByTokenAndEmail(token, email);
+	const passwordRequestRequest = await passwordResetService.findPasswordResetRequestByTokenAndEmail(
+		token,
+		email
+	);
 	// check token expiry
 	const currentDate = DateTime.now();
 	const expiryDate = DateTime.fromJSDate(passwordRequestRequest.created_at).plus({ hours: 1 });

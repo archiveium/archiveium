@@ -32,14 +32,14 @@
 	"session": {
 		"secrets": [""]
 	},
-    "mail": {
-        "host": "",
-        "port": 587,
-        "secure": false,
-        "auth": {
-            "user": "",
-            "pass": ""
-        },
-        "fromAddress": ""
-    }
+	"mail": {
+		"host": "",
+		"port": 587,
+		"secure": false,
+		"auth": {
+			"user": "",
+			"pass": ""
+		},
+		"fromAddress": ""
+	}
 }

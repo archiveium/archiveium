@@ -2,15 +2,7 @@
 	import { enhance } from '$app/forms';
 	import type { ActionData } from '../../../../routes/accounts/add/$types';
 	import type { Provider } from '../../../../types/provider';
-	import {
-		Card,
-		Button,
-		Label,
-		Input,
-		Radio,
-		Alert,
-		Helper
-	} from 'flowbite-svelte';	
+	import { Card, Button, Label, Input, Radio, Alert, Helper } from 'flowbite-svelte';
 
 	export let data: { availableProviders: Provider[]; defaultProvider: Provider | undefined };
 	export let form: ActionData;
@@ -42,7 +34,7 @@
 			<div class="sm:col-span-2">
 				<Label for="email" class="mb-2">Email Address</Label>
 				<Input
-					color={form?.fieldErrors?.email ? 'red' : undefined}				
+					color={form?.fieldErrors?.email ? 'red' : undefined}
 					type="email"
 					name="email"
 					placeholder="Enter email address"
@@ -68,7 +60,11 @@
 				<Label for="providers" class="mb-2">Providers</Label>
 				<div class="flex gap-3">
 					{#each data.availableProviders as provider}
-						<Radio name="provider_id" value={provider.id} group={provider.is_default ? provider.id : ''}>
+						<Radio
+							name="provider_id"
+							value={provider.id}
+							group={provider.is_default ? provider.id : ''}
+						>
 							{provider.name}
 						</Radio>
 					{/each}

@@ -7,10 +7,7 @@
 	export let form;
 
 	$: currentStep = form?.steps?.current ?? 1;
-	let steps = [
-		'Credentials',
-		'Folders'
-	];
+	let steps = ['Credentials', 'Folders'];
 </script>
 
 <StepIndicator {currentStep} {steps} />

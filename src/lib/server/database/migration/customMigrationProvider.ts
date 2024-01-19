@@ -1,11 +1,11 @@
-import type { Migration, MigrationProvider } from "kysely";
+import type { Migration, MigrationProvider } from 'kysely';
 
 export class CustomMigrationProvider implements MigrationProvider {
-    getMigrations(): Promise<Record<string, Migration>> {
-        const migrations: Record<string, Migration> = import.meta.glob('./../migration/migration_*', {
-            eager: true,
-        });
+	getMigrations(): Promise<Record<string, Migration>> {
+		const migrations: Record<string, Migration> = import.meta.glob('./../migration/migration_*', {
+			eager: true
+		});
 
-        return Promise.resolve(migrations);
-    }
+		return Promise.resolve(migrations);
+	}
 }

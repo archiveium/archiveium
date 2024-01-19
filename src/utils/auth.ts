@@ -43,7 +43,7 @@ export async function createGuestSession(cookies: Cookies): Promise<string> {
 	} else {
 		throw new CacheSaveFailedException(`Failed to save guest session`);
 	}
-	return sessionId;	
+	return sessionId;
 }
 
 export async function createUserSession(cookies: Cookies, user: User): Promise<string> {
@@ -86,7 +86,9 @@ export async function deleteAllUserSessions(userId: string): Promise<void> {
 		cursor = scanResult[0];
 		const keys = scanResult[1];
 		if (keys.length > 0) {
-			const promises = keys.map((key) => { return redis.del(key); });
+			const promises = keys.map((key) => {
+				return redis.del(key);
+			});
 			await Promise.all(promises);
 		}
 	} while (cursor !== '0');

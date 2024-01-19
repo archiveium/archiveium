@@ -1,6 +1,15 @@
 import * as folderRepository from '$lib/server/repositories/folderRepository';
-import { FolderDeletedException, FolderDeletedOnRemoteException, FolderNotFoundException, FolderNotSyncingException } from '../../../exceptions/folder';
-import type { NewAccount, ValidatedAccount, ValidatedExistingAccount } from '../../../types/account';
+import {
+	FolderDeletedException,
+	FolderDeletedOnRemoteException,
+	FolderNotFoundException,
+	FolderNotSyncingException
+} from '../../../exceptions/folder';
+import type {
+	NewAccount,
+	ValidatedAccount,
+	ValidatedExistingAccount
+} from '../../../types/account';
 import type { Folder, FolderInsert } from '../../../types/folder';
 import { encrypt } from '../../../utils/encrypter';
 import { db } from '../database/connection';
@@ -9,7 +18,7 @@ import type { FolderUpdate } from '../database/wrappers';
 export async function findFoldersWithDeletedFilterByAccountIdAndUserId(
 	userId: string,
 	accountId: string,
-	deletedRemote: boolean,
+	deletedRemote: boolean
 ) {
 	const folders = await folderRepository.findFoldersWithDeletedFilterByAccountIdAndUserId(
 		userId,
@@ -27,34 +36,32 @@ export async function findFoldersWithDeletedFilterByAccountIdAndUserId(
 
 export async function findFoldersWithoutDeletedFilterByAccountIdAndUserId(
 	userId: string,
-	accountId: string,
+	accountId: string
 ) {
-	return folderRepository.findFoldersWithoutDeletedFilterByAccountIdAndUserId(
-		userId,
-		accountId,
-	);
+	return folderRepository.findFoldersWithoutDeletedFilterByAccountIdAndUserId(userId, accountId);
 }
 
 export async function findFolderById(folderId: string) {
 	const folders = await folderRepository.findFolderById(folderId);
-    if (folders.length > 0) {
-        const folder = folders[0];
-        if (folder.deleted) {
-            throw new FolderDeletedException(`Folder ${folderId} was deleted`);
-        } else if (folder.deleted_remote) {
-            throw new FolderDeletedOnRemoteException(`Folder ${folderId} was deleted on remote`);
-        } else if (!folder.syncing) {
-            throw new FolderNotSyncingException(`Folder ${folderId} has syncing = false`);
-        }
-        return folder;
-    }
-    throw new FolderNotFoundException(`Folder ${folderId} was not found`);
+	if (folders.length > 0) {
+		const folder = folders[0];
+		if (folder.deleted) {
+			throw new FolderDeletedException(`Folder ${folderId} was deleted`);
+		} else if (folder.deleted_remote) {
+			throw new FolderDeletedOnRemoteException(`Folder ${folderId} was deleted on remote`);
+		} else if (!folder.syncing) {
+			throw new FolderNotSyncingException(`Folder ${folderId} has syncing = false`);
+		}
+		return folder;
+	}
+	throw new FolderNotFoundException(`Folder ${folderId} was not found`);
 }
 
 export async function insertFoldersAndAccount(
 	userId: string,
 	validatedAccount: ValidatedAccount,
-	selectedRemoteFolders: FormDataEntryValue[]) {
+	selectedRemoteFolders: FormDataEntryValue[]
+) {
 	return db.transaction().execute(async (trx) => {
 		const account = validatedAccount.account;
 		const encryptedPassword = encrypt(account.password);
@@ -65,10 +72,11 @@ export async function insertFoldersAndAccount(
 			provider_id: account.provider_id,
 			user_id: userId
 		};
-		const insertedAccount = await trx.insertInto('accounts')
+		const insertedAccount = await trx
+			.insertInto('accounts')
 			.values(newAccount)
 			.returning('id')
-			.executeTakeFirstOrThrow()
+			.executeTakeFirstOrThrow();
 
 		const foldersToSave: FolderInsert[] = [];
 		selectedRemoteFolders.forEach((selectedFolder) => {
@@ -86,9 +94,7 @@ export async function insertFoldersAndAccount(
 			}
 		});
 
-		return await trx.insertInto('folders')
-			.values(foldersToSave)
-			.executeTakeFirst()
+		return await trx.insertInto('folders').values(foldersToSave).executeTakeFirst();
 	});
 }
 
@@ -101,7 +107,8 @@ export async function updateFoldersAndAccount(
 	return db.transaction().execute(async (trx) => {
 		// update account
 		const encryptedPassword = encrypt(validatedExistingAccount.account.password);
-		await trx.updateTable('accounts')
+		await trx
+			.updateTable('accounts')
 			.set({
 				name: validatedExistingAccount.account.name,
 				password: encryptedPassword
@@ -134,7 +141,8 @@ export async function updateFoldersAndAccount(
 		});
 
 		// disable syncing for all existing folders
-		await trx.updateTable('folders')
+		await trx
+			.updateTable('folders')
 			.set({ syncing: false })
 			.where('user_id', '=', userId)
 			.where('account_id', '=', validatedExistingAccount.account.account_id)
@@ -142,7 +150,8 @@ export async function updateFoldersAndAccount(
 
 		// enable syncing for all selected folders
 		if (folderIdsToUpdate.length > 0) {
-			await trx.updateTable('folders')
+			await trx
+				.updateTable('folders')
 				.set({ syncing: true })
 				.where('user_id', '=', userId)
 				.where('account_id', '=', validatedExistingAccount.account.account_id)
@@ -152,9 +161,7 @@ export async function updateFoldersAndAccount(
 
 		// insert new folders not present in database
 		if (foldersToSave.length > 0) {
-			return await trx.insertInto('folders')
-				.values(foldersToSave)
-				.executeTakeFirst();
+			return await trx.insertInto('folders').values(foldersToSave).executeTakeFirst();
 		}
 	});
 }
@@ -166,7 +173,7 @@ export async function findDeletedFoldersByUserAndAccount(userId: string, account
 export async function findSyncingFoldersByUserAndAccount(
 	userId: string,
 	accountId: string,
-	remoteDeleted: boolean,
+	remoteDeleted: boolean
 ) {
 	return folderRepository.findSyncingFoldersByUserAndAccount(userId, accountId, remoteDeleted);
 }

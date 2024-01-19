@@ -2,17 +2,16 @@
 	import logo from '$lib/images/logo.svg';
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
-	import {
-		Avatar,
-		Dropdown,
-		DropdownItem,
-	} from 'flowbite-svelte';
+	import { Avatar, Dropdown, DropdownItem } from 'flowbite-svelte';
 
 	const username = $page.data.user.name;
 	const email = $page.data.user.email;
-	const initials = username.split(' ')
-		.map(function (/** @type {string[]} */ item) { return item[0]; })
-		.join('');	
+	const initials = username
+		.split(' ')
+		.map(function (/** @type {string[]} */ item) {
+			return item[0];
+		})
+		.join('');
 </script>
 
 <nav
@@ -22,9 +21,7 @@
 		<div class="flex justify-start items-center">
 			<a href="/dashboard" class="flex items-center justify-between mr-4">
 				<img src={logo} alt="" class="mr-2 h-10" />
-				<span class="self-center text-xl whitespace-nowrap dark:text-white">
-					Archiveium
-				</span>
+				<span class="self-center text-xl whitespace-nowrap dark:text-white"> Archiveium </span>
 			</a>
 		</div>
 		<div class="flex items-center lg:order-2">
@@ -36,19 +33,17 @@
 				data-dropdown-toggle="dropdown"
 			>
 				<span class="sr-only">Open user menu</span>
-				<Avatar class="acs">{ initials }</Avatar>
+				<Avatar class="acs">{initials}</Avatar>
 			</button>
 			<!-- Dropdown menu -->
 			<Dropdown>
 				<div slot="header" class="px-4 py-2">
-					<span class="block text-sm text-gray-900 dark:text-white">{ username }</span>
-					<span class="block truncate text-sm font-medium">{ email }</span>
+					<span class="block text-sm text-gray-900 dark:text-white">{username}</span>
+					<span class="block truncate text-sm font-medium">{email}</span>
 				</div>
 				<form method="post" action="/logout" use:enhance>
-				<DropdownItem type="submit">
-					Logout
-				</DropdownItem>
-				</form>					
+					<DropdownItem type="submit">Logout</DropdownItem>
+				</form>
 			</Dropdown>
 		</div>
 	</div>

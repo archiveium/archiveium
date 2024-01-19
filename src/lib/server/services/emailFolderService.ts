@@ -4,5 +4,5 @@ import type { DB } from '../database/types';
 import type { EmailFolderInsert } from '../database/wrappers';
 
 export async function insertEmailFolder(emailFolder: EmailFolderInsert, trx?: Transaction<DB>) {
-    return emailFolderRepository.insertEmailFolder(emailFolder, trx);
+	return emailFolderRepository.insertEmailFolder(emailFolder, trx);
 }

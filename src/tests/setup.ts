@@ -1,29 +1,29 @@
 // import { vitest } from 'vitest';
 
 export class MockCookie {
-    private cookieData;
+	private cookieData;
 
-    constructor(cookieData = {}) {
-        this.cookieData = cookieData;
-    }
+	constructor(cookieData = {}) {
+		this.cookieData = cookieData;
+	}
 
-    set(key: string) {
-        // Do nothing
-    }
+	set(key: string) {
+		// Do nothing
+	}
 
-    get(key: string) {
-        return '';
-    }
+	get(key: string) {
+		return '';
+	}
 
-    getAll() {
-        return [];
-    }
+	getAll() {
+		return [];
+	}
 
-    delete(key: string) {
-        // return '';
-    }    
+	delete(key: string) {
+		// return '';
+	}
 
-    serialize () {
-        return '';
-    }
+	serialize() {
+		return '';
+	}
 }
