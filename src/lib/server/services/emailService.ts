@@ -69,16 +69,23 @@ export async function findEmailByEmailId(emailId: string, folderId: string) {
 	const emails = await emailRepository.findEmailByEmailId(emailId);
 
 	// check if email <-> folder association doesn't already exist
-	const emailFolderAssociation = emails.some((email) => { return email.folder_id === folderId; })
+	const emailFolderAssociation = emails.some((email) => {
+		return email.folder_id === folderId;
+	});
 	if (emailFolderAssociation) {
 		throw new MultipleEmailWithSameEmailIdException(`Multiple emails exist for emailId ${emailId}`);
 	}
-	
+
 	return emails[0] ?? null;
 }
 
 export async function saveAndSyncWithS3(email: ImapEmail, folder: Folder, checkEmailId: boolean) {
-	let savedEmail: { id: string; user_id: string; email_id: string | null; imported: boolean } | null;
+	let savedEmail: {
+		id: string;
+		user_id: string;
+		email_id: string | null;
+		imported: boolean;
+	} | null;
 	let hasSource = false;
 	if (checkEmailId) {
 		try {

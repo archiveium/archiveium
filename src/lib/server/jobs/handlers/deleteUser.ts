@@ -32,7 +32,11 @@ export async function deleteUser(job: Job): Promise<void> {
 				const promises: Promise<void>[] = [];
 				accountsActive.forEach((account) => {
 					logger.warn(`Soft deleting accounts: ${account.id}`);
-					promises.push(promisesLimit(() => accountService.softDeleteAccountByUserId(deletedUser.id, account.id)));
+					promises.push(
+						promisesLimit(() =>
+							accountService.softDeleteAccountByUserId(deletedUser.id, account.id)
+						)
+					);
 				});
 				await Promise.all(promises);
 			}

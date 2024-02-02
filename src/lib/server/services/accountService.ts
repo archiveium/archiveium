@@ -78,7 +78,9 @@ export async function isAccountUnique(email: string, userId: string) {
 	const account = await accountRepository.findAccountByUserIdAndEmail(email, userId);
 	if (account) {
 		if (account.deleted) {
-			throw new AccountDeletedException(`${email} is pending deletion. Please add once account has been deleted.`);
+			throw new AccountDeletedException(
+				`${email} is pending deletion. Please add once account has been deleted.`
+			);
 		}
 		throw new AccountExistsException(`${email} has already been added.`);
 	}
