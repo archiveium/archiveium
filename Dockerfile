@@ -1,5 +1,5 @@
 # Stage release
-FROM node:16.17.1
+FROM node:18.19.0
 LABEL authors="Paritosh Bhatia"
 WORKDIR /app
 COPY . .
@@ -7,7 +7,7 @@ RUN npm ci
 RUN npm run build
 
 # Final build
-FROM node:16.17.1
+FROM node:18.19.0
 LABEL authors="Paritosh Bhatia"
 ENV NODE_ENV=production
 WORKDIR /app
