@@ -99,9 +99,10 @@ export async function findEmailByIdAndUserId(userId: string, emailId: string) {
 
 export async function findEmailByEmailId(emailId: string) {
 	return db
-		.selectFrom('emails')
-		.select(['id', 'user_id', 'email_id', 'imported'])
-		.where('email_id', '=', emailId)
+		.selectFrom('emails as e')
+		.innerJoin('email_folders as ef', 'ef.email_id', 'e.id')
+		.select(['e.id', 'e.user_id', 'e.email_id', 'e.imported', 'ef.folder_id', 'ef.has_source'])
+		.where('e.email_id', '=', emailId)
 		.execute();
 }
 

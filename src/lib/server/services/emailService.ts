@@ -5,6 +5,7 @@ import type { Folder } from '../../../types/folder';
 import type { ImapEmail } from '../../../types/imap';
 import { db } from '../database/connection';
 import { MultipleEmailWithSameEmailIdException } from '../../../exceptions/email';
+import { logger } from '../../../utils/logger';
 
 export async function findEmailByFolderIdAndUserId(
 	userId: string,
@@ -64,19 +65,32 @@ export async function findFailedEmailCountByUserId(userId: string): Promise<numb
 	return emailRepository.findFailedEmailCountByUserId(userId);
 }
 
-export async function findEmailByEmailId(emailId: string) {
+export async function findEmailByEmailId(emailId: string, folderId: string) {
 	const emails = await emailRepository.findEmailByEmailId(emailId);
-	if (emails.length > 1) {
+
+	// check if email <-> folder association doesn't already exist
+	const emailFolderAssociation = emails.some((email) => { return email.folder_id === folderId; })
+	if (emailFolderAssociation) {
 		throw new MultipleEmailWithSameEmailIdException(`Multiple emails exist for emailId ${emailId}`);
 	}
-	return emails[0];
+	
+	return emails[0] ?? null;
 }
 
 export async function saveAndSyncWithS3(email: ImapEmail, folder: Folder, checkEmailId: boolean) {
-	let savedEmail: { id: string; user_id: string; email_id: string | null; imported: boolean };
+	let savedEmail: { id: string; user_id: string; email_id: string | null; imported: boolean } | null;
 	let hasSource = false;
 	if (checkEmailId) {
-		savedEmail = await findEmailByEmailId(email.emailId);
+		try {
+			savedEmail = await findEmailByEmailId(email.emailId, folder.id);
+		} catch (error) {
+			if (error instanceof MultipleEmailWithSameEmailIdException) {
+				// do nothing, probably a result of job re-processing already saved email/folder combo
+				logger.warn(error.message);
+				return;
+			}
+			throw error;
+		}
 	}
 
 	return db.transaction().execute(async (trx) => {
