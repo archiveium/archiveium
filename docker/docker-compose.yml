@@ -44,6 +44,9 @@ services:
       TZ: 'America/Toronto'       # Change timezone as needed
       NODE_APP_INSTANCE: 0
       USE_AS_CRON_PROCESSOR: true # Needed to run container as cron job processor
+      APP_ENCRYPTION_KEY: <KEY>       # Key used for encrypting email account passwords
+                                      # changing this key will invalidate all added accounts
+                                      # and they'll have to reauthorized again
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/login"]
       interval: 30s

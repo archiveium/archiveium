@@ -95,15 +95,13 @@ export async function findAllSyncingAccounts() {
 		.execute();
 }
 
-export async function isAccountUnique(email: string, userId: string): Promise<boolean> {
-	const result = await db
+export async function findAccountByUserIdAndEmail(email: string, userId: string) {
+	return db
 		.selectFrom('accounts')
-		.select((eb) => eb.fn('count', ['id']).as('count'))
+		.select(['id', 'deleted'])
 		.where('user_id', '=', userId)
 		.where('email', '=', email)
-		.where('deleted', '=', false)
-		.executeTakeFirstOrThrow();
-	return (result.count as number) == 0;
+		.executeTakeFirst();
 }
 
 export async function softDeleteAccountByUserId(

@@ -75,7 +75,13 @@ export async function findAllSyncingAccounts() {
 }
 
 export async function isAccountUnique(email: string, userId: string) {
-	return accountRepository.isAccountUnique(email, userId);
+	const account = await accountRepository.findAccountByUserIdAndEmail(email, userId);
+	if (account) {
+		if (account.deleted) {
+			throw new AccountDeletedException(`${email} is pending deletion. Please add once account has been deleted.`);
+		}
+		throw new AccountExistsException(`${email} has already been added.`);
+	}
 }
 
 export async function softDeleteAccountByUserId(userId: string, accountId: string): Promise<void> {
@@ -159,10 +165,7 @@ export async function validateAccount(data: FormData, userId: string): Promise<V
 		password: data.get('password'),
 		provider_id: data.get('provider_id')
 	});
-	const accountUnique = await isAccountUnique(validatedData.email, userId);
-	if (!accountUnique) {
-		throw new AccountExistsException(`${validatedData.email} has already been added.`);
-	}
+	await isAccountUnique(validatedData.email, userId);
 
 	const provider = await providerService.findProviderById(validatedData.provider_id);
 	const imapClient = await imapService.buildClient(
