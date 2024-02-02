@@ -8,31 +8,31 @@ on:
   workflow_dispatch:
 
 jobs:
-  #   lint:
-  #     name: Lint
-  #     runs-on: ubuntu-latest
-  #     steps:
-  #       - name: Checkout Repository
-  #         uses: actions/checkout@v3
-  #       - name: Use Node.js 16.x
-  #         uses: actions/setup-node@v3
-  #         with:
-  #           node-version: 16.x
-  #           cache: 'npm'
-  #       - run: npm ci
-  #       - run: npm run lint
+    lint:
+      name: Lint
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v3
+        - name: Use Node.js 18.x
+          uses: actions/setup-node@v3
+          with:
+            node-version: 18.x
+            cache: 'npm'
+        - run: npm ci
+        - run: npm run lint
 
   build:
     name: Build
-    # needs: lint
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-      - name: Use Node.js 16.x
+      - name: Use Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
           cache: 'npm'
       - run: npm ci
       - run: npm run build
@@ -45,10 +45,10 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-      - name: Use Node.js 16.x
+      - name: Use Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
           cache: 'npm'
       - run: npm ci
       - run: npm run test:unit
@@ -68,10 +68,10 @@ jobs:
         with:
           fetch-depth: 0
           ref: main
-      - name: Use Node.js 16.x
+      - name: Use Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
           cache: 'npm'
       - run: npm ci
       - env:
@@ -92,10 +92,10 @@ jobs:
         with:
           fetch-depth: 0
           ref: beta
-      - name: Use Node.js 16.x
+      - name: Use Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
           cache: 'npm'
       - run: npm ci
       - env:
