@@ -59,7 +59,10 @@ export const actions = {
 					error: 'Provided credentials are invalid.',
 					fieldErrors: undefined
 				});
-			} else if (error instanceof AccountExistsException || error instanceof AccountDeletedException) {
+			} else if (
+				error instanceof AccountExistsException ||
+				error instanceof AccountDeletedException
+			) {
 				return fail(400, {
 					error: error.message,
 					fieldErrors: undefined
