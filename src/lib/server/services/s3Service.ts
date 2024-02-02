@@ -33,9 +33,11 @@ export async function findEmailsByFolderIdAndUserId(
 		resultsPerPage
 	);
 	const promises = emails.map(async (email) => {
+		// TODO This should be removed if/when data is pulled from future search index
+		const emailWithSource = await emailService.findEmailByIdAndUserId(userId, email.id);
 		const params: GetObjectCommandInput = {
 			Bucket: BUCKET_NAME,
-			Key: `${userId}/${folderId}/${email.id}.eml`
+			Key: `${userId}/${emailWithSource.folder_id}/${emailWithSource.id}.eml`
 		};
 		const s3Data = await s3Client.send(new GetObjectCommand(params));
 		const parsedEmail = await parseEmail(await s3Data.Body?.transformToString());
