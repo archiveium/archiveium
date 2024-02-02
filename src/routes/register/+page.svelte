@@ -2,7 +2,7 @@
 	import logo from '$lib/images/logo.svg';
 	import type { PageData, ActionData } from './$types';
 	import { enhance } from '$app/forms';
-	import { Card, Button, Label, Input, A, Heading, Alert, Helper } from 'flowbite-svelte';
+	import { Card, Button, Label, Input, Heading, Alert, Helper } from 'flowbite-svelte';
 
 	export let data: PageData;
 	export let form: ActionData;

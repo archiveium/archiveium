@@ -12,7 +12,6 @@
 		Dropdown,
 		DropdownItem,
 		Chevron,
-		DropdownDivider,
 		MenuButton,
 		A,
 		Alert,

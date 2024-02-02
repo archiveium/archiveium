@@ -1,7 +1,7 @@
 <script lang="ts">
 	import logo from '$lib/images/logo.svg';
 	import { enhance } from '$app/forms';
-	import { Card, Button, Label, Input, A, Heading, Alert, P } from 'flowbite-svelte';
+	import { Card, Button, A, P } from 'flowbite-svelte';
 </script>
 
 <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
