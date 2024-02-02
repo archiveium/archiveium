@@ -1,6 +1,6 @@
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 import { ZodError } from 'zod';
-import { AccountExistsException } from '../../../exceptions/account.js';
+import { AccountDeletedException, AccountExistsException } from '../../../exceptions/account.js';
 import * as providerService from '$lib/server/services/providerService.js';
 import * as accountService from '$lib/server/services/accountService.js';
 import { requireUserId, saveFlashMessage } from '../../../utils/auth.js';
@@ -59,7 +59,7 @@ export const actions = {
 					error: 'Provided credentials are invalid.',
 					fieldErrors: undefined
 				});
-			} else if (error instanceof AccountExistsException) {
+			} else if (error instanceof AccountExistsException || error instanceof AccountDeletedException) {
 				return fail(400, {
 					error: error.message,
 					fieldErrors: undefined
