@@ -3,7 +3,7 @@ FROM node:18.19.0
 LABEL authors="Paritosh Bhatia"
 WORKDIR /app
 COPY . .
-RUN npm ci --maxsockets 1
+RUN npm ci --maxsockets 5
 RUN npm run build
 
 # Final build
