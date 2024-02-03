@@ -130,7 +130,7 @@ jobs:
           version=$(node -p "require('./package.json').version")
           echo "RELEASE_VERSION=$version" >> $GITHUB_ENV
       - name: Push to Docker
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           platforms: |-
@@ -165,7 +165,7 @@ jobs:
           version=$(node -p "require('./package.json').version")
           echo "RELEASE_VERSION=$version" >> $GITHUB_ENV
       - name: Push to Docker
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           platforms: |-
