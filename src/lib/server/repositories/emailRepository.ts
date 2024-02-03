@@ -18,7 +18,9 @@ export async function findEmailByFolderIdAndUserId(
 			'e.message_number',
 			'e.email_id',
 			'e.udate',
-			sql<string>`to_char(e.udate, 'Mon DD, YYYY')`.as('formatted_date')
+			sql<string>`to_char(e.udate, 'Mon DD, YYYY')`.as('formatted_date'),
+			'ef.has_source',
+			'ef.folder_id',
 		])
 		.where('e.user_id', '=', userId)
 		.where('ef.folder_id', '=', folderId)

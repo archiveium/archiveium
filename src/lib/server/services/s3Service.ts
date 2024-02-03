@@ -34,7 +34,7 @@ export async function findEmailsByFolderIdAndUserId(
 	);
 	const promises = emails.map(async (email) => {
 		// TODO This should be removed if/when data is pulled from future search index
-		const emailWithSource = await emailService.findEmailByIdAndUserId(userId, email.id);
+		const emailWithSource = email.has_source ? email : await emailService.findEmailByIdAndUserId(userId, email.id);
 		const params: GetObjectCommandInput = {
 			Bucket: BUCKET_NAME,
 			Key: `${userId}/${emailWithSource.folder_id}/${emailWithSource.id}.eml`

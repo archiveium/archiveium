@@ -11,6 +11,12 @@ export default defineConfig({
 			exclude: ['tests'],
 			include: ['src'],
 			reporter: ['text', 'json-summary', 'json']
+		},
+		deps: {
+			inline: [
+				"@aws-sdk/util-user-agent-node",
+				"@aws-sdk/signature-v4-multi-region"
+			]
 		}
 	}
 });
