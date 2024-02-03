@@ -4,14 +4,14 @@ import { expect, describe, it, vi, afterEach } from 'vitest';
 import config from 'config';
 import { DecryptException } from '../../../exceptions/encrypter';
 import { NoResultError } from 'kysely';
-import { AccountNotFoundException } from '../../../exceptions/account';
+import { AccountDeletedException, AccountExistsException, AccountNotFoundException } from '../../../exceptions/account';
 
 describe('accountService', () => {
-	describe('findAccountByUserIdAndAccountId', () => {
-		afterEach(() => {
-			vi.restoreAllMocks();
-		});
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
 
+	describe('findAccountByUserIdAndAccountId', () => {
 		it('should return account with decrypted password', async () => {
 			// arrange
 			vi.spyOn(config, 'get').mockReturnValueOnce('encryptionKey');
@@ -110,6 +110,49 @@ describe('accountService', () => {
 			// act & assert
 			await expect(accountService.findAccountByUserIdAndAccountId('1', '2')).rejects.toThrow(
 				AccountNotFoundException
+			);
+		});
+	});
+
+	describe('isAccountUnique', () => {
+		it('should not throw exception if no account exists', async () => {
+			// arrange
+			const userEmail = 'test@email.com';
+			const userId = '1234';
+			const findAccountByUserIdAndEmailSpy = vi.spyOn(accountRepository, 'findAccountByUserIdAndEmail');
+			findAccountByUserIdAndEmailSpy.mockResolvedValueOnce(undefined);
+
+			// act
+			const result = await accountService.isAccountUnique(userEmail, userId);
+
+			// assert
+			expect(result).toBeUndefined();
+			expect(findAccountByUserIdAndEmailSpy).toBeCalledWith(userEmail, userId);
+		});
+
+		it('should throw AccountDeletedException exception if account is flagged for deletion', async () => {
+			// arrange
+			const userEmail = 'test@email.com';
+			const userId = '1234';
+			const findAccountByUserIdAndEmailSpy = vi.spyOn(accountRepository, 'findAccountByUserIdAndEmail');
+			findAccountByUserIdAndEmailSpy.mockResolvedValueOnce({id: userId, deleted: true});
+
+			// act & assert
+			await expect(accountService.isAccountUnique(userEmail, userId)).rejects.toThrow(
+				AccountDeletedException
+			);
+		});
+
+		it('should throw AccountExistsException exception if account is not flagged for deletion', async () => {
+			// arrange
+			const userEmail = 'test@email.com';
+			const userId = '1234';
+			const findAccountByUserIdAndEmailSpy = vi.spyOn(accountRepository, 'findAccountByUserIdAndEmail');
+			findAccountByUserIdAndEmailSpy.mockResolvedValueOnce({id: userId, deleted: false});
+
+			// act & assert
+			await expect(accountService.isAccountUnique(userEmail, userId)).rejects.toThrow(
+				AccountExistsException
 			);
 		});
 	});
