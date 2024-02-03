@@ -19,5 +19,5 @@ COPY --from=0 /app/config ./config
 COPY --from=0 /app/src/lib/mailTransport/templates ./templates
 RUN npm config set registry https://registry.npmjs.org/
 RUN npm config set fetch-retry-maxtimeout 1200000
-RUN npm ci --omit dev
+RUN npm ci --omit dev --maxsockets 5
 CMD [ "node", "build" ]
