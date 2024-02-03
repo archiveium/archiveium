@@ -14,10 +14,10 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Use Node.js 18.x
+      - name: Use Node.js 18
         uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 18
           cache: 'npm'
       - run: npm ci
       - run: npm run lint
@@ -29,10 +29,10 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Use Node.js 18.x
+      - name: Use Node.js 18
         uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 18
           cache: 'npm'
       - run: npm ci
       - run: npm run build
@@ -45,10 +45,10 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Use Node.js 18.x
+      - name: Use Node.js 18
         uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 18
           cache: 'npm'
       - run: npm ci
       - run: npm run test:unit
@@ -68,10 +68,10 @@ jobs:
         with:
           fetch-depth: 0
           ref: main
-      - name: Use Node.js 18.x
+      - name: Use Node.js 18
         uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 18
           cache: 'npm'
       - run: npm ci
       - env:
@@ -92,10 +92,10 @@ jobs:
         with:
           fetch-depth: 0
           ref: beta
-      - name: Use Node.js 18.x
+      - name: Use Node.js 18
         uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 18
           cache: 'npm'
       - run: npm ci
       - env:
@@ -117,12 +117,9 @@ jobs:
           fetch-depth: 0
           ref: beta
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.0.0
+        uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.0.0
-        with:
-          driver-opts: |
-            image=moby/buildkit:v0.10.6
+        uses: docker/setup-buildx-action@v1
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
@@ -133,7 +130,7 @@ jobs:
           version=$(node -p "require('./package.json').version")
           echo "RELEASE_VERSION=$version" >> $GITHUB_ENV
       - name: Push to Docker
-        uses: docker/build-push-action@v5.1.0
+        uses: docker/build-push-action@v3
         with:
           context: .
           platforms: |-
