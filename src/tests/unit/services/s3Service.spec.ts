@@ -43,6 +43,7 @@ describe('s3Service', () => {
 				Body: sdkStream
 			};
 			findEmailByFolderIdAndUserIdSpy.mockResolvedValueOnce([email]);
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore argument mismatch error
 			s3SendSpy.mockResolvedValueOnce(s3Data);
 
@@ -93,6 +94,7 @@ describe('s3Service', () => {
 			};
 			findEmailByFolderIdAndUserIdSpy.mockResolvedValueOnce([email]);
 			findEmailByIdAndUserIdSpy.mockResolvedValueOnce(emailWithSource);
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore argument mismatch error
 			s3SendSpy.mockResolvedValueOnce(s3Data);
 
