@@ -14,14 +14,14 @@ describe('emailsService', () => {
 			const emailId = '12345667890';
 			const folderId = '1234';
 			const findEmailByEmailIdSpy = vi.spyOn(emailRepository, 'findEmailByEmailId');
-            const email = {
-                id: '1',
-                email_id: emailId,
-                folder_id: '5678',
-                has_source: true,
-                imported: true,
-                user_id: '1'
-            };
+			const email = {
+				id: '1',
+				email_id: emailId,
+				folder_id: '5678',
+				has_source: true,
+				imported: true,
+				user_id: '1'
+			};
 			findEmailByEmailIdSpy.mockResolvedValueOnce([email]);
 
 			// act
@@ -51,14 +51,14 @@ describe('emailsService', () => {
 			// arrange
 			const emailId = '12345667890';
 			const folderId = '1234';
-            const email = {
-                id: '1',
-                email_id: emailId,
-                folder_id: folderId,
-                has_source: true,
-                imported: true,
-                user_id: '1'
-            };			
+			const email = {
+				id: '1',
+				email_id: emailId,
+				folder_id: folderId,
+				has_source: true,
+				imported: true,
+				user_id: '1'
+			};
 			const findEmailByEmailIdSpy = vi.spyOn(emailRepository, 'findEmailByEmailId');
 			findEmailByEmailIdSpy.mockResolvedValueOnce([email]);
 

@@ -4,7 +4,11 @@ import { expect, describe, it, vi, afterEach } from 'vitest';
 import config from 'config';
 import { DecryptException } from '../../../exceptions/encrypter';
 import { NoResultError } from 'kysely';
-import { AccountDeletedException, AccountExistsException, AccountNotFoundException } from '../../../exceptions/account';
+import {
+	AccountDeletedException,
+	AccountExistsException,
+	AccountNotFoundException
+} from '../../../exceptions/account';
 
 describe('accountService', () => {
 	afterEach(() => {
@@ -119,7 +123,10 @@ describe('accountService', () => {
 			// arrange
 			const userEmail = 'test@email.com';
 			const userId = '1234';
-			const findAccountByUserIdAndEmailSpy = vi.spyOn(accountRepository, 'findAccountByUserIdAndEmail');
+			const findAccountByUserIdAndEmailSpy = vi.spyOn(
+				accountRepository,
+				'findAccountByUserIdAndEmail'
+			);
 			findAccountByUserIdAndEmailSpy.mockResolvedValueOnce(undefined);
 
 			// act
@@ -134,8 +141,11 @@ describe('accountService', () => {
 			// arrange
 			const userEmail = 'test@email.com';
 			const userId = '1234';
-			const findAccountByUserIdAndEmailSpy = vi.spyOn(accountRepository, 'findAccountByUserIdAndEmail');
-			findAccountByUserIdAndEmailSpy.mockResolvedValueOnce({id: userId, deleted: true});
+			const findAccountByUserIdAndEmailSpy = vi.spyOn(
+				accountRepository,
+				'findAccountByUserIdAndEmail'
+			);
+			findAccountByUserIdAndEmailSpy.mockResolvedValueOnce({ id: userId, deleted: true });
 
 			// act & assert
 			await expect(accountService.isAccountUnique(userEmail, userId)).rejects.toThrow(
@@ -147,8 +157,11 @@ describe('accountService', () => {
 			// arrange
 			const userEmail = 'test@email.com';
 			const userId = '1234';
-			const findAccountByUserIdAndEmailSpy = vi.spyOn(accountRepository, 'findAccountByUserIdAndEmail');
-			findAccountByUserIdAndEmailSpy.mockResolvedValueOnce({id: userId, deleted: false});
+			const findAccountByUserIdAndEmailSpy = vi.spyOn(
+				accountRepository,
+				'findAccountByUserIdAndEmail'
+			);
+			findAccountByUserIdAndEmailSpy.mockResolvedValueOnce({ id: userId, deleted: false });
 
 			// act & assert
 			await expect(accountService.isAccountUnique(userEmail, userId)).rejects.toThrow(
