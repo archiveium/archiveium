@@ -13,7 +13,8 @@
 		Input,
 		Radio,
 		Modal,
-		Alert
+		Alert,
+		Helper
 	} from 'flowbite-svelte';
 
 	export let data: {
@@ -51,6 +52,9 @@
 					value={data.selectedAccount.name}
 					required
 				/>
+				{#if form?.fieldErrors?.name}
+					<Helper color="red">{form?.fieldErrors?.name}</Helper>
+				{/if}
 			</div>
 			<div class="sm:col-span-2">
 				<Label for="email" class="mb-2">Email Address</Label>
@@ -63,9 +67,12 @@
 					name="password"
 					placeholder="Update password (leave blank if unchanged)"
 				/>
+				{#if form?.fieldErrors?.password}
+					<Helper color="red">{form?.fieldErrors?.password}</Helper>
+				{/if}
 			</div>
 			<div class="sm:col-span-2">
-				<!-- TODO Disable lable similar to email field -->
+				<!-- TODO Disable label similar to email field -->
 				<Label for="providers" class="mb-2">Providers</Label>
 				<div class="flex gap-3">
 					{#each data.availableProviders as provider}
