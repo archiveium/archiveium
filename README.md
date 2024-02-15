@@ -1,9 +1,18 @@
 # Getting Started
 
-In order to self-host Archiveium, you'll need [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/). Deployment of Archiveium involves 2 services (same container serving 2 different purposes),
+> [!WARNING]
+> - The project is under **very active** development.
+> - Expect bugs and breaking changes.
+> - Do **not** use the app as the **only way** to backup your emails.
+> - Always follow [3-2-1](https://www.backblaze.com/blog/the-3-2-1-backup-strategy/) backup plan.
+
+In order to self-host Archiveium, you'll need [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/). Deployment of Archiveium involves following services,
 
 - Frontend app - for interaction with user.
 - Cron scheduler - for running background jobs eg. downloading emails from IMAP server.
+- Postgres database
+- Minio (local S3)
+- Redis
 
 In order to deploy the above mentioned components, follow the steps mentioned below,
 
@@ -43,12 +52,9 @@ In order to deploy the above mentioned components, follow the steps mentioned be
 1. Clone this repository
 1. Create `development.json` under config directory and add values based on `default.json`. For further reference on how configs are loaded refer to [config package](https://github.com/node-config/node-config#readme).
 1. Update pull style to be rebase by running `git config pull.rebase true` in project directory.
+1. Create admin user by updating `development.json` created previously and fill in values for `adminEmail` and `adminPassword`. 
 
 Following this open the project in VS Code. VS Code should then prompt you to open project in dev container. This will result in VS Code building required containers to get started. Once VS Code is done,
-
-1. Run migrations - `npm run migrate:database up`
-1. Seed database - `npm run seed:database`
-1. Run unit tests - `npm run test:unit`
 
 Start a development server:
 
@@ -58,6 +64,8 @@ npm run dev
 # or start the server and open the app in a new browser tab
 npm run dev -- --open
 ```
+
+Starting the development server will take care of running migrations as well as seeding the database.
 
 ## Building
 
