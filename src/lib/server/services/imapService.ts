@@ -41,14 +41,14 @@ export async function buildClient(
 		} else if (error.authenticationFailed) {
 			throw new IMAPAuthenticationFailedException(error.response);
 		} else if (error instanceof Error) {
-			console.log(error);
+			logger.error(error.message);
 			throw new IMAPGenericException(error.message);
 		}
 		throw error;
 	}
 
 	client.on('error', (error) => {
-		console.error(JSON.stringify(error));
+		logger.error(JSON.stringify(error));
 	});
 
 	return client;
