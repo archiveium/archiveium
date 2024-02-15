@@ -41,6 +41,7 @@
 					<span class="block text-sm text-gray-900 dark:text-white">{username}</span>
 					<span class="block truncate text-sm font-medium">{email}</span>
 				</div>
+				<DropdownItem href="/profile">Profile</DropdownItem>
 				<form method="post" action="/logout" use:enhance>
 					<DropdownItem type="submit">Logout</DropdownItem>
 				</form>
