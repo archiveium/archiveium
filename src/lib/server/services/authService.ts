@@ -129,9 +129,7 @@ export async function updatePassword(data: FormData): Promise<void> {
 	}
 }
 
-// Private functions
-
-function verifyUserPassword(hashedPassword: string, password: string) {
+export function verifyUserPassword(hashedPassword: string, password: string): void {
 	const [salt, key] = hashedPassword.split(':');
 	const keyBuffer = Buffer.from(key, 'hex');
 	const derivedKey = crypto.scryptSync(password, salt, 64);
