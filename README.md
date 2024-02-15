@@ -1,6 +1,7 @@
 # Getting Started
 
 > [!WARNING]
+>
 > - The project is under **very active** development.
 > - Expect bugs and breaking changes.
 > - Do **not** use the app as the **only way** to backup your emails.
@@ -52,7 +53,7 @@ In order to deploy the above mentioned components, follow the steps mentioned be
 1. Clone this repository
 1. Create `development.json` under config directory and add values based on `default.json`. For further reference on how configs are loaded refer to [config package](https://github.com/node-config/node-config#readme).
 1. Update pull style to be rebase by running `git config pull.rebase true` in project directory.
-1. Create admin user by updating `development.json` created previously and fill in values for `adminEmail` and `adminPassword`. 
+1. Create admin user by updating `development.json` created previously and fill in values for `adminEmail` and `adminPassword`.
 
 Following this open the project in VS Code. VS Code should then prompt you to open project in dev container. This will result in VS Code building required containers to get started. Once VS Code is done,
 
