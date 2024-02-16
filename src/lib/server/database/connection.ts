@@ -7,7 +7,6 @@ import { logger } from '../../../utils/logger';
 
 const { Pool } = pg;
 const dbConfig = config.get<DatabaseConfig>('database');
-const logLevel = config.get<string>('app.logLevel');
 const dialect = new PostgresDialect({
 	pool: new Pool(dbConfig)
 });
@@ -19,9 +18,9 @@ const dialect = new PostgresDialect({
 export const db = new Kysely<DB>({
 	dialect,
 	log(event) {
-		if (event.level === 'query' && logLevel === 'verbose') {
-			logger.info(event.query.sql);
-			logger.info(JSON.stringify(event.query.parameters));
+		if (event.level === 'query') {
+			logger.debug(event.query.sql);
+			logger.debug(JSON.stringify(event.query.parameters));
 		}
 	}
 });
