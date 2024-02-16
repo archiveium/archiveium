@@ -49,8 +49,8 @@ export class JobScheduler {
 	}
 
 	async initialize(): Promise<void> {
-		const useAsCronProcessor = config.get<string>('app.useAsCronProcessor');
-		if (useAsCronProcessor === 'true') {
+		const useAsCronProcessor = config.get<boolean>('app.useAsCronProcessor');
+		if (useAsCronProcessor) {
 			logger.info('Initializing scheduler');
 			// remove completed jobs
 			// await this.userInvitationQueue.clean(0, 1000, 'completed');

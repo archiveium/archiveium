@@ -3,7 +3,7 @@
 	"version": "0.0.25-beta.0",
 	"private": true,
 	"scripts": {
-		"dev": "export USE_AS_CRON_PROCESSOR=true && vite dev",
+		"dev": "vite dev",
 		"build": "svelte-kit sync && vite build",
 		"preview": "vite preview",
 		"test": "playwright test",
