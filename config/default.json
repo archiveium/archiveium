@@ -2,8 +2,8 @@
 	"app": {
 		"name": "Archiveium",
 		"url": "",
-		"logLevel": "",
-		"useAsCronProcessor": false,
+		"logLevel": "info",
+		"useAsCronProcessor": true,
 		"adminEmail": "",
 		"adminPassword": "",
 		"encryptionKey": ""
