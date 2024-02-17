@@ -30,7 +30,7 @@ jobs:
 
   build:
     name: Build
-    needs: lint
+    needs: prettify-lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
