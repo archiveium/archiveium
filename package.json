@@ -70,7 +70,7 @@
 		"kysely-codegen": "0.10.1",
 		"postcss": "8.4.24",
 		"postcss-load-config": "4.0.1",
-		"prettier": "2.8.0",
+		"prettier": "2.8.8",
 		"prettier-plugin-svelte": "2.8.1",
 		"release-it": "15.10.3",
 		"svelte": "3.59.2",
