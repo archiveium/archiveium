@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  prettify-lint:
-    name: Prettify & Lint
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -19,18 +19,12 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
-      - run: |
-          npm ci
-          npm run format
-          npm run lint
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git commit -m "chore: Prettify files" .
-          git push
+      - run: npm ci
+      - run: npm run lint
 
   build:
     name: Build
-    needs: prettify-lint
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
