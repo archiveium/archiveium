@@ -67,6 +67,7 @@
 		"eslint": "8.44.0",
 		"eslint-config-prettier": "8.8.0",
 		"eslint-plugin-svelte": "2.32.2",
+		"husky": "9.0.11",
 		"kysely-codegen": "0.10.1",
 		"postcss": "8.4.24",
 		"postcss-load-config": "4.0.1",
