@@ -1,5 +1,5 @@
 # Stage release
-FROM node:18.19.0
+FROM node:18.19.1
 LABEL authors="Paritosh Bhatia"
 WORKDIR /app
 COPY . .
@@ -9,7 +9,7 @@ RUN npm ci --maxsockets 5
 RUN npm run build
 
 # Final build
-FROM node:18.19.0
+FROM node:18.19.1
 LABEL authors="Paritosh Bhatia"
 ENV NODE_ENV=production
 WORKDIR /app
