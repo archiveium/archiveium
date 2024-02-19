@@ -1,10 +1,18 @@
 import type { Handle } from '@sveltejs/kit';
 import { redis } from '$lib/server/redis/connection';
 import { buildSessionCacheKey, createGuestSession, deleteFlashMessage } from './utils/auth';
-import { JobScheduler } from '$lib/server/jobs';
 import { runMigrations } from '$lib/server/database/migration';
 import { createAdminUser, seedDatabase } from '$lib/server/database/seed';
 import { building } from '$app/environment';
+import { scheduler } from '$lib/server/jobs';
+import { UserInvitationQueue } from '$lib/server/jobs/queues/userInvitationQueue';
+import { PasswordResetQueue } from '$lib/server/jobs/queues/passwordResetQueue';
+import { EmailVerificationQueue } from '$lib/server/jobs/queues/emailVerificationQueue';
+import { SyncAccountQueue } from '$lib/server/jobs/queues/syncAccountQueue';
+import { SyncFolderQueue } from '$lib/server/jobs/queues/syncFolder';
+import { deleteAccountQueue } from '$lib/server/jobs/queues/deleteAccountQueue';
+import { deleteUserQueue } from '$lib/server/jobs/queues/deleteUserQueue';
+import { ImportEmailQueue } from '$lib/server/jobs/queues/importEmailQueue';
 
 export const handle = (async ({ event, resolve }) => {
 	const sessionId = event.cookies.get('sessionId');
@@ -42,8 +50,17 @@ BigInt.prototype.toJSON = function () {
 };
 
 async function initScheduler() {
-	const jobScheduler = new JobScheduler();
-	await jobScheduler.initialize();
+	await scheduler.addQueues([
+		new UserInvitationQueue(),
+		new PasswordResetQueue(),
+		new EmailVerificationQueue(),
+		new SyncAccountQueue(),
+		new SyncFolderQueue(),
+		new deleteAccountQueue(),
+		new deleteUserQueue(),
+		new ImportEmailQueue(),
+	]);
+	scheduler.startWorkers();
 }
 
 if (!building) {
