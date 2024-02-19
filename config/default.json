@@ -3,7 +3,7 @@
 		"name": "Archiveium",
 		"url": "",
 		"logLevel": "info",
-		"useAsCronProcessor": true,
+		"useAsCronProcessor": false,
 		"adminEmail": "",
 		"adminPassword": "",
 		"encryptionKey": ""
