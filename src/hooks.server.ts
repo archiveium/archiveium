@@ -13,6 +13,8 @@ import { SyncFolderQueue } from '$lib/server/jobs/queues/syncFolder';
 import { deleteAccountQueue } from '$lib/server/jobs/queues/deleteAccountQueue';
 import { deleteUserQueue } from '$lib/server/jobs/queues/deleteUserQueue';
 import { ImportEmailQueue } from '$lib/server/jobs/queues/importEmailQueue';
+import config from 'config';
+import { logger } from './utils/logger';
 
 export const handle = (async ({ event, resolve }) => {
 	const sessionId = event.cookies.get('sessionId');
@@ -49,7 +51,11 @@ BigInt.prototype.toJSON = function () {
 	return this.toString();
 };
 
-async function initScheduler() {
+async function initQueues() {
+	if (!config.get<boolean>('app.useAsCronProcessor')) {
+		logger.warn('Skipping initialization of queues');
+		return;
+	}
 	await scheduler.addQueues([
 		new UserInvitationQueue(),
 		new PasswordResetQueue(),
@@ -70,6 +76,6 @@ if (!building) {
 	await seedDatabase();
 	// Create admin user
 	await createAdminUser();
-	// Initialize cron jobs
-	await initScheduler();
+	// Initialize queues
+	await initQueues();
 }
