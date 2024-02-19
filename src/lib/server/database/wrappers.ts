@@ -15,3 +15,4 @@ export type ProviderInsert = Insertable<Providers>;
  * Borrowed from https://github.com/RobinBlomberg/kysely-codegen/issues/90
  */
 export type FolderSelect = DBSelect['folders'];
+export type UserSelect = DBSelect['users'];

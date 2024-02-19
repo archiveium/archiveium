@@ -31,8 +31,11 @@ export async function findUserByEmail(email: string) {
 			'email',
 			'password',
 			'deleted',
+			'admin',
 			'email_notified_at',
-			'email_verified_at'
+			'email_verified_at',
+			'created_at',
+			'updated_at'
 		])
 		.where('email', '=', email)
 		.executeTakeFirstOrThrow();

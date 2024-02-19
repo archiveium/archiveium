@@ -6,6 +6,7 @@
 
 	const username = $page.data.user.name;
 	const email = $page.data.user.email;
+	const isAdmin = $page.data.user.admin;
 	const initials = username
 		.split(' ')
 		.map(function (/** @type {string[]} */ item) {
@@ -41,6 +42,9 @@
 					<span class="block text-sm text-gray-900 dark:text-white">{username}</span>
 					<span class="block truncate text-sm font-medium">{email}</span>
 				</div>
+				{#if isAdmin}
+				<DropdownItem href="/administration">Administration</DropdownItem>
+				{/if}
 				<DropdownItem href="/profile">Profile</DropdownItem>
 				<form method="post" action="/logout" use:enhance>
 					<DropdownItem type="submit">Logout</DropdownItem>

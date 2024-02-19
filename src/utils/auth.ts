@@ -3,9 +3,9 @@ import crypto from 'crypto';
 import { CacheDeleteFailedException, CacheSaveFailedException } from '../exceptions/cache';
 import { redis } from '$lib/server/redis/connection';
 import type { FlashMessage, SessionData } from '../types/session';
-import type { User } from '../types/user';
+import type { UserSelect } from '$lib/server/database/wrappers';
 
-export function buildSessionId(cookieSessionId?: string, userId?: number): string {
+export function buildSessionId(cookieSessionId?: string, userId?: string): string {
 	let sessionId = cookieSessionId ?? crypto.randomUUID();
 	if (userId && !sessionId.startsWith(`${userId}:`)) {
 		sessionId = `${userId}:${sessionId}`;
@@ -46,10 +46,17 @@ export async function createGuestSession(cookies: Cookies): Promise<string> {
 	return sessionId;
 }
 
-export async function createUserSession(cookies: Cookies, user: User): Promise<string> {
+export async function createUserSession(cookies: Cookies, user: UserSelect): Promise<string> {
 	const sessionId = buildSessionId(cookies.get('sessionId'), user.id);
 	const sessionExpiry = 60 * 60 * 24 * 7; // one week
-	const sessionData: SessionData = { user: { id: user.id, name: user.name, email: user.email } };
+	const sessionData: SessionData = {
+		user: {
+			id: user.id,
+			name: user.name,
+			email: user.email,
+			admin: user.admin ?? false
+		}
+	};
 	const result = await redis.setex(
 		buildSessionCacheKey(sessionId),
 		sessionExpiry,
@@ -125,7 +132,7 @@ export async function deleteFlashMessage(sessionId: string): Promise<void> {
 	}
 }
 
-export function requireUserId(redirectIfLoggedIn: boolean, user?: User): string {
+export function requireUserId(redirectIfLoggedIn: boolean, user?: UserSelect): string {
 	if (!user) {
 		throw redirect(302, '/login');
 	}
@@ -134,11 +141,11 @@ export function requireUserId(redirectIfLoggedIn: boolean, user?: User): string 
 		throw redirect(302, '/dashboard');
 	}
 
-	return user.id.toString();
+	return user.id;
 }
 
-export function getUserId(user?: User): string | undefined {
-	return user?.id.toString();
+export function getUserId(user?: UserSelect): string | undefined {
+	return user?.id;
 }
 
 async function getSessionData(sessionId: string): Promise<SessionData> {
