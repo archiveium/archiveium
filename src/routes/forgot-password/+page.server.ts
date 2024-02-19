@@ -18,7 +18,7 @@ export const actions = {
 
 		try {
 			await authService.createPasswordResetRequest(data);
-			saveFlashMessage(locals.sessionId, {
+			await saveFlashMessage(locals.sessionId, {
 				type: 'success',
 				message: 'A password reset email has been sent.'
 			});

@@ -1,7 +1,7 @@
 // See https://kit.svelte.dev/docs/types#app
 
+import type { UserSelect } from '$lib/server/database/wrappers';
 import type { FlashMessage } from './types/session';
-import type { User } from './types/user';
 
 // for information about these interfaces
 declare global {
@@ -9,7 +9,7 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			sessionId: string;
-			user?: User;
+			user?: UserSelect;
 			flashMessage?: FlashMessage;
 		}
 		// interface PageData {}
