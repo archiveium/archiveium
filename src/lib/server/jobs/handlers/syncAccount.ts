@@ -14,17 +14,17 @@ import {
 } from '../../../../exceptions/imap';
 import type { Folder } from '../../../../types/folder';
 import type { ImapFolderStatus, MessageNumber } from '../../../../types/imap';
-import { JobScheduler } from '..';
 import _ from 'lodash';
 import { FolderDeletedOnRemoteException } from '../../../../exceptions/folder';
 import { decrypt } from '../../../../utils/encrypter';
+import { scheduler } from '..';
+import { ImportEmailQueue } from '../queues/importEmailQueue';
 
 const BATCH_SIZE = 200;
 
 export async function syncAccount(job: Job): Promise<void> {
 	logger.info(`Running ${job.name} job`);
 
-	const jobScheduler = new JobScheduler();
 	const allSyncingAccounts = await accountService.findAllSyncingAccounts();
 	for (const syncingAccount of allSyncingAccounts) {
 		let imapClient: ImapFlow;
@@ -69,7 +69,7 @@ export async function syncAccount(job: Job): Promise<void> {
 		);
 		const promises = accountFolders.map(async (accountFolder) => {
 			try {
-				await processAccount(accountFolder, imapClient, jobScheduler);
+				await processAccount(accountFolder, imapClient);
 			} catch (error) {
 				if (error instanceof IMAPTooManyRequestsException) {
 					logger.error(`Too many requests for Account ID: ${accountFolder.account_id}`);
@@ -108,7 +108,6 @@ export async function syncAccount(job: Job): Promise<void> {
 async function processAccount(
 	accountFolder: Folder,
 	imapClient: ImapFlow,
-	jobScheduler: JobScheduler
 ): Promise<void> {
 	// TODO Check if there can be multiple folders for a given account and user
 	const folder = await folderService.findFolderById(accountFolder.id);
@@ -129,7 +128,6 @@ async function processAccount(
 				folder.account_id,
 				folder.id,
 				imapFolderStatus,
-				jobScheduler
 			);
 		} else {
 			logger.info(`FolderId ${accountFolder.id} has 0 messages to sync`);
@@ -156,7 +154,6 @@ async function processAccount(
 				folder.account_id,
 				folder.id,
 				imapFolderStatus,
-				jobScheduler
 			);
 		}
 	}
@@ -168,15 +165,15 @@ async function processMessageNumbers(
 	accountId: string,
 	folderId: string,
 	imapFolderStatus: ImapFolderStatus,
-	jobScheduler: JobScheduler
 ): Promise<void> {
 	if (messageNumbers.length > 0) {
-		const job = await jobScheduler.addJobToExistingQueue(JobScheduler.QUEUE_IMPORT_EMAIL, {
+		const jobData = {
 			userId,
 			accountId,
 			folderId,
 			messageNumbers
-		});
+		};
+		const job = await scheduler.addJobByQueueName(ImportEmailQueue.name, jobData);
 		logger.info(`Created job ${job?.id} to process ${messageNumbers.length} emails`);
 
 		const updateResult = await folderService.updateFolder(folderId, {
