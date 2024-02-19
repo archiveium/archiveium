@@ -1,7 +1,8 @@
 export interface SessionUser {
-	id: number;
+	id: string;
 	name: string;
 	email: string;
+	admin: boolean;
 }
 
 export interface CreateUser {
