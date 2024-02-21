@@ -105,10 +105,7 @@ export async function syncAccount(job: Job): Promise<void> {
 	logger.info(`Finished running ${job.name} job`);
 }
 
-async function processAccount(
-	accountFolder: Folder,
-	imapClient: ImapFlow,
-): Promise<void> {
+async function processAccount(accountFolder: Folder, imapClient: ImapFlow): Promise<void> {
 	// TODO Check if there can be multiple folders for a given account and user
 	const folder = await folderService.findFolderById(accountFolder.id);
 	const imapFolderStatus = await imapService.getFolderStatusByName(imapClient, folder.name);
@@ -127,7 +124,7 @@ async function processAccount(
 				folder.user_id,
 				folder.account_id,
 				folder.id,
-				imapFolderStatus,
+				imapFolderStatus
 			);
 		} else {
 			logger.info(`FolderId ${accountFolder.id} has 0 messages to sync`);
@@ -153,7 +150,7 @@ async function processAccount(
 				folder.user_id,
 				folder.account_id,
 				folder.id,
-				imapFolderStatus,
+				imapFolderStatus
 			);
 		}
 	}
@@ -164,7 +161,7 @@ async function processMessageNumbers(
 	userId: string,
 	accountId: string,
 	folderId: string,
-	imapFolderStatus: ImapFolderStatus,
+	imapFolderStatus: ImapFolderStatus
 ): Promise<void> {
 	if (messageNumbers.length > 0) {
 		const jobData = {
