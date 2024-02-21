@@ -1,7 +1,7 @@
 {
 	"app": {
 		"url": "",
-		"logLevel": "",
+		"logLevel": "error",
 		"adminEmail": "",
 		"adminPassword": "",
 		"encryptionKey": ""
