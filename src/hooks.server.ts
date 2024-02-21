@@ -52,10 +52,6 @@ BigInt.prototype.toJSON = function () {
 };
 
 async function initQueues() {
-	if (!config.get<boolean>('app.useAsCronProcessor')) {
-		logger.warn('Skipping initialization of queues');
-		return;
-	}
 	await scheduler.addQueues([
 		new UserInvitationQueue(),
 		new PasswordResetQueue(),
@@ -66,6 +62,10 @@ async function initQueues() {
 		new deleteUserQueue(),
 		new ImportEmailQueue(),
 	]);
+	if (!config.get<boolean>('app.useAsCronProcessor')) {
+		logger.warn('Skipping initialization of workers for queues');
+		return;
+	}
 	scheduler.startWorkers();
 }
 

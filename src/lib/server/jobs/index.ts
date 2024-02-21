@@ -4,6 +4,7 @@ import { logger } from '../../../utils/logger';
 import { redis } from '../redis/connection';
 import type { BaseQueue } from './queues/baseQueue';
 import type { Redis } from 'ioredis';
+import type { JobCount } from '../../../types/scheduler';
 
 class Scheduler {
 	queues = new Map<string, BaseQueue>();
@@ -47,10 +48,17 @@ class Scheduler {
 		return queue.addJob(data);
 	}
 
-	// async getJobCounts(queue: string): Promise<{[index: string]: number}> {
-	// 	console.log(await this.importEmailQueue.getFailed());
-	// 	return this.importEmailQueue.getJobCounts('failed', 'delayed');
-	// }
+	async getAllJobCounts(): Promise<JobCount[]> {
+		const jobCounts: JobCount[] = [];
+		for await (const queue of this.queues.values()) {
+			const jobCount = await queue.getQueue().getJobCounts('failed', 'delayed');
+			jobCounts.push({
+				name: queue.getName(),
+				status: jobCount
+			});
+		}
+		return jobCounts;
+	}
 
 	private getRedisConnection(): Redis {
 		return this.redis;
