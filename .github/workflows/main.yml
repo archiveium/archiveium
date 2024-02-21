@@ -53,6 +53,7 @@ jobs:
       - run: npm ci
       - run: npm run test:unit
       - run: npm run test:coverage
+        if: always() # generate coverage even if tests are failing
       - name: Coverage Report
         if: always() # generate the report even if tests are failing
         uses: davelosert/vitest-coverage-report-action@v2
