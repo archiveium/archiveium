@@ -60,7 +60,7 @@ async function initQueues() {
 		new SyncFolderQueue(),
 		new deleteAccountQueue(),
 		new deleteUserQueue(),
-		new ImportEmailQueue(),
+		new ImportEmailQueue()
 	]);
 	if (!config.get<boolean>('app.useAsCronProcessor')) {
 		logger.warn('Skipping initialization of workers for queues');

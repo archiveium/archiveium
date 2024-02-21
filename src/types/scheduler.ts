@@ -1,6 +1,6 @@
 export type JobCount = {
-    name: string;
-    status: {
-        [index: string]: number;
-    }
+	name: string;
+	status: {
+		[index: string]: number;
+	};
 };
