@@ -43,7 +43,7 @@
 					<span class="block truncate text-sm font-medium">{email}</span>
 				</div>
 				{#if isAdmin}
-				<DropdownItem href="/administration">Administration</DropdownItem>
+					<DropdownItem href="/administration">Administration</DropdownItem>
 				{/if}
 				<DropdownItem href="/profile">Profile</DropdownItem>
 				<form method="post" action="/logout" use:enhance>
