@@ -10,6 +10,7 @@ import type { Redis } from 'ioredis';
 
 export abstract class BaseQueue {
 	private queue!: Queue;
+	defaultAddJob = true;
 
 	abstract getName(): string;
 	abstract getJobName(): string;
@@ -50,6 +51,6 @@ export abstract class BaseQueue {
 	}
 
 	addJobByDefault(): boolean {
-		return true;
+		return this.defaultAddJob;
 	}
 }

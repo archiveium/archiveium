@@ -1,4 +1,9 @@
-// import { vitest } from 'vitest';
+import { BaseQueue } from "$lib/server/jobs/queues/baseQueue";
+import type { Job, Processor } from "bullmq";
+
+async function mockProcessor(job: Job): Promise<void> {
+	// do nothing
+}
 
 export class MockCookie {
 	private cookieData;
@@ -25,5 +30,19 @@ export class MockCookie {
 
 	serialize() {
 		return '';
+	}
+}
+
+export class MockQueue extends BaseQueue {
+	getName(): string {
+		return 'MockQueue';
+	}
+
+	getJobName(): string {
+		return 'mockQueue';
+	}
+
+	getProcessor(): Processor {
+		return mockProcessor;
 	}
 }
