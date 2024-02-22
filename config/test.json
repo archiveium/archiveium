@@ -14,7 +14,7 @@
 		"database": ""
 	},
 	"redis": {
-		"host": "redis",
+		"host": "",
 		"port": 6379
 	},
 	"s3": {
