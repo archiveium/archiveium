@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { Card, Heading, Listgroup, ListgroupItem, Badge } from 'flowbite-svelte';
-	import { capitalize, startCase } from 'lodash';
 
 	export let data;
 </script>
@@ -18,7 +17,7 @@
 					<div class="flex items-center space-x-4 rtl:space-x-reverse">
 						<div class="flex-1 min-w-0">
 							<p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-								{startCase(queueJob.name)}
+								{queueJob.name}
 							</p>
 							<p class="text-sm text-gray-500 truncate dark:text-gray-400">
 								{#each Object.entries(queueJob.status) as [status, count]}
@@ -27,8 +26,7 @@
 										rounded
 										color={count > 0 && status === 'failed' ? 'red' : 'green'}
 									>
-										{capitalize(status)}
-										{count}
+										{`${status.charAt(0).toUpperCase()}${status.substring(1)}`} {count}
 									</Badge>
 								{/each}
 							</p>

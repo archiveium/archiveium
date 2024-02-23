@@ -122,7 +122,7 @@ describe('scheduler', () => {
 		expect(queueGetJobCountsSpy).toBeCalledWith('failed', 'delayed');
 		expect(allJobCounts).toStrictEqual([
 			{
-				name: 'MockQueue',
+				name: 'Mock Queue',
 				status: { failed: 1, delayed: 2 }
 			}
 		]);
