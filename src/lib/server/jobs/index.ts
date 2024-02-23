@@ -5,7 +5,7 @@ import { redis } from '../redis/connection';
 import type { BaseQueue } from './queues/baseQueue';
 import type { Redis } from 'ioredis';
 import type { JobCount } from '../../../types/scheduler';
-import { startCase } from 'lodash';
+import _ from 'lodash';
 
 class Scheduler {
 	queues = new Map<string, BaseQueue>();
@@ -54,7 +54,7 @@ class Scheduler {
 		for await (const queue of this.queues.values()) {
 			const jobCount = await queue.getQueue().getJobCounts('failed', 'delayed');
 			jobCounts.push({
-				name: startCase(queue.getName()),
+				name: _.startCase(queue.getName()),
 				status: jobCount
 			});
 		}
