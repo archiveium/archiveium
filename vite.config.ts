@@ -13,7 +13,11 @@ export default defineConfig({
 			reporter: ['text', 'json-summary', 'json']
 		},
 		deps: {
-			inline: ['@aws-sdk/util-user-agent-node', '@aws-sdk/signature-v4-multi-region']
+			optimizer: {
+				ssr: {
+					include: ['@aws-sdk/util-user-agent-node', '@aws-sdk/signature-v4-multi-region']
+				}
+			}
 		}
 	}
 });

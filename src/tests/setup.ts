@@ -1,5 +1,5 @@
-import { BaseQueue } from "$lib/server/jobs/queues/baseQueue";
-import type { Job, Processor } from "bullmq";
+import { BaseQueue } from '$lib/server/jobs/queues/baseQueue';
+import type { Job, Processor } from 'bullmq';
 
 async function mockProcessor(job: Job): Promise<void> {
 	// do nothing
