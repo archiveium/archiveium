@@ -26,7 +26,8 @@
 										rounded
 										color={count > 0 && status === 'failed' ? 'red' : 'green'}
 									>
-										{`${status.charAt(0).toUpperCase()}${status.substring(1)}`} {count}
+										{`${status.charAt(0).toUpperCase()}${status.substring(1)}`}
+										{count}
 									</Badge>
 								{/each}
 							</p>
