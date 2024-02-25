@@ -42,10 +42,7 @@ class Scheduler {
 	}
 
 	async addJobByQueueName(queueName: string, data: unknown = null): Promise<Job> {
-		const queue = this.queues.get(queueName);
-		if (!queue) {
-			throw new InvalidQueueException(queueName);
-		}
+		const queue = this.getQueueByName(queueName);
 		return queue.addJob(data);
 	}
 
@@ -54,11 +51,25 @@ class Scheduler {
 		for await (const queue of this.queues.values()) {
 			const jobCount = await queue.getQueue().getJobCounts('failed', 'delayed');
 			jobCounts.push({
-				name: _.startCase(queue.getName()),
+				jobName: queue.getName(),
+				displayName: _.startCase(queue.getName()),
 				status: jobCount
 			});
 		}
 		return jobCounts;
+	}
+
+	retryFailedJobs(queueName: string): Promise<void> {
+		const queue = this.getQueueByName(queueName);
+		return queue.getQueue().retryJobs();
+	}
+
+	private getQueueByName(queueName: string): BaseQueue {
+		const queue = this.queues.get(queueName);
+		if (!queue) {
+			throw new InvalidQueueException(queueName);
+		}
+		return queue;
 	}
 
 	private getRedisConnection(): Redis {
