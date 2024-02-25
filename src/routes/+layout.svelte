@@ -2,6 +2,7 @@
 	import Navbar from '../components/navbar.svelte';
 	import '../app.postcss';
 	import { page } from '$app/stores';
+	import Footer from '../components/footer.svelte';
 </script>
 
 <div class="antialiased">
@@ -14,4 +15,9 @@
 	<main class={$page.data.showNavbar ? 'p-4 h-auto pt-20' : ''}>
 		<slot />
 	</main>
+
+	<!-- Footer -->
+	{#if $page.data.showNavbar}
+		<Footer />
+	{/if}
 </div>
