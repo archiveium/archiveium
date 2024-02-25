@@ -122,9 +122,36 @@ describe('scheduler', () => {
 		expect(queueGetJobCountsSpy).toBeCalledWith('failed', 'delayed');
 		expect(allJobCounts).toStrictEqual([
 			{
-				name: 'Mock Queue',
+				jobName: 'MockQueue',
+				displayName: 'Mock Queue',
 				status: { failed: 1, delayed: 2 }
 			}
 		]);
+	});
+
+	it('should retry all failed jobs', async () => {
+		// arrange
+		const mockQueue = new MockQueue();
+		scheduler.addQueues([mockQueue]);
+		const queueRetryJobsSpy = vi.spyOn(bullmq.Queue.prototype, 'retryJobs');
+		queueRetryJobsSpy.mockResolvedValue(undefined);
+
+		// act
+		await scheduler.retryFailedJobs('MockQueue');
+
+		// assert
+		expect(queueRetryJobsSpy).toBeCalledWith();
+	});
+
+	it('should throw exception when retrying failed jobs for invalid queue', async () => {
+		// arrange
+		const mockQueue = new MockQueue();
+		scheduler.addQueues([mockQueue]);
+		const queueRetryJobsSpy = vi.spyOn(bullmq.Queue.prototype, 'retryJobs');
+		queueRetryJobsSpy.mockResolvedValue(undefined);
+
+		// act & assert
+		expect(() => scheduler.retryFailedJobs('InvalidQueue')).toThrow(InvalidQueueException);
+		expect(queueRetryJobsSpy).not.toBeCalled();
 	});
 });
