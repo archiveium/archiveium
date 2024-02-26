@@ -4,8 +4,8 @@ LABEL authors="Paritosh Bhatia"
 WORKDIR /app
 COPY . .
 RUN npm update -g npm
-# RUN npm config set registry https://registry.npmjs.org/
-# RUN npm config set fetch-retry-maxtimeout 1200000
+RUN npm config set registry https://registry.npmjs.org/
+RUN npm config set fetch-retry-maxtimeout 1200000
 RUN npm ci
 RUN npm run build
 
@@ -19,7 +19,7 @@ COPY --from=0 /app/build ./build
 COPY --from=0 /app/config ./config
 COPY --from=0 /app/src/lib/mailTransport/templates ./templates
 RUN npm update -g npm
-# RUN npm config set registry https://registry.npmjs.org/
-# RUN npm config set fetch-retry-maxtimeout 1200000
+RUN npm config set registry https://registry.npmjs.org/
+RUN npm config set fetch-retry-maxtimeout 1200000
 RUN npm ci --omit dev
 CMD [ "node", "build" ]
