@@ -108,7 +108,7 @@ jobs:
 
   docker-beta:
     name: Build & Push Beta Docker Image
-    runs-on: self-hosted-arm64
+    runs-on: self-hosted
     if: github.event_name == 'push' && github.ref == 'refs/heads/beta'
     needs: release-beta
     steps:
