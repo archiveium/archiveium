@@ -5,19 +5,17 @@
 	import Footer from '../components/footer.svelte';
 </script>
 
-<div class="antialiased">
-	<!-- Navbar -->
-	{#if $page.data.showNavbar}
-		<Navbar />
-	{/if}
+<!-- Navbar -->
+{#if $page.data.showNavbar}
+	<Navbar />
+{/if}
 
-	<!-- Content -->
-	<main class={$page.data.showNavbar ? 'p-4 h-auto pt-20' : ''}>
-		<slot />
-	</main>
+<!-- Content -->
+<main class={$page.data.showNavbar ? 'p-4 h-auto pt-20' : ''}>
+	<slot />
+</main>
 
-	<!-- Footer -->
-	{#if $page.data.showNavbar}
-		<Footer />
-	{/if}
-</div>
+<!-- Footer -->
+{#if $page.data.showNavbar}
+	<Footer />
+{/if}
