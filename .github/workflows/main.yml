@@ -143,7 +143,7 @@ jobs:
 
   docker-prod:
     name: Build & Push Prod Docker Image
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: release-prod
     steps:
