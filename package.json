@@ -24,7 +24,7 @@
 		"@aws-sdk/client-s3": "3.256.0",
 		"@floating-ui/dom": "1.4.5",
 		"@smithy/util-stream": "2.1.1",
-		"bullmq": "4.13.1",
+		"bullmq": "4.17.0",
 		"config": "3.3.11",
 		"dompurify": "3.0.9",
 		"flowbite": "1.7.0",
