@@ -46,8 +46,20 @@
 						<div class="flex justify-start items-center">
 							<Button color="alternative" size="sm" class="mr-2">
 								Accounts
-								<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-									<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 10 4 4 4-4"/>
+								<svg
+									class="w-6 h-6 text-gray-800 dark:text-white"
+									aria-hidden="true"
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="m8 10 4 4 4-4"
+									/>
 								</svg>
 							</Button>
 							<Dropdown placement="bottom-start" class="w-full overflow-y-auto py-1 h-48">
@@ -62,8 +74,20 @@
 							{#if value.folders.all && value.accounts.selected}
 								<Button color="alternative" size="sm" class="mr-2">
 									Folders
-									<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-										<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 10 4 4 4-4"/>
+									<svg
+										class="w-6 h-6 text-gray-800 dark:text-white"
+										aria-hidden="true"
+										xmlns="http://www.w3.org/2000/svg"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="m8 10 4 4 4-4"
+										/>
 									</svg>
 								</Button>
 								<Dropdown placement="bottom-start" class="w-48 overflow-y-auto py-1 h-48">
@@ -94,8 +118,19 @@
 								</div>
 							</form> -->
 							{#if value.accounts.selected}
-								<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-									<path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M12 6h0m0 6h0m0 6h0"/>
+								<svg
+									class="w-6 h-6 text-gray-800 dark:text-white"
+									aria-hidden="true"
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-width="2"
+										d="M12 6h0m0 6h0m0 6h0"
+									/>
 								</svg>
 								<Dropdown placement="bottom-start" class="w-36">
 									<DropdownItem href="/accounts/edit/{value.accounts.selected.id}">
@@ -153,16 +188,40 @@
 				<svelte:fragment slot="prev">
 					<A href={value.paginator.previousLink.href} color="">
 						<span class="sr-only">Previous</span>
-						<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-							<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14 8-4 4 4 4"/>
+						<svg
+							class="w-6 h-6 text-gray-800 dark:text-white"
+							aria-hidden="true"
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="m14 8-4 4 4 4"
+							/>
 						</svg>
 					</A>
 				</svelte:fragment>
 				<svelte:fragment slot="next">
 					<A href={value.paginator.nextLink.href} color="">
 						<span class="sr-only">Next</span>
-						<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-							<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m10 16 4-4-4-4"/>
+						<svg
+							class="w-6 h-6 text-gray-800 dark:text-white"
+							aria-hidden="true"
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="m10 16 4-4-4-4"
+							/>
 						</svg>
 					</A>
 				</svelte:fragment>
