@@ -119,7 +119,7 @@ describe('scheduler', () => {
 		const allJobCounts = await scheduler.getAllJobCounts();
 
 		// assert
-		expect(queueGetJobCountsSpy).toBeCalledWith('failed', 'delayed');
+		expect(queueGetJobCountsSpy).toBeCalledWith();
 		expect(allJobCounts).toStrictEqual([
 			{
 				jobName: 'MockQueue',

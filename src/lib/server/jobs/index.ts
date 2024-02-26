@@ -49,7 +49,7 @@ class Scheduler {
 	async getAllJobCounts(): Promise<JobCount[]> {
 		const jobCounts: JobCount[] = [];
 		for await (const queue of this.queues.values()) {
-			const jobCount = await queue.getQueue().getJobCounts('failed', 'delayed');
+			const jobCount = await queue.getQueue().getJobCounts();
 			jobCounts.push({
 				jobName: queue.getName(),
 				displayName: _.startCase(queue.getName()),
