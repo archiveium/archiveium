@@ -28,7 +28,7 @@
 		"config": "3.3.11",
 		"dompurify": "3.0.9",
 		"flowbite": "1.8.1",
-		"flowbite-svelte": "0.44.23",
+		"flowbite-svelte": "0.44.24",
 		"handlebars": "4.7.8",
 		"imapflow": "1.0.152",
 		"ioredis": "5.3.2",
