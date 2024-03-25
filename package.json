@@ -37,7 +37,7 @@
 		"lodash": "4.17.21",
 		"luxon": "3.4.4",
 		"mailparser": "3.6.7",
-		"nodemailer": "6.9.10",
+		"nodemailer": "6.9.13",
 		"p-limit": "4.0.0",
 		"pg": "8.11.3",
 		"pino": "8.16.1",
