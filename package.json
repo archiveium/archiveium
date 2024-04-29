@@ -40,7 +40,7 @@
 		"nodemailer": "6.9.10",
 		"p-limit": "4.0.0",
 		"pg": "8.11.3",
-		"pino": "8.16.1",
+		"pino": "8.21.0",
 		"pino-pretty": "10.2.3",
 		"tailwind-merge": "1.14.0",
 		"zod": "3.21.4"
