@@ -23,26 +23,28 @@ import { ImportEmailQueue } from '../queues/importEmailQueue';
 const BATCH_SIZE = 200;
 
 export async function syncAccount(job: Job): Promise<void> {
-	logger.info(`Running ${job.name} job`);
+	logger.info(`${job.name}: Running job`);
 
+	let imapClient: ImapFlow;
 	const allSyncingAccounts = await accountService.findAllSyncingAccounts();
 	for (const syncingAccount of allSyncingAccounts) {
-		let imapClient: ImapFlow;
 		const decryptedPassword = decrypt(syncingAccount.password);
 		try {
+			logger.info(`${job.name}: Logging in`);
 			imapClient = await buildClient(
 				syncingAccount.email,
 				decryptedPassword,
 				syncingAccount.provider_host
 			);
+			logger.info(`${job.name}: Logged in`);
 		} catch (error) {
 			if (error instanceof IMAPTooManyRequestsException) {
-				logger.error(`Too many requests for Account ID: ${syncingAccount.id}`);
+				logger.error(`${job.name}: Too many requests for Account ID: ${syncingAccount.id}`);
 				// TODO Add logic to backoff for a while before attempting again
 				throw error;
 			} else if (error instanceof IMAPAuthenticationFailedException) {
 				logger.error(
-					`Authentication failed for Account ID ${syncingAccount.id}. Disabling account syncing`
+					`${job.name}: Authentication failed for Account ID ${syncingAccount.id}. Disabling account syncing`
 				);
 				await accountService.updateAccountSyncingStatus(
 					syncingAccount.user_id,
@@ -55,10 +57,12 @@ export async function syncAccount(job: Job): Promise<void> {
 				error instanceof IMAPGenericException ||
 				error instanceof IMAPUserAuthenticatedNotConnectedException
 			) {
-				logger.error(`${error.message} for Account ID: ${syncingAccount.id}`);
+				logger.error(`${job.name}: ${error.message} for Account ID: ${syncingAccount.id}`);
 				// TODO Add logic to backoff for a while before attempting again
 				throw error;
 			}
+
+			logger.error(`${job.name}: ` + JSON.stringify(error));
 			throw error;
 		}
 
@@ -72,12 +76,12 @@ export async function syncAccount(job: Job): Promise<void> {
 				await processAccount(accountFolder, imapClient);
 			} catch (error) {
 				if (error instanceof IMAPTooManyRequestsException) {
-					logger.error(`Too many requests for Account ID: ${accountFolder.account_id}`);
+					logger.error(`${job.name}: Too many requests for Account ID: ${accountFolder.account_id}`);
 					// TODO Add logic to backoff for a while before attempting again
 					throw error;
 				} else if (error instanceof IMAPAuthenticationFailedException) {
 					logger.error(
-						`Authentication failed for Account ID ${accountFolder.id}. Disabling account syncing`
+						`${job.name}: Authentication failed for Account ID ${accountFolder.id}. Disabling account syncing`
 					);
 					await accountService.updateAccountSyncingStatus(
 						syncingAccount.user_id,
@@ -86,23 +90,26 @@ export async function syncAccount(job: Job): Promise<void> {
 					);
 					// TODO send notification to user
 				} else if (error instanceof FolderDeletedOnRemoteException) {
-					logger.warn(`Folder ID ${accountFolder.id} was deleted on remote. Skipping account`);
+					logger.warn(`${job.name}: Folder ID ${accountFolder.id} was deleted on remote. Skipping account`);
 				} else if (error instanceof IMAPGenericException) {
-					logger.error(`${error.message} for Account ID: ${accountFolder.id}`);
+					logger.error(`${job.name}: ${error.message} for Account ID: ${accountFolder.id}`);
 					// TODO Add logic to backoff for a while before attempting again
 					throw error;
 				} else {
-					logger.error(`[schedule]` + JSON.stringify(error));
+					logger.error(`${job.name}: ` + JSON.stringify(error));
 					throw error;
 				}
 			}
 		});
 
+		logger.info(`${job.name}: Waiting for all folders to be processed`);
 		await Promise.all(promises);
+
+		logger.info(`${job.name}: Logging out`);
 		await imapClient.logout();
 	}
 
-	logger.info(`Finished running ${job.name} job`);
+	logger.info(`${job.name}: Finished running job`);
 }
 
 async function processAccount(accountFolder: Folder, imapClient: ImapFlow): Promise<void> {
