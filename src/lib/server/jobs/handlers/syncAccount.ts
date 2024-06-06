@@ -76,7 +76,9 @@ export async function syncAccount(job: Job): Promise<void> {
 				await processAccount(accountFolder, imapClient);
 			} catch (error) {
 				if (error instanceof IMAPTooManyRequestsException) {
-					logger.error(`${job.name}: Too many requests for Account ID: ${accountFolder.account_id}`);
+					logger.error(
+						`${job.name}: Too many requests for Account ID: ${accountFolder.account_id}`
+					);
 					// TODO Add logic to backoff for a while before attempting again
 					throw error;
 				} else if (error instanceof IMAPAuthenticationFailedException) {
@@ -90,7 +92,9 @@ export async function syncAccount(job: Job): Promise<void> {
 					);
 					// TODO send notification to user
 				} else if (error instanceof FolderDeletedOnRemoteException) {
-					logger.warn(`${job.name}: Folder ID ${accountFolder.id} was deleted on remote. Skipping account`);
+					logger.warn(
+						`${job.name}: Folder ID ${accountFolder.id} was deleted on remote. Skipping account`
+					);
 				} else if (error instanceof IMAPGenericException) {
 					logger.error(`${job.name}: ${error.message} for Account ID: ${accountFolder.id}`);
 					// TODO Add logic to backoff for a while before attempting again
