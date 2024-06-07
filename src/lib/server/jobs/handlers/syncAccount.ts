@@ -78,9 +78,7 @@ export async function syncAccount(job: Job): Promise<void> {
 				await processAccount(accountFolder, imapClient);
 			} catch (error) {
 				if (error instanceof IMAPTooManyRequestsException) {
-					logger.error(
-						`${jobName}: Too many requests for Account ID: ${accountFolder.account_id}`
-					);
+					logger.error(`${jobName}: Too many requests for Account ID: ${accountFolder.account_id}`);
 					// TODO Add logic to backoff for a while before attempting again
 					throw error;
 				} else if (error instanceof IMAPAuthenticationFailedException) {
@@ -147,7 +145,9 @@ async function processAccount(accountFolder: Folder, imapClient: ImapFlow): Prom
 		if (folder.status_uidvalidity != imapFolderStatus.uidValidity) {
 			logger.warn(`${jobName}: FolderId ${accountFolder.id} uidvalidity changed.
             This error should fix itself after scanner job runs`);
-			throw new IMAPUidValidityChangedException(`${jobName}: FolderId ${accountFolder.id} uidvalidity changed`);
+			throw new IMAPUidValidityChangedException(
+				`${jobName}: FolderId ${accountFolder.id} uidvalidity changed`
+			);
 		} else if (imapFolderStatus.messages == 0) {
 			logger.info(`${jobName}: FolderId ${accountFolder.id} has 0 messages to sync`);
 		} else if (folder.last_updated_msgno == imapFolderLastUid) {
