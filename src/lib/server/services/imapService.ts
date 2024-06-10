@@ -75,13 +75,16 @@ export async function getFolderStatusByName(
 	let status: ImapFolderStatus;
 	const lock = await client.getMailboxLock(name);
 	try {
+		logger.info(`[getFolderStatusByName] Fetching folder status`);
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore since type definitions have the parameters wrong
 		status = await client.status(name, { messages: true, uidNext: true, uidValidity: true });
+		logger.info(`[getFolderStatusByName] Fetched folder status`);
 	} catch (e) {
 		logger.error(`[getFolderStatusByName] ${JSON.stringify(e)}`);
 		throw e;
 	} finally {
+		logger.info(`[getFolderStatusByName] Lock released`);
 		lock.release();
 	}
 
@@ -103,6 +106,7 @@ export async function getMessageNumbers(
 
 	const lock = await client.getMailboxLock(folderName);
 	try {
+		logger.info(`[getMessageNumbers] Fetching message numbers`);
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore since type definitions have the parameters wrong
 		const messages = client.fetch(`${startSeq}:${endSeq}`, { size: true }, { uid: true });
@@ -112,12 +116,14 @@ export async function getMessageNumbers(
 				size: message.size
 			});
 		}
+		logger.info(`[getMessageNumbers] Fetched message numbers`);
 	} catch (error) {
 		logger.error(`[getMessageNumbers] ${JSON.stringify(error)}`);
 		if (error instanceof Error) {
 			throw new IMAPGenericException(error.message);
 		}
 	} finally {
+		logger.info(`[getMessageNumbers] Lock released`);
 		lock.release();
 	}
 

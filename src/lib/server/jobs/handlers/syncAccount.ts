@@ -142,6 +142,7 @@ async function processAccount(accountFolder: Folder, imapClient: ImapFlow): Prom
 			logger.info(`${jobName}: FolderId ${accountFolder.id} has 0 messages to sync`);
 		}
 	} else {
+		logger.info(`${jobName}: last_updated_msgno for folder id ${accountFolder.id} is not null`);
 		if (folder.status_uidvalidity != imapFolderStatus.uidValidity) {
 			logger.warn(`${jobName}: FolderId ${accountFolder.id} uidvalidity changed.
             This error should fix itself after scanner job runs`);
@@ -177,24 +178,27 @@ async function processMessageNumbers(
 	folderId: string,
 	imapFolderStatus: ImapFolderStatus
 ): Promise<void> {
-	if (messageNumbers.length > 0) {
-		const jobData = {
-			userId,
-			accountId,
-			folderId,
-			messageNumbers
-		};
-		const job = await scheduler.addJobByQueueName(ImportEmailQueue.name, jobData);
-		logger.info(`${jobName}: Created job ${job?.id} to process ${messageNumbers.length} emails`);
+	if (messageNumbers.length <= 0) {
+		logger.info(`${jobName}: No job needs to be created`);
+		return;	
+	}
 
-		const updateResult = await folderService.updateFolder(folderId, {
-			status_uidvalidity: imapFolderStatus.uidValidity,
-			last_updated_msgno: messageNumbers[messageNumbers.length - 1].uid
-		});
+	const jobData = {
+		userId,
+		accountId,
+		folderId,
+		messageNumbers
+	};
+	const job = await scheduler.addJobByQueueName(ImportEmailQueue.name, jobData);
+	logger.info(`${jobName}: Created job ${job?.id} to process ${messageNumbers.length} emails`);
 
-		if (Number(updateResult.numUpdatedRows) != 1) {
-			logger.error(`${jobName}: Inadequate no. of rows updated: ${updateResult.numUpdatedRows}`);
-		}
+	const updateResult = await folderService.updateFolder(folderId, {
+		status_uidvalidity: imapFolderStatus.uidValidity,
+		last_updated_msgno: messageNumbers[messageNumbers.length - 1].uid
+	});
+
+	if (Number(updateResult.numUpdatedRows) != 1) {
+		logger.error(`${jobName}: Inadequate no. of rows updated: ${updateResult.numUpdatedRows}`);
 	}
 }
 
