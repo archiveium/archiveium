@@ -180,7 +180,7 @@ async function processMessageNumbers(
 ): Promise<void> {
 	if (messageNumbers.length <= 0) {
 		logger.info(`${jobName}: No job needs to be created`);
-		return;	
+		return;
 	}
 
 	const jobData = {
