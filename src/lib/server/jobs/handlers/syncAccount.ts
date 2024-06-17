@@ -154,6 +154,7 @@ async function processAccount(accountFolder: Folder, imapClient: ImapFlow): Prom
 		} else if (folder.last_updated_msgno == imapFolderLastUid) {
 			logger.info(`${jobName}: FolderId ${accountFolder.id} has no new messages to sync`);
 		} else {
+			logger.info(`${jobName}: FolderId ${accountFolder.id} has new messages to sync`);
 			const messageNumbers = await buildMessageNumbers(
 				imapClient,
 				folder.name,
