@@ -73,7 +73,7 @@ export async function getFolderStatusByName(
 	name: string
 ): Promise<ImapFolderStatus> {
 	let status: ImapFolderStatus;
-	const lock = await client.getMailboxLock(name);
+	const lock = await client.getMailboxLock(name, { readonly: true });
 	try {
 		logger.info(`[getFolderStatusByName] Fetching folder status`);
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -104,7 +104,7 @@ export async function getMessageNumbers(
 ): Promise<MessageNumber[]> {
 	const messageNumbers: MessageNumber[] = [];
 
-	const lock = await client.getMailboxLock(folderName);
+	const lock = await client.getMailboxLock(folderName, { readonly: true });
 	try {
 		logger.info(`[getMessageNumbers] Fetching message numbers`);
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -144,7 +144,7 @@ export async function getEmails(
 			`${startSeq}:${endSeq}`,
 			{ envelope: true, source: true, bodyStructure: true, internalDate: true, size: true },
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore since type definations have the parameters wrong
+			// @ts-ignore since type definitions have the parameters wrong
 			{ uid: true }
 		);
 
