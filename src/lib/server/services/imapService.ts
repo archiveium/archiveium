@@ -48,7 +48,15 @@ export async function buildClient(
 	}
 
 	client.on('error', (error) => {
-		logger.error(JSON.stringify(error));
+		logger.error(`[buildClient] ${JSON.stringify(error)}`);
+	});
+
+	client.on('close', () => {
+		logger.error('[buildClient] Connection closed');
+	});
+
+	client.on('log', (entry) => {
+		logger.error(`[buildClient] ${JSON.stringify(entry)}`);
 	});
 
 	return client;
