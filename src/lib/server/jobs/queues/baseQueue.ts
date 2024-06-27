@@ -45,7 +45,7 @@ export abstract class BaseQueue {
 
 	buildQueue(redis: Redis): void {
 		this.queue = new Queue(this.getName(), {
-			connection: redis,
+			connection: redis && { enableOfflineQueue: false },
 			defaultJobOptions: this.getQueueOptions()
 		});
 	}
