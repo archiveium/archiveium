@@ -5,6 +5,11 @@ import type { RedisConfig } from '../../../types/config';
 const redisConfig = config.get<RedisConfig>('redis');
 
 // TODO These get triggered during build time resulting in errors
-// TODO Add a connection timeout for docker container to die instead of retrying forever
-// Note maxRetriesPerRequest is set to null for the purpose of bullmq
-export const redis = new Redis({ ...redisConfig, maxRetriesPerRequest: null });
+// Note maxRetriesPerRequest and retryStrategy are set especially for bullmq
+export const redis = new Redis({
+	...redisConfig,
+	maxRetriesPerRequest: null,
+	retryStrategy: function (times: number) {
+		return Math.max(Math.min(Math.exp(times), 20000), 1000);
+	}
+});
