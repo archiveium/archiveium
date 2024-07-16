@@ -7,6 +7,7 @@ import {
 	Job
 } from 'bullmq';
 import type { Redis } from 'ioredis';
+import { logger } from '../../../../utils/logger';
 
 export abstract class BaseQueue {
 	private queue!: Queue;
@@ -45,8 +46,15 @@ export abstract class BaseQueue {
 
 	buildQueue(redis: Redis): void {
 		this.queue = new Queue(this.getName(), {
-			connection: redis && { enableOfflineQueue: false },
+			connection: {
+				...redis.options,
+				enableOfflineQueue: false // disable command queueing for Queue instance
+			},
 			defaultJobOptions: this.getQueueOptions()
+		});
+
+		this.queue.on('error', (err) => {
+			logger.error(`Queue Error: ` + JSON.stringify(err));
 		});
 	}
 

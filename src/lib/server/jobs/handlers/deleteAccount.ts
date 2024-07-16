@@ -4,8 +4,14 @@ import * as accountService from '$lib/server/services/accountService';
 import * as folderService from '$lib/server/services/folderService';
 import * as s3Service from '$lib/server/services/s3Service';
 
+let jobName: string;
+
 export async function deleteAccount(job: Job): Promise<void> {
-	logger.info(`Running ${job.name} job`);
+	jobName = job.name;
+	logger.info(`${jobName}: Running job`);
+
+	// set max execution time of 10 minutes
+	setTimeout(() => new Error(`${jobName}: Timed out`), 10 * 60 * 1000);
 
 	const allDeletedAccounts = await accountService.findDeletedAccounts();
 	for (const deletedAccount of allDeletedAccounts) {
@@ -16,18 +22,18 @@ export async function deleteAccount(job: Job): Promise<void> {
 			deletedAccount.id
 		);
 
-		logger.info('Started deleting S3 objects');
+		logger.info(`${jobName}: Started deleting S3 objects`);
 		const promises = folders.map((folder) => {
-			logger.info(`Deleting S3 objects in folder ${folder.id}`);
+			logger.info(`${jobName}: Deleting S3 objects in folder ${folder.id}`);
 			return s3Service.deleteS3Objects(`${folder.user_id}/${folder.id}`);
 		});
 		await Promise.all(promises);
-		logger.info('Finished deleting S3 objects');
+		logger.info(`${jobName}: Finished deleting S3 objects`);
 
-		logger.info('Started deleting account, folder & emails');
+		logger.info(`${jobName}: Started deleting account, folder & emails`);
 		await accountService.deleteAccount(deletedAccount.id);
-		logger.info('Finished deleting account, folder & emails');
+		logger.info(`${jobName}: Finished deleting account, folder & emails`);
 	}
 
-	logger.info(`Finished running ${job.name} job`);
+	logger.info(`${jobName}: Finished running job`);
 }

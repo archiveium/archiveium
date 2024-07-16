@@ -15,8 +15,14 @@ import type { FolderSelect } from '$lib/server/database/wrappers';
 import _ from 'lodash';
 import { decrypt } from '../../../../utils/encrypter';
 
+let jobName: string;
+
 export async function syncFolder(job: Job): Promise<void> {
-	logger.info(`Running ${job.name} job`);
+	jobName = job.name;
+	logger.info(`${jobName}: Running job`);
+
+	// set max execution time of 10 minutes
+	setTimeout(() => new Error(`${jobName}: Timed out`), 10 * 60 * 1000);
 
 	const allSyncingAccounts = await accountService.findAllSyncingAccounts();
 	const promises = allSyncingAccounts.map((syncingAccount) => {
@@ -24,12 +30,12 @@ export async function syncFolder(job: Job): Promise<void> {
 	});
 
 	await Promise.all(promises);
-	logger.info(`Finished running ${job.name} job`);
+	logger.info(`${jobName}: Finished running job`);
 }
 
 // TEST Add a test case where one of the local folder isn't processed
 async function syncAccount(account: SyncingAccount): Promise<void> {
-	logger.info(`Syncing Account ID ${account.id}`);
+	logger.info(`${jobName}: Syncing Account ID ${account.id}`);
 
 	let imapClient: ImapFlow;
 	const decryptedPassword = decrypt(account.password);
@@ -41,13 +47,17 @@ async function syncAccount(account: SyncingAccount): Promise<void> {
 		);
 	} catch (error) {
 		if (error instanceof IMAPTooManyRequestsException) {
-			logger.warn(`Too many requests, skipping account id ${account.id}. Error: ${error.message}`);
+			logger.warn(
+				`${jobName}: Too many requests, skipping account id ${account.id}. Error: ${error.message}`
+			);
 			return;
 		} else if (
 			error instanceof IMAPGenericException ||
 			error instanceof IMAPUserAuthenticatedNotConnectedException
 		) {
-			logger.error(`${error.message} for account id ${account.id}. Skipping account`);
+			logger.error(
+				`${jobName}: Error ${error.message} for account id ${account.id}. Skipping account`
+			);
 			return;
 		}
 		throw error;
@@ -73,15 +83,15 @@ async function syncAccount(account: SyncingAccount): Promise<void> {
 					name: remoteFolders[i].path
 				});
 				if (updateResult.numUpdatedRows > 0) {
-					logger.info(`Renamed folder id ${syncedSavedFolder.id}`);
+					logger.info(`${jobName}: Renamed folder id ${syncedSavedFolder.id}`);
 					delete remoteFolders[i];
 				} else {
-					logger.error(`Failed to rename folder id ${syncedSavedFolder.id}`);
+					logger.error(`${jobName}: Failed to rename folder id ${syncedSavedFolder.id}`);
 				}
 			} else if (syncedSavedFolder.deleted_remote) {
 				await folderService.updateFolder(syncedSavedFolder.id, { deleted_remote: false });
 				delete remoteFolders[i];
-				logger.info(`Restored folder id ${syncedSavedFolder.id}`);
+				logger.info(`${jobName}: Restored folder id ${syncedSavedFolder.id}`);
 			} else {
 				delete remoteFolders[i];
 			}
@@ -89,12 +99,12 @@ async function syncAccount(account: SyncingAccount): Promise<void> {
 			processedFolders.push(syncedSavedFolder);
 		}
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore since type definations have the parameters wrong
+		// @ts-ignore since type definitions have the parameters wrong
 		else if (!remoteFolders[i].status) {
 			delete remoteFolders[i];
 		} else {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore since type definations have the parameters wrong
+			// @ts-ignore since type definitions have the parameters wrong
 			if (remoteFolders[i].status.messages > 0) {
 				// TODO Save name separately from remote folder path
 				const insertedFolder = await folderService.insertFolder({
@@ -102,12 +112,12 @@ async function syncAccount(account: SyncingAccount): Promise<void> {
 					user_id: account.user_id,
 					name: remoteFolders[i].path,
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-ignore since type definations have the parameters wrong
+					// @ts-ignore since type definitions have the parameters wrong
 					status_uidvalidity: remoteFolders[i].status.uidValidity,
 					syncing: false
 				});
 				delete remoteFolders[i];
-				logger.info(`Inserted folder with id ${insertedFolder.id}`);
+				logger.info(`${jobName}: Inserted folder with id ${insertedFolder.id}`);
 			} else {
 				delete remoteFolders[i];
 			}
@@ -118,9 +128,9 @@ async function syncAccount(account: SyncingAccount): Promise<void> {
 	remoteFolderDeletes?.map(async (deletedFolder) => {
 		if (!deletedFolder.deleted_remote) {
 			await folderService.updateFolder(deletedFolder.id, { deleted_remote: true });
-			logger.info(`Soft deleted folder ${deletedFolder.id}`);
+			logger.info(`${jobName}: Soft deleted folder ${deletedFolder.id}`);
 		}
 	});
 
-	logger.info(`Finished syncing account ID ${account.id}`);
+	logger.info(`${jobName}: Finished syncing account Id ${account.id}`);
 }

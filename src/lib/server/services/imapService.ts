@@ -52,11 +52,11 @@ export async function buildClient(
 	});
 
 	client.on('close', () => {
-		logger.error('[buildClient] Connection closed');
+		logger.debug('[buildClient] Connection closed');
 	});
 
 	client.on('log', (entry) => {
-		logger.error(`[buildClient] ${JSON.stringify(entry)}`);
+		logger.debug(`[buildClient] ${JSON.stringify(entry)}`);
 	});
 
 	return client;

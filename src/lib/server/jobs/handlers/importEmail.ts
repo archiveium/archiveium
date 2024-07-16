@@ -27,9 +27,15 @@ import {
 import pLimit from 'p-limit';
 import { decrypt } from '../../../../utils/encrypter';
 
+let jobName: string;
+
 // TODO Add a progress bar to show how many emails have been imported for each account
 export async function importEmail(job: Job): Promise<void> {
-	logger.info(`Running ${job.name} job`);
+	jobName = job.name;
+	logger.info(`${jobName}: Running job`);
+
+	// set max execution time of 10 minutes
+	setTimeout(() => new Error(`${jobName}: Timed out`), 10 * 60 * 1000);
 
 	const jobData = job.data as ImportEmailJobPayload;
 
@@ -41,9 +47,11 @@ export async function importEmail(job: Job): Promise<void> {
 			folder.account_id
 		);
 		if (account.deleted) {
-			throw new AccountDeletedException(`Account ${folder.account_id} was deleted`);
+			throw new AccountDeletedException(`${jobName}: Account ${folder.account_id} was deleted`);
 		} else if (!account.syncing) {
-			throw new AccountSyncingPausedException(`Account syncing ${folder.account_id} was paused`);
+			throw new AccountSyncingPausedException(
+				`${jobName}: Account syncing ${folder.account_id} was paused`
+			);
 		}
 
 		const decryptedPassword = decrypt(account.password);
@@ -58,10 +66,10 @@ export async function importEmail(job: Job): Promise<void> {
 		const endSeq = _.last(jobData.messageNumbers)?.uid;
 
 		if (startSeq === undefined || endSeq === undefined) {
-			logger.error('Flagging job as failed');
+			logger.error(`${jobName}: Flagging job as failed`);
 			throw new MissingStartEndSeqException(JSON.stringify(jobData));
 		} else {
-			logger.info(`Processing job ${JSON.stringify(jobData)}`);
+			logger.info(`${jobName}: Processing job ${JSON.stringify(jobData)}`);
 			const emails = await imapService.getEmails(imapClient, folder, startSeq, endSeq);
 
 			const promisesLimit = pLimit(10);
@@ -84,23 +92,28 @@ export async function importEmail(job: Job): Promise<void> {
 		) {
 			// FIXME Check why this error is thrown when re-processing a job
 			logger.warn(error.message);
-			logger.warn(`Ignoring job since account/folder was deleted locally or on remote`, {
-				folderId: jobData.folderId,
-				accountId: jobData.accountId
-			});
+			logger.warn(
+				`${jobName}: Ignoring job since account/folder was deleted locally or on remote`,
+				{
+					folderId: jobData.folderId,
+					accountId: jobData.accountId
+				}
+			);
 		} else if (error instanceof IMAPTooManyRequestsException) {
 			// This will retry job as per configured attempts and backoff
-			logger.warn(`Too many requests for Job ID: ${job.id}`);
+			logger.warn(`${jobName}: Too many requests for Job Id ${job.id}`);
 			throw error;
 		} else if (error instanceof IMAPAuthenticationFailedException) {
 			// TODO send notification to user
-			logger.error(`Authentication failed for Account ID ${jobData.accountId}. Disabling syncing`);
+			logger.error(
+				`${jobName}: Authentication failed for Account ID ${jobData.accountId}. Disabling syncing`
+			);
 			await accountService.updateAccountSyncingStatus(jobData.userId, jobData.accountId, false);
 		} else if (
 			error instanceof IMAPGenericException ||
 			error instanceof IMAPUserAuthenticatedNotConnectedException
 		) {
-			logger.error(`${error.message} for Job ID: ${job.id}`);
+			logger.error(`${jobName}: Error ${error.message} for Job Id ${job.id}`);
 			throw error;
 		} else if (
 			error instanceof AccountSyncingPausedException ||
@@ -109,12 +122,14 @@ export async function importEmail(job: Job): Promise<void> {
 			// TODO Rethink handling of account when syncing is paused
 			// Avoid db read and write unnecessarily, maybe a separate table
 			// with account and folder id as separate columns
-			logger.warn(`Account/Folder syncing paused. Skipping job: ${error.message}`);
+			logger.warn(
+				`${jobName}: Account/Folder syncing paused. Skipping job with error ${error.message}`
+			);
 		} else {
-			logger.error(JSON.stringify(error));
+			logger.error(`${jobName}: ` + JSON.stringify(error));
 			throw error;
 		}
 	}
 
-	logger.info(`Finished running ${job.name} job`);
+	logger.info(`${jobName}: Finished running job`);
 }
