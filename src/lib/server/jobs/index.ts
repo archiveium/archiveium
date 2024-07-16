@@ -1,4 +1,4 @@
-import type { Job } from 'bullmq';
+import type { Job, Worker } from 'bullmq';
 import { InvalidQueueException } from '../../../exceptions/scheduler';
 import { logger } from '../../../utils/logger';
 import { redis } from '../redis/connection';
@@ -9,6 +9,7 @@ import _ from 'lodash';
 
 class Scheduler {
 	queues = new Map<string, BaseQueue>();
+	workers = new Map<string, Worker>();
 
 	constructor(public readonly redis: Redis) {
 		// Do nothing
@@ -20,9 +21,23 @@ class Scheduler {
 		});
 	}
 
+	async stopWorkers() {
+		for (const [name, worker] of this.workers) {
+			logger.info(`Stopping worker ${name}`);
+			await worker.close();
+			logger.info(`Stopped worker ${name}`);
+		}
+	}
+
 	startWorker(queue: BaseQueue) {
 		logger.info(`Starting worker for queue ${queue.getJobName()}`);
+
 		const worker = queue.startWorker(this.getRedisConnection());
+		this.workers.set(worker.id, worker);
+
+		worker.on('error', (err) => {
+			logger.error(`Worker Error: ` + JSON.stringify(err));
+		});
 		logger.info(`Started worker ${worker.name} (${worker.id})`);
 	}
 

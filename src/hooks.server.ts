@@ -51,6 +51,13 @@ BigInt.prototype.toJSON = function () {
 	return this.toString();
 };
 
+async function gracefulShutdown(signal: string) {
+	logger.info(`Received ${signal}, shutting down.`);
+	await scheduler.stopWorkers();
+	// Exit successfully for other asynchronous closings
+	process.exit(0);
+}
+
 async function initQueues() {
 	await scheduler.addQueues([
 		new UserInvitationQueue(),
@@ -79,3 +86,6 @@ if (!building) {
 	// Initialize queues
 	await initQueues();
 }
+
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));

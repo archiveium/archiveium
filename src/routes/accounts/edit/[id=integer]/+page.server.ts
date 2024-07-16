@@ -5,6 +5,7 @@ import { AccountExistsException } from '../../../../exceptions/account.js';
 import { IMAPAuthenticationFailedException } from '../../../../exceptions/imap.js';
 import * as providerService from '$lib/server/services/providerService.js';
 import { requireUserId, saveFlashMessage } from '../../../../utils/auth.js';
+import { logger } from '../../../../utils/logger.js';
 
 export const load = async ({ locals, params }) => {
 	const userId = requireUserId(false, locals.user);
@@ -93,7 +94,7 @@ export const actions = {
 				});
 			}
 
-			console.log(error);
+			logger.error(JSON.stringify(error));
 			await saveFlashMessage(locals.sessionId, {
 				type: 'error',
 				message: 'There was an error editing account.'

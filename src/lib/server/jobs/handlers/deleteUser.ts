@@ -5,12 +5,18 @@ import * as accountService from '$lib/server/services/accountService';
 import pLimit from 'p-limit';
 import { deleteAllUserSessions } from '../../../../utils/auth';
 
+let jobName: string;
+
 export async function deleteUser(job: Job): Promise<void> {
-	logger.info(`Running ${job.name} job`);
+	jobName = job.name;
+	logger.info(`${jobName}: Running job`);
+
+	// set max execution time of 10 minutes
+	setTimeout(() => new Error(`${jobName}: Timed out`), 10 * 60 * 1000);
 
 	const deletedUsers = await userService.findDeletedUsers();
 	for (const deletedUser of deletedUsers) {
-		logger.info(`Processing user id: ${deletedUser.id} for deletion`);
+		logger.info(`${jobName}: Processing user id ${deletedUser.id} for deletion`);
 
 		// Delete all user sessions (if any)
 		await deleteAllUserSessions(deletedUser.id);
@@ -19,10 +25,10 @@ export async function deleteUser(job: Job): Promise<void> {
 
 		// delete user if user has not account(s) configured
 		if (accounts.length === 0) {
-			logger.info(`Deleting user id: ${deletedUser.id}`);
+			logger.info(`${jobName}: Deleting user id ${deletedUser.id}`);
 			const result = await userService.deleteUser(deletedUser.id);
 			if (result.numDeletedRows < 1) {
-				logger.error(`Failed to delete user id: ${deletedUser.id}`);
+				logger.error(`${jobName}: Failed to delete user id ${deletedUser.id}`);
 			}
 		} else {
 			// Flag all active accounts as deleted
@@ -31,7 +37,7 @@ export async function deleteUser(job: Job): Promise<void> {
 				const promisesLimit = pLimit(10);
 				const promises: Promise<void>[] = [];
 				accountsActive.forEach((account) => {
-					logger.warn(`Soft deleting accounts: ${account.id}`);
+					logger.warn(`${jobName}: Soft deleting account id ${account.id}`);
 					promises.push(
 						promisesLimit(() =>
 							accountService.softDeleteAccountByUserId(deletedUser.id, account.id)
@@ -47,10 +53,12 @@ export async function deleteUser(job: Job): Promise<void> {
 				const accountPendingDeletionIds = accountsPendingDeletion.map((account) => {
 					return account.id;
 				});
-				logger.warn(`Waiting for accounts: ${accountPendingDeletionIds.toString()} to be deleted`);
+				logger.warn(
+					`${jobName}: Waiting for account ids ${accountPendingDeletionIds.toString()} to be deleted`
+				);
 			}
 		}
 	}
 
-	logger.info(`Finished running ${job.name} job`);
+	logger.info(`${jobName}: Finished running job`);
 }

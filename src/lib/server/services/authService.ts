@@ -18,6 +18,7 @@ import * as passwordResetService from '$lib/server/services/passwordResetService
 import * as userInvitationService from '$lib/server/services/userInvitiationService';
 import { buildSessionId, deleteUserSession } from '../../../utils/auth';
 import type { Cookies } from '@sveltejs/kit';
+import { logger } from '../../../utils/logger';
 
 export async function createPasswordResetRequest(data: FormData): Promise<void> {
 	const validatedData = forgotPasswordFormSchema.parse({ email: data.get('email') });
@@ -32,7 +33,7 @@ export async function createPasswordResetRequest(data: FormData): Promise<void> 
 	} catch (error) {
 		// if it doesn't do nothing
 		if (error instanceof RecordNotFoundException) {
-			console.warn(`Invalid password request for: ${validatedData.email}`);
+			logger.warn(`Invalid password request for: ${validatedData.email}`);
 		}
 		throw error;
 	}
@@ -125,7 +126,7 @@ export async function updatePassword(data: FormData): Promise<void> {
 	try {
 		await passwordResetService.deletePasswordResetRequestByEmail(validatedData.email);
 	} catch (error) {
-		console.error(error);
+		logger.error(JSON.stringify(error));
 	}
 }
 

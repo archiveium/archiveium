@@ -28,7 +28,7 @@ export async function syncAccount(job: Job): Promise<void> {
 	logger.info(`${jobName}: Running job`);
 
 	// set max execution time of 10 minutes
-	setTimeout(() => new Error('TimeoutError'), 10 * 60 * 1000);
+	setTimeout(() => new Error(`${jobName}: Timed out`), 10 * 60 * 1000);
 
 	let imapClient: ImapFlow;
 	const allSyncingAccounts = await accountService.findAllSyncingAccounts();

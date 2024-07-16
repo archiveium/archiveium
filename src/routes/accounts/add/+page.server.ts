@@ -5,6 +5,7 @@ import * as providerService from '$lib/server/services/providerService.js';
 import * as accountService from '$lib/server/services/accountService.js';
 import { requireUserId, saveFlashMessage } from '../../../utils/auth.js';
 import { IMAPAuthenticationFailedException } from '../../../exceptions/imap.js';
+import { logger } from '../../../utils/logger.js';
 
 export const load = async ({ locals }) => {
 	requireUserId(false, locals.user);
@@ -48,7 +49,7 @@ export const actions = {
 					break;
 			}
 		} catch (error) {
-			console.log(error);
+			logger.error(JSON.stringify(error));
 			if (error instanceof ZodError) {
 				return fail(400, {
 					error: undefined,

@@ -4,6 +4,7 @@ import { getUserId, saveFlashMessage } from '../../utils/auth';
 import { ZodError } from 'zod';
 import { UserNotVerifiedException } from '../../exceptions/auth';
 import * as authService from '$lib/server/services/authService';
+import { logger } from '../../utils/logger';
 
 export const load = ({ locals }) => {
 	const userId = getUserId(locals.user);
@@ -28,7 +29,7 @@ export const actions = {
 			} else if (error instanceof UserNotVerifiedException) {
 				return fail(400, { error: error.message });
 			}
-			console.log(error);
+			logger.error(JSON.stringify(error));
 			return fail(400, { error: 'There was an error processing your request. Please try again.' });
 		}
 
