@@ -3,5 +3,6 @@
 	"extends": ["config:recommended"],
 	"labels": ["dependencies"],
 	"minimumReleaseAge": "5 days",
-	"baseBranches": ["beta"]
+	"baseBranches": ["beta"],
+	"schedule": ["on the first day of the week"]
 }
