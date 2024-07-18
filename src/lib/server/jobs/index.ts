@@ -46,7 +46,13 @@ class Scheduler {
 			this.buildQueue(queue);
 			return this.addQueue(queue);
 		});
-		await Promise.all(promises);
+
+		try {
+			await Promise.all(promises);
+		} catch (error) {
+			logger.error(`[Scheduler][addQueues]: ${JSON.stringify(error)}`);
+			throw error;
+		}
 	}
 
 	async addQueue(queue: BaseQueue): Promise<void> {
