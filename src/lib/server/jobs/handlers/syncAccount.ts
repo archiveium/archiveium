@@ -110,7 +110,13 @@ export async function syncAccount(job: Job): Promise<void> {
 		});
 
 		logger.info(`${jobName}: Waiting for all folders to be processed`);
-		await Promise.all(promises);
+
+		try {
+			await Promise.all(promises);
+		} catch (error) {
+			logger.error(`${jobName}: ${JSON.stringify(error)}`);
+			throw error;
+		}
 
 		logger.info(`${jobName}: Logging out`);
 		await imapClient.logout();

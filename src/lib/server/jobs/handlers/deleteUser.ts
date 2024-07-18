@@ -44,7 +44,13 @@ export async function deleteUser(job: Job): Promise<void> {
 						)
 					);
 				});
-				await Promise.all(promises);
+
+				try {
+					await Promise.all(promises);
+				} catch (error) {
+					logger.error(`${jobName}: ${JSON.stringify(error)}`);
+					throw error;
+				}
 			}
 
 			const accountsPendingDeletion = accounts.filter((account) => account.deleted);

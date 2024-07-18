@@ -96,7 +96,12 @@ export async function deleteAllUserSessions(userId: string): Promise<void> {
 			const promises = keys.map((key) => {
 				return redis.del(key);
 			});
-			await Promise.all(promises);
+
+			try {
+				await Promise.all(promises);
+			} catch (error) {
+				throw new CacheDeleteFailedException('Failed to delete session(s)');
+			}
 		}
 	} while (cursor !== '0');
 }

@@ -29,7 +29,13 @@ export async function syncFolder(job: Job): Promise<void> {
 		return syncAccount(syncingAccount);
 	});
 
-	await Promise.all(promises);
+	try {
+		await Promise.all(promises);
+	} catch (error) {
+		logger.error(`${jobName}: ${JSON.stringify(error)}`);
+		throw error;
+	}
+
 	logger.info(`${jobName}: Finished running job`);
 }
 

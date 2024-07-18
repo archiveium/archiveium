@@ -50,7 +50,7 @@ export async function findEmailsByFolderIdAndUserId(
 		return email;
 	});
 
-	return await Promise.all(promises);
+	return Promise.all(promises);
 }
 
 export async function findEmailsByAccountIdAndUserId(
@@ -79,7 +79,7 @@ export async function findEmailsByAccountIdAndUserId(
 		return email;
 	});
 
-	return await Promise.all(promises);
+	return Promise.all(promises);
 }
 
 export async function findEmailsByUserId(
@@ -102,7 +102,7 @@ export async function findEmailsByUserId(
 		return email;
 	});
 
-	return await Promise.all(promises);
+	return Promise.all(promises);
 }
 
 export async function findEmailByIdAndUserId(userId: string, emailId: string) {

@@ -89,3 +89,11 @@ if (!building) {
 
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+
+process.on('uncaughtException', function (err) {
+	logger.error(err, 'Uncaught exception');
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+	logger.error({ promise, reason }, 'Unhandled Rejection at: Promise');
+});
