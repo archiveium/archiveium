@@ -138,7 +138,12 @@
 									</DropdownItem>
 									<DropdownItem>
 										<form method="post" use:enhance>
-											<input type="hidden" name="accountId" value={value.accounts.selected.id} readonly />
+											<input
+												type="hidden"
+												name="accountId"
+												value={value.accounts.selected.id}
+												readonly
+											/>
 											{#if value.accounts.selected.syncing}
 												<input type="hidden" name="syncing" value="false" readonly />
 												<button type="submit">Pause Syncing</button>
