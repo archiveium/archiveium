@@ -11,9 +11,6 @@ export async function deleteUser(job: Job): Promise<void> {
 	jobName = job.name;
 	logger.info(`${jobName}: Running job`);
 
-	// set max execution time of 10 minutes
-	setTimeout(() => new Error(`${jobName}: Timed out`), 10 * 60 * 1000);
-
 	const deletedUsers = await userService.findDeletedUsers();
 	for (const deletedUser of deletedUsers) {
 		logger.info(`${jobName}: Processing user id ${deletedUser.id} for deletion`);

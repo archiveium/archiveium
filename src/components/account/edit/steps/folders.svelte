@@ -40,7 +40,7 @@
 					{/each}
 				</TableBody>
 			</Table>
-			<input name="email" value={form?.email} hidden />
+			<input type="hidden" name="email" value={form?.email} />
 			<Button type="submit" name="step" value="addAccountStep2" class="w-full mt-6">
 				Update Account
 			</Button>
