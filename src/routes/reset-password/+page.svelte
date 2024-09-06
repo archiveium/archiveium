@@ -47,8 +47,8 @@
 				{/if}
 			</Label>
 			<Button type="submit" class="w-full">Update</Button>
-			<input name="token" value={data.token} hidden />
-			<input name="email" value={data.email} hidden />
+			<input type="hidden" name="token" value={data.token} />
+			<input type="hidden" name="email" value={data.email} />
 			<div class="text-sm font-medium text-gray-500 dark:text-gray-300">
 				Remember it already? <A href="/login">Login</A>
 			</div>

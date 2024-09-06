@@ -10,9 +10,6 @@ export async function deleteAccount(job: Job): Promise<void> {
 	jobName = job.name;
 	logger.info(`${jobName}: Running job`);
 
-	// set max execution time of 10 minutes
-	setTimeout(() => new Error(`${jobName}: Timed out`), 10 * 60 * 1000);
-
 	const allDeletedAccounts = await accountService.findDeletedAccounts();
 	for (const deletedAccount of allDeletedAccounts) {
 		// TODO Can there be a case wherein account is flagged for deletion
