@@ -21,6 +21,7 @@ export async function buildClient(
 		host,
 		port: 993,
 		secure: true,
+		disableAutoIdle: true,
 		auth: {
 			user: username,
 			pass: password
