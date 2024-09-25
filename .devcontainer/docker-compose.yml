@@ -8,6 +8,7 @@ services:
       - ..:/workspace:cached
     networks:
       - archiveium
+
   db:
     image: 'postgres:13'
     ports:
@@ -21,6 +22,7 @@ services:
       - 'db:/var/lib/postgresql/data'
     networks:
       - archiveium
+
   redis:
     image: 'redis:7.2.4-alpine'
     ports:
@@ -30,6 +32,7 @@ services:
       - 'cache:/data'
     networks:
       - archiveium
+
   minio:
     image: 'minio/minio:RELEASE.2023-12-23T07-19-11Z'
     ports:
@@ -51,6 +54,21 @@ services:
       timeout: 5s
     networks:
       - archiveium
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.9.0
+    environment:
+      - MEILI_MASTER_KEY=developmentMasterKey
+      - MEILI_ENV=development
+      - MEILI_NO_ANALYTICS=true
+    ports:
+      - 7700:7700
+    volumes:
+      - meilisearch:/meili_data
+    networks:
+      - archiveium
+
+  # Development tools
   mailpit:
     image: 'axllent/mailpit:v1.19.1'
     environment:
@@ -62,6 +80,15 @@ services:
     networks:
       - archiveium
 
+  redisinsight:
+    image: redis/redisinsight:2.52
+    ports:
+      - 5540:5540
+    volumes:
+      - redisinsight:/data
+    networks:
+      - archiveium
+
 networks:
   archiveium:
 
@@ -69,3 +96,5 @@ volumes:
   db:
   cache:
   minio:
+  meilisearch:
+  redisinsight:

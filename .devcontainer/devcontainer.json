@@ -24,7 +24,9 @@
 	},
 	"forwardPorts": [
 		3000, // for application
-		8002 // for livereload to work
+		8002, // for livereload to work
+		7700, // meilisearch
+		"redisinsight:5540" // redis insight
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "npm install",
