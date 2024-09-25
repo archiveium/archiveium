@@ -15,6 +15,9 @@ import { deleteUserQueue } from '$lib/server/jobs/queues/deleteUserQueue';
 import { ImportEmailQueue } from '$lib/server/jobs/queues/importEmailQueue';
 import config from 'config';
 import { logger } from './utils/logger';
+import { indexEmailQueue } from '$lib/server/jobs/queues/indexEmailQueue';
+import { fork } from 'node:child_process';
+import cluster from 'node:cluster';
 
 export const handle = (async ({ event, resolve }) => {
 	const sessionId = event.cookies.get('sessionId');
@@ -67,7 +70,8 @@ async function initQueues() {
 		new SyncFolderQueue(),
 		new deleteAccountQueue(),
 		new deleteUserQueue(),
-		new ImportEmailQueue()
+		new ImportEmailQueue(),
+		new indexEmailQueue(),
 	]);
 	if (!config.get<boolean>('app.useAsCronProcessor')) {
 		logger.warn('Skipping initialization of workers for queues');
@@ -84,7 +88,16 @@ if (!building) {
 	// Create admin user
 	await createAdminUser();
 	// Initialize queues
-	await initQueues();
+	if (cluster.isPrimary) {
+		logger.info(`Primary ${process.pid} is running`);
+		cluster.fork();
+		cluster.on('exit', (worker, code, signal) => {
+			logger.info(`Worker ${worker.process.pid} died`);
+		});
+	} else {
+		logger.info(`Worker ${process.pid} started`);
+		await initQueues();
+	}
 }
 
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
