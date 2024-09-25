@@ -1,4 +1,12 @@
 {
-	"cSpell.words": ["backoff", "bigserial", "bullmq", "kysely", "mailparser", "pino"],
+	"cSpell.words": [
+		"backoff",
+		"bigserial",
+		"bullmq",
+		"kysely",
+		"mailparser",
+		"meilisearch",
+		"pino"
+	],
 	"eslint.validate": ["javascript", "javascriptreact", "svelte"]
 }
