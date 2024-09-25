@@ -27,9 +27,6 @@ export async function syncAccount(job: Job): Promise<void> {
 	jobName = job.name;
 	logger.info(`${jobName}: Running job`);
 
-	// set max execution time of 10 minutes
-	setTimeout(() => new Error(`${jobName}: Timed out`), 10 * 60 * 1000);
-
 	let imapClient: ImapFlow;
 	const allSyncingAccounts = await accountService.findAllSyncingAccounts();
 	for (const syncingAccount of allSyncingAccounts) {
@@ -110,7 +107,13 @@ export async function syncAccount(job: Job): Promise<void> {
 		});
 
 		logger.info(`${jobName}: Waiting for all folders to be processed`);
-		await Promise.all(promises);
+
+		try {
+			await Promise.all(promises);
+		} catch (error) {
+			logger.error(`${jobName}: ${JSON.stringify(error)}`);
+			throw error;
+		}
 
 		logger.info(`${jobName}: Logging out`);
 		await imapClient.logout();

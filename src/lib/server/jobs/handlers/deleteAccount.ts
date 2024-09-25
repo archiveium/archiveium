@@ -10,9 +10,6 @@ export async function deleteAccount(job: Job): Promise<void> {
 	jobName = job.name;
 	logger.info(`${jobName}: Running job`);
 
-	// set max execution time of 10 minutes
-	setTimeout(() => new Error(`${jobName}: Timed out`), 10 * 60 * 1000);
-
 	const allDeletedAccounts = await accountService.findDeletedAccounts();
 	for (const deletedAccount of allDeletedAccounts) {
 		// TODO Can there be a case wherein account is flagged for deletion
@@ -27,7 +24,14 @@ export async function deleteAccount(job: Job): Promise<void> {
 			logger.info(`${jobName}: Deleting S3 objects in folder ${folder.id}`);
 			return s3Service.deleteS3Objects(`${folder.user_id}/${folder.id}`);
 		});
-		await Promise.all(promises);
+
+		try {
+			await Promise.all(promises);
+		} catch (error) {
+			logger.error(`${jobName}: ${JSON.stringify(error)}`);
+			throw error;
+		}
+
 		logger.info(`${jobName}: Finished deleting S3 objects`);
 
 		logger.info(`${jobName}: Started deleting account, folder & emails`);

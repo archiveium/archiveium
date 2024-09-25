@@ -24,12 +24,10 @@
 								{queueJob.displayName}
 							</p>
 							{#each Object.entries(queueJob.status) as [status, count]}
-								{@const failedJob = count > 0 && status === 'failed'}
 								<Badge
-									href={failedJob ? '/administration' : undefined}
 									class="mr-1"
 									rounded
-									color={failedJob ? 'red' : 'green'}
+									color={count > 0 && status === 'failed' ? 'red' : 'green'}
 								>
 									{`${status.charAt(0).toUpperCase()}${status.substring(1)}`}
 									{count}
@@ -39,7 +37,7 @@
 						<div class="inline-flex">
 							{#if failedJob}
 								<form method="post" action="/administration?/updateJob" use:enhance>
-									<input name="jobName" value={queueJob.jobName} hidden />
+									<input type="hidden" name="jobName" value={queueJob.jobName} />
 									<Button pill={true} class="!p-2" type="submit" color="light">
 										<svg
 											class="w-4 h-4"
