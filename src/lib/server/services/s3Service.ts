@@ -37,11 +37,7 @@ export async function findEmailsByFolderIdAndUserId(
 		const emailWithSource = email.has_source
 			? email
 			: await emailService.findEmailByIdAndUserId(userId, email.id);
-		const params: GetObjectCommandInput = {
-			Bucket: BUCKET_NAME,
-			Key: `${userId}/${emailWithSource.folder_id}/${emailWithSource.id}.eml`
-		};
-		const s3Data = await s3Client.send(new GetObjectCommand(params));
+		const s3Data = await getS3Data(userId, emailWithSource.folder_id, emailWithSource.id);
 		const parsedEmail = await parseEmail(await s3Data.Body?.transformToString());
 		email.s3Data = {
 			subject: parseEmailSubject(parsedEmail.subject),
@@ -66,11 +62,7 @@ export async function findEmailsByAccountIdAndUserId(
 		resultsPerPage
 	);
 	const promises = emails.map(async (email) => {
-		const params: GetObjectCommandInput = {
-			Bucket: BUCKET_NAME,
-			Key: `${userId}/${email.folder_id}/${email.id}.eml`
-		};
-		const s3Data = await s3Client.send(new GetObjectCommand(params));
+		const s3Data = await getS3Data(userId, email.folder_id, email.id);
 		const parsedEmail = await parseEmail(await s3Data.Body?.transformToString());
 		email.s3Data = {
 			subject: parseEmailSubject(parsedEmail.subject),
@@ -89,11 +81,7 @@ export async function findEmailsByUserId(
 ) {
 	const emails = await emailService.findEmailByUserId(userId, currentPage, resultsPerPage);
 	const promises = emails.map(async (email) => {
-		const params: GetObjectCommandInput = {
-			Bucket: BUCKET_NAME,
-			Key: `${userId}/${email.folder_id}/${email.id}.eml`
-		};
-		const s3Data = await s3Client.send(new GetObjectCommand(params));
+		const s3Data = await getS3Data(userId, email.folder_id, email.id);
 		const parsedEmail = await parseEmail(await s3Data.Body?.transformToString());
 		email.s3Data = {
 			subject: parseEmailSubject(parsedEmail.subject),
@@ -107,14 +95,18 @@ export async function findEmailsByUserId(
 
 export async function findEmailByIdAndUserId(userId: string, emailId: string) {
 	const email = await emailService.findEmailByIdAndUserId(userId, emailId);
-	const params: GetObjectCommandInput = {
-		Bucket: BUCKET_NAME,
-		Key: `${userId}/${email.folder_id}/${email.id}.eml`
-	};
-	const s3Data = await s3Client.send(new GetObjectCommand(params));
+	const s3Data = await getS3Data(userId, email.folder_id, email.id);
 	const parsedEmail = await parseEmail(await s3Data.Body?.transformToString());
 	const html = parsedEmail.html ? parsedEmail.html : parsedEmail.textAsHtml ?? '';
 	return { ...email, html };
+}
+
+export async function getS3Data(userId: string, folderId: string, emailId: string) {
+	const params: GetObjectCommandInput = {
+		Bucket: BUCKET_NAME,
+		Key: `${userId}/${folderId}/${emailId}.eml`
+	};
+	return s3Client.send(new GetObjectCommand(params));
 }
 
 export async function deleteS3Objects(prefix: string): Promise<void> {
