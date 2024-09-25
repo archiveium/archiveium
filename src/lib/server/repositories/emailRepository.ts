@@ -161,3 +161,34 @@ export async function insertEmail(email: EmailInsert, trx?: Transaction<DB>) {
 	const dbObject = trx ?? db;
 	return dbObject.insertInto('emails').values(email).returningAll().executeTakeFirstOrThrow();
 }
+
+export async function updateIndexingStatus(emailIds: string[], options: { indexed: boolean, indexerProcessing: boolean}) {
+	return db
+		.updateTable('emails')
+		.where('id', 'in', emailIds)
+		.set({
+			'indexed': options.indexed,
+			'indexer_processing': options.indexerProcessing,
+		})
+		.executeTakeFirstOrThrow();
+}
+
+export async function updateIndexerProcessing(indexerProcessing: boolean, limit: number) {
+	return db.with('locked_emails', (db) => db.updateTable('emails')
+		.set('indexer_processing', indexerProcessing)
+		.where('id', 'in', db.selectFrom('emails')
+			.select('id')
+			.where('indexer_processing', '=', !indexerProcessing)
+			.where('indexed', '=', false)
+			.orderBy('id', 'asc')
+			.limit(limit)
+			.forUpdate()
+			.skipLocked()
+		)
+		.returning(['id', 'account_id', 'user_id'])
+	)
+	.selectFrom('locked_emails')
+	.innerJoin('email_folders', 'email_folders.email_id', 'locked_emails.id')
+	.select(['locked_emails.id', 'locked_emails.account_id', 'locked_emails.user_id', 'folder_id'])
+	.execute();
+}

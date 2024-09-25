@@ -65,6 +65,14 @@ export async function findFailedEmailCountByUserId(userId: string): Promise<numb
 	return emailRepository.findFailedEmailCountByUserId(userId);
 }
 
+export async function updateIndexerProcessing(indexerProcessing: boolean, limit: number) {
+	return emailRepository.updateIndexerProcessing(indexerProcessing, limit);
+}
+
+export async function updateIndexingStatus(emailIds: string[], options: { indexed: boolean, indexerProcessing: boolean}) {
+	return emailRepository.updateIndexingStatus(emailIds, options);
+}
+
 export async function findEmailByEmailId(emailId: string, folderId: string) {
 	const emails = await emailRepository.findEmailByEmailId(emailId);
 
