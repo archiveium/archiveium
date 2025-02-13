@@ -2,7 +2,7 @@ import type { Job, Worker } from 'bullmq';
 import { InvalidQueueException } from '../../../exceptions/scheduler';
 import { logger } from '../../../utils/logger';
 import { redis } from '../redis/connection';
-import type { BaseQueue } from './queues/baseQueue';
+import type { BaseQueue } from './queues/BaseQueue';
 import type { Redis } from 'ioredis';
 import type { JobCount } from '../../../types/scheduler';
 import _ from 'lodash';
