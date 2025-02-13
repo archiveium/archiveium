@@ -1,6 +1,6 @@
-import type { JobsOptions, Processor } from 'bullmq';
-import { BaseQueue } from './baseQueue';
-import { importEmail } from '$lib/server/jobs/handlers/importEmail';
+import type { Job, JobsOptions, Processor } from 'bullmq';
+import { BaseQueue } from './BaseQueue';
+import { ImportEmailHandler } from '$lib/server/jobs/handlers/ImportEmailHandler';
 
 export class ImportEmailQueue extends BaseQueue {
 	static name = 'ImportEmail';
@@ -15,7 +15,10 @@ export class ImportEmailQueue extends BaseQueue {
 	}
 
 	getProcessor(): Processor {
-		return importEmail;
+		return async function (job: Job) {
+			const handler = new ImportEmailHandler(job);
+			await handler.execute();
+		};
 	}
 
 	getJobOptions(): JobsOptions {
