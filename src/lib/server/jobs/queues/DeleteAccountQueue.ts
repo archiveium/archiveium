@@ -2,7 +2,7 @@ import type { Job, Processor } from 'bullmq';
 import { BaseQueue } from './BaseQueue';
 import { DeleteAccountHandler } from '../handlers/DeleteAccountHandler';
 
-export class deleteAccountQueue extends BaseQueue {
+export class DeleteAccountQueue extends BaseQueue {
 	private name = 'DeleteAccount';
 	private jobName = 'deleteAccount';
 
