@@ -3,7 +3,7 @@
 	"version": "0.0.28-beta.3",
 	"private": true,
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --host",
 		"build": "svelte-kit sync && vite build",
 		"preview": "vite preview",
 		"test": "playwright test",
@@ -11,6 +11,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test:unit": "vitest run",
 		"test:unit:monitor": "vitest",
+		"populate:fake-email-data": "vite-node scripts/populateFakeEmailData.ts",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write .",
 		"release:prod": "release-it --ci --config release-it.json",
@@ -37,8 +38,8 @@
 		"lodash": "4.17.21",
 		"luxon": "3.4.4",
 		"mailparser": "3.7.1",
-		"nodemailer": "6.9.15",
 		"meilisearch": "^0.41.0",
+		"nodemailer": "6.9.15",
 		"p-limit": "4.0.0",
 		"pg": "8.12.0",
 		"pino": "8.21.0",
@@ -47,6 +48,7 @@
 		"zod": "3.23.8"
 	},
 	"devDependencies": {
+		"@faker-js/faker": "^9.0.3",
 		"@playwright/test": "1.45.2",
 		"@release-it/bumper": "6.0.1",
 		"@sveltejs/adapter-auto": "2.1.1",
