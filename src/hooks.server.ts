@@ -5,19 +5,17 @@ import { runMigrations } from '$lib/server/database/migration';
 import { createAdminUser, seedDatabase } from '$lib/server/database/seed';
 import { building } from '$app/environment';
 import { scheduler } from '$lib/server/jobs';
-import { UserInvitationQueue } from '$lib/server/jobs/queues/userInvitationQueue';
-import { PasswordResetQueue } from '$lib/server/jobs/queues/passwordResetQueue';
-import { EmailVerificationQueue } from '$lib/server/jobs/queues/emailVerificationQueue';
-import { SyncAccountQueue } from '$lib/server/jobs/queues/syncAccountQueue';
-import { SyncFolderQueue } from '$lib/server/jobs/queues/syncFolder';
-import { deleteAccountQueue } from '$lib/server/jobs/queues/deleteAccountQueue';
-import { deleteUserQueue } from '$lib/server/jobs/queues/deleteUserQueue';
-import { ImportEmailQueue } from '$lib/server/jobs/queues/importEmailQueue';
+import { UserInvitationQueue } from '$lib/server/jobs/queues/UserInvitationQueue';
+import { PasswordResetQueue } from '$lib/server/jobs/queues/PasswordResetQueue';
+import { EmailVerificationQueue } from '$lib/server/jobs/queues/EmailVerificationQueue';
+import { SyncAccountQueue } from '$lib/server/jobs/queues/SyncAccountQueue';
+import { SyncFolderQueue } from '$lib/server/jobs/queues/SyncFolderQueue';
+import { DeleteAccountQueue } from '$lib/server/jobs/queues/DeleteAccountQueue';
+import { DeleteUserQueue } from '$lib/server/jobs/queues/DeleteUserQueue';
 import config from 'config';
 import { logger } from './utils/logger';
-import { indexEmailQueue } from '$lib/server/jobs/queues/indexEmailQueue';
-import { fork } from 'node:child_process';
-import cluster from 'node:cluster';
+import { ImportEmailQueue } from '$lib/server/jobs/queues/ImportEmailQueue';
+import { IndexEmailQueue } from '$lib/server/jobs/queues/IndexEmailQueue';
 
 export const handle = (async ({ event, resolve }) => {
 	const sessionId = event.cookies.get('sessionId');
@@ -68,10 +66,10 @@ async function initQueues() {
 		new EmailVerificationQueue(),
 		new SyncAccountQueue(),
 		new SyncFolderQueue(),
-		new deleteAccountQueue(),
-		new deleteUserQueue(),
+		new DeleteAccountQueue(),
+		new DeleteUserQueue(),
 		new ImportEmailQueue(),
-		new indexEmailQueue(),
+		new IndexEmailQueue(),
 	]);
 	if (!config.get<boolean>('app.useAsCronProcessor')) {
 		logger.warn('Skipping initialization of workers for queues');
@@ -88,16 +86,7 @@ if (!building) {
 	// Create admin user
 	await createAdminUser();
 	// Initialize queues
-	if (cluster.isPrimary) {
-		logger.info(`Primary ${process.pid} is running`);
-		cluster.fork();
-		cluster.on('exit', (worker, code, signal) => {
-			logger.info(`Worker ${worker.process.pid} died`);
-		});
-	} else {
-		logger.info(`Worker ${process.pid} started`);
-		await initQueues();
-	}
+	await initQueues();
 }
 
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
