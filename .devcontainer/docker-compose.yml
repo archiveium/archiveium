@@ -82,10 +82,19 @@ services:
 
   redisinsight:
     image: redis/redisinsight:2.52
-    ports:
-      - 5540:5540
+    # ports:
+    #   - 5540:5540
     volumes:
       - redisinsight:/data
+    networks:
+      - archiveium
+
+  smtp4dev:
+    image: rnwood/smtp4dev:3.6.1
+    # ports:
+    #   - 5340:80
+    volumes:
+      - smtp4dev:/smtp4dev
     networks:
       - archiveium
 
@@ -98,3 +107,4 @@ volumes:
   minio:
   meilisearch:
   redisinsight:
+  smtp4dev:
