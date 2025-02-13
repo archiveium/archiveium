@@ -26,7 +26,8 @@
 		3000, // for application
 		8002, // for livereload to work
 		7700, // meilisearch
-		"redisinsight:5540" // redis insight
+		"redisinsight:5540", // redis insight
+		"smtp4dev:80" // smtp4dev
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "npm install",
