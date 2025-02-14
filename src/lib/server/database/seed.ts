@@ -10,7 +10,7 @@ const providers: Array<ProviderInsert> = [
 		name: 'gmail',
 		host: 'imap.gmail.com',
 		port: 993,
-		secure: true,
+		secure: !(config.util.getEnv('NODE_ENV').toString() === 'development'),
 		is_default: true,
 		check_email_id: true
 	},
@@ -31,6 +31,17 @@ const providers: Array<ProviderInsert> = [
 		check_email_id: false
 	}
 ];
+
+if (config.util.getEnv('NODE_ENV').toString() === 'development') {
+	providers.push({
+		name: 'smtp4dev',
+		host: 'smtp4dev',
+		port: 143,
+		secure: false,
+		is_default: true,
+		check_email_id: true,
+	});
+}
 
 export async function seedDatabase() {
 	try {

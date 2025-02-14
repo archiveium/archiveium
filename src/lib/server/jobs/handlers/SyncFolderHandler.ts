@@ -37,11 +37,13 @@ export class SyncFolderHandler extends BaseHandler {
         let imapClient: ImapFlow;
         const decryptedPassword = decrypt(account.password);
         try {
-            imapClient = await imapService.buildClient(
-                account.email,
-                decryptedPassword,
-                account.provider_host
-            );
+            imapClient = await imapService.buildClient({
+                username: account.email,
+                password: decryptedPassword,
+                host: account.provider_host,
+                port: account.provider_port,
+                secure: account.provider_secure,
+            });
         } catch (error) {
             if (error instanceof IMAPTooManyRequestsException) {
                 logger.warn(

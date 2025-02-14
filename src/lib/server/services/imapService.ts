@@ -10,21 +10,23 @@ import type { ImapEmail, ImapFolderStatus, MessageNumber } from '../../../types/
 import { logger } from '../../../utils/logger';
 import type { Folder } from '../../../types/folder';
 
-export async function buildClient(
+export async function buildClient(imapConfig: {
 	username: string,
 	password: string,
-	host: string
-): Promise<ImapFlow.ImapFlow> {
+	host: string,
+	port: number,
+	secure: boolean,
+}): Promise<ImapFlow.ImapFlow> {
 	const client = new ImapFlow.ImapFlow({
 		emitLogs: true,
 		logger: false,
-		host,
-		port: 993,
-		secure: true,
+		host: imapConfig.host,
+		port: imapConfig.port,
+		secure: imapConfig.secure,
 		disableAutoIdle: true,
 		auth: {
-			user: username,
-			pass: password
+			user: imapConfig.username,
+			pass: imapConfig.password
 		}
 	});
 

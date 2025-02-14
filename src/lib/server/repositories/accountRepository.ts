@@ -61,7 +61,9 @@ export async function findAccountWithProviderByUserIdAndAccountId(
 			'a.deleted',
 			'a.syncing',
 			'p.host as provider_host',
-			'p.check_email_id as provider_check_email_id'
+			'p.check_email_id as provider_check_email_id',
+			'p.port as provider_port',
+			'p.secure as provider_secure',
 		])
 		.where('a.user_id', '=', userId)
 		.where('a.id', '=', accountId)
@@ -88,7 +90,9 @@ export async function findAllSyncingAccounts() {
 			'a.password',
 			'a.user_id',
 			'p.host as provider_host',
-			'p.name as provider_name'
+			'p.name as provider_name',
+			'p.port as provider_port',
+			'p.secure as provider_secure'
 		])
 		.where('a.deleted', '=', false)
 		.where('a.syncing', '=', true)

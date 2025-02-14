@@ -30,11 +30,13 @@ export class SyncAccountHandler extends BaseHandler {
             const decryptedPassword = decrypt(syncingAccount.password);
             try {
                 logger.info(`${this.jobName}: Logging in`);
-                imapClient = await buildClient(
-                    syncingAccount.email,
-                    decryptedPassword,
-                    syncingAccount.provider_host
-                );
+                imapClient = await buildClient({
+                    username: syncingAccount.email,
+                    password: decryptedPassword,
+                    host: syncingAccount.provider_host,
+                    port: syncingAccount.provider_port,
+                    secure: syncingAccount.provider_secure,
+                });
                 logger.info(`${this.jobName}: Logged in`);
             } catch (error) {
                 if (error instanceof IMAPTooManyRequestsException) {

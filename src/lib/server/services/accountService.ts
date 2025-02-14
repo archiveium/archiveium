@@ -126,7 +126,13 @@ export async function validateExistingAccount(
 		validatedData.password && validatedData.password != ''
 			? validatedData.password
 			: account.password;
-	const imapClient = await imapService.buildClient(account.email, updatedPassword, provider.host);
+	const imapClient = await imapService.buildClient({
+		username: account.email,
+		password: updatedPassword,
+		host: provider.host,
+		port: provider.port,
+		secure: provider.secure,
+	});
 	const remoteFolders = await imapService.getAllIMAPFolders(imapClient);
 	const selectedFolders = await folderService.findFoldersWithDeletedFilterByAccountIdAndUserId(
 		userId,
@@ -170,11 +176,13 @@ export async function validateAccount(data: FormData, userId: string): Promise<V
 	await isAccountUnique(validatedData.email, userId);
 
 	const provider = await providerService.findProviderById(validatedData.provider_id);
-	const imapClient = await imapService.buildClient(
-		validatedData.email,
-		validatedData.password,
-		provider.host
-	);
+	const imapClient = await imapService.buildClient({
+		username: validatedData.email,
+		password: validatedData.password,
+		host: provider.host,
+		port: provider.port,
+		secure: provider.secure
+	});
 	const remoteFolders = await imapService.getAllIMAPFolders(imapClient);
 
 	const validatedProvider = {
