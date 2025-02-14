@@ -20,6 +20,8 @@ export interface SyncingAccount {
 	user_id: string;
 	provider_name: string;
 	provider_host: string;
+	provider_port: number;
+	provider_secure: boolean;
 }
 
 export interface NewAccount {

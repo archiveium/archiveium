@@ -47,11 +47,13 @@ export class ImportEmailHandler extends BaseHandler {
             }
     
             const decryptedPassword = decrypt(account.password);
-            const imapClient = await imapService.buildClient(
-                account.email,
-                decryptedPassword,
-                account.provider_host
-            );
+            const imapClient = await imapService.buildClient({
+                username: account.email,
+                password: decryptedPassword,
+                host: account.provider_host,
+                port: account.provider_port,
+                secure: account.provider_secure,
+            });
     
             // TODO Pass startSeq and endSeq from scheduler
             const startSeq = _.first(jobData.messageNumbers)?.uid;
