@@ -11,8 +11,6 @@ export class IndexEmailHandler extends BaseHandler {
     private readonly EMAIL_PROCESS_LIMIT = 20;
 
     async handle(): Promise<void> {
-        // TODO on account delete, delete index
-
         const emailsWithSource = await this.getEmailsWithSource();
         if (emailsWithSource.length === 0) {
             logger.info(`${this.jobName}: Found no emails to process.`);
