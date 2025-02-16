@@ -63,7 +63,7 @@ export async function findAccountWithProviderByUserIdAndAccountId(
 			'p.host as provider_host',
 			'p.check_email_id as provider_check_email_id',
 			'p.port as provider_port',
-			'p.secure as provider_secure',
+			'p.secure as provider_secure'
 		])
 		.where('a.user_id', '=', userId)
 		.where('a.id', '=', accountId)

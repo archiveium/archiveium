@@ -16,6 +16,7 @@ services:
       APP_ENCRYPTION_KEY: <KEY>       # Key used for encrypting email account passwords
                                       # changing this key will invalidate all added accounts
                                       # and they'll have to reauthorized again
+      SEARCH_API_KEY: '$MEILI_MASTER_KEY'
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/login"]
       interval: 30s
@@ -29,6 +30,7 @@ services:
       - db
       - redis
       - minio
+      - meilisearch
     # Enable if running behind Traefik
     # labels:
     #   - "traefik.enable=true"
@@ -46,9 +48,10 @@ services:
       TZ: 'America/Toronto'       # Change timezone as needed
       NODE_APP_INSTANCE: 0
       USE_AS_CRON_PROCESSOR: true # Needed to run container as cron job processor
-      APP_ENCRYPTION_KEY: <KEY>       # Key used for encrypting email account passwords
-                                      # changing this key will invalidate all added accounts
-                                      # and they'll have to reauthorized again
+      APP_ENCRYPTION_KEY: <KEY>   # Key used for encrypting email account passwords
+                                  # changing this key will invalidate all added accounts
+                                  # and they'll have to reauthorized again
+      SEARCH_API_KEY: '$MEILI_MASTER_KEY'
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/login"]
       interval: 30s
@@ -60,6 +63,7 @@ services:
       - app
       - db
       - minio
+      - meilisearch
 
   db:
     image: postgres:13
@@ -117,10 +121,24 @@ services:
     networks:
       - archiveium
 
+  meilisearch:
+    image: getmeili/meilisearch:v1.9.0
+    environment:
+      - MEILI_MASTER_KEY='$MEILI_MASTER_KEY'
+      - MEILI_ENV=production
+      - MEILI_NO_ANALYTICS=true
+    ports:
+      - 7700:7700
+    volumes:
+      - meilisearch_data:/meili_data
+    networks:
+      - archiveium
+
 volumes:
   db_data:
   minio_data:
   redis_data:
+  meilisearch_data:
 
 networks:
   archiveium:

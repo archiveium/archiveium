@@ -7,5 +7,10 @@
 		"adminEmail": "APP_ADMIN_EMAIL",
 		"adminPassword": "APP_ADMIN_PASSWORD",
 		"encryptionKey": "APP_ENCRYPTION_KEY"
+	},
+	"search": {
+		"host": "SEARCH_HOST",
+		"port": "SEARCH_PORT",
+		"apiKey": "SEARCH_API_KEY"
 	}
 }
