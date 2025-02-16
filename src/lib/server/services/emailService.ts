@@ -69,7 +69,10 @@ export async function updateIndexerProcessing(indexerProcessing: boolean, limit:
 	return emailRepository.updateIndexerProcessing(indexerProcessing, limit);
 }
 
-export async function updateIndexingStatus(emailIds: string[], options: { indexed: boolean, indexerProcessing: boolean}) {
+export async function updateIndexingStatus(
+	emailIds: string[],
+	options: { indexed: boolean; indexerProcessing: boolean }
+) {
 	return emailRepository.updateIndexingStatus(emailIds, options);
 }
 

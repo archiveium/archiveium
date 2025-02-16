@@ -131,7 +131,7 @@ export async function validateExistingAccount(
 		password: updatedPassword,
 		host: provider.host,
 		port: provider.port,
-		secure: provider.secure,
+		secure: provider.secure
 	});
 	const remoteFolders = await imapService.getAllIMAPFolders(imapClient);
 	const selectedFolders = await folderService.findFoldersWithDeletedFilterByAccountIdAndUserId(

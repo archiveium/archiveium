@@ -40,7 +40,7 @@ export abstract class BaseQueue {
 
 	startWorker(redis: Redis): Worker {
 		return new Worker(this.getName(), this.getProcessor(), {
-			connection: redis.options,
+			connection: redis.options
 		});
 	}
 

@@ -39,7 +39,7 @@ if (config.util.getEnv('NODE_ENV').toString() === 'development') {
 		port: 143,
 		secure: false,
 		is_default: true,
-		check_email_id: true,
+		check_email_id: true
 	});
 }
 
