@@ -1,30 +1,23 @@
-import { BaseHandler } from "./BaseHandler";
+import { BaseHandler } from './BaseHandler';
 import * as accountService from '../../services/accountService';
 import * as folderService from '../../services/folderService';
 import * as s3Service from '../../services/s3Service';
-import { logger } from "../../../../utils/logger";
-import { meilisearch } from "$lib/server/search/connection";
+import { logger } from '../../../../utils/logger';
+import { searchService } from '$lib/server/services/searchService';
 // import timersPromises from "node:timers/promises";
 
 export class DeleteAccountHandler extends BaseHandler {
-    async handle(): Promise<void> {
-		const index = meilisearch.index('emails');
+	async handle(): Promise<void> {
 		const allDeletedAccounts = await accountService.findDeletedAccounts();
 		for (const deletedAccount of allDeletedAccounts) {
 			logger.info(`${this.jobName}: Started deleting indexed documents`);
 
 			let estimatedTotalHits = 0;
 			do {
-				const enqueuedTask = await index.deleteDocuments({
+				await searchService.deleteDocuments({
 					filter: `userId = ${deletedAccount.user_id} AND accountId = ${deletedAccount.id}`
 				});
-				const task = await index.waitForTask(enqueuedTask.taskUid, {
-					timeOutMs: 10 * 1000, // 10 seconds
-					intervalMs: 100 // time to wait before checking status of task 
-				});
-				logger.info(`${this.jobName}: Completed task info ${JSON.stringify(task)}`);
-
-				const searchRes = await index.search('', {
+				const searchRes = await searchService.search('', {
 					limit: 0,
 					filter: `userId = ${deletedAccount.user_id} AND accountId = ${deletedAccount.id}`
 				});
@@ -58,6 +51,6 @@ export class DeleteAccountHandler extends BaseHandler {
 			await accountService.deleteAccount(deletedAccount.id);
 			logger.info(`${this.jobName}: Finished deleting account, folder & emails`);
 		}
-        // await timersPromises.setTimeout(2000, null);
-    }
+		// await timersPromises.setTimeout(2000, null);
+	}
 }

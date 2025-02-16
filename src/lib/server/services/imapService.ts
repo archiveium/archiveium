@@ -11,11 +11,11 @@ import { logger } from '../../../utils/logger';
 import type { Folder } from '../../../types/folder';
 
 export async function buildClient(imapConfig: {
-	username: string,
-	password: string,
-	host: string,
-	port: number,
-	secure: boolean,
+	username: string;
+	password: string;
+	host: string;
+	port: number;
+	secure: boolean;
 }): Promise<ImapFlow.ImapFlow> {
 	const client = new ImapFlow.ImapFlow({
 		emitLogs: true,

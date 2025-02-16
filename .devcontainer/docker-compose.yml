@@ -58,7 +58,7 @@ services:
   meilisearch:
     image: getmeili/meilisearch:v1.9.0
     environment:
-      - MEILI_MASTER_KEY=developmentMasterKey
+      - MEILI_MASTER_KEY=meilisearch-api-key
       - MEILI_ENV=development
       - MEILI_NO_ANALYTICS=true
     ports:
