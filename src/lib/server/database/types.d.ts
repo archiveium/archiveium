@@ -42,8 +42,8 @@ export interface Emails {
 	size_total: Int8;
 	size_without_attachments: Int8;
 	created_at: Generated<Timestamp | null>;
-  indexed: Generated<boolean | null>;
-  indexer_processing: Generated<boolean | null>;
+	indexed: Generated<boolean | null>;
+	indexer_processing: Generated<boolean | null>;
 }
 
 export interface Folders {

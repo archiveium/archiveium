@@ -31,6 +31,7 @@ In order to deploy the above mentioned components, follow the steps mentioned be
    - `$DB_USERNAME`
    - `$MINIO_USER`
    - `$MINIO_PASSWORD`
+   - `$MEILI_MASTER_KEY` (should be of at least 16 bytes)
 1. Create admin user by updating `docker-compose.yml` and setting following environment variables,
 
    - `APP_ADMIN_EMAIL`
