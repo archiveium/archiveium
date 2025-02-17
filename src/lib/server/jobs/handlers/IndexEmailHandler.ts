@@ -24,6 +24,7 @@ export class IndexEmailHandler extends BaseHandler {
 			accountId: string;
 			folderId: string;
 			userId: string;
+			textBody: string;
 			subject?: string;
 		}[] = [];
 		parsedEmails.map((parsedEmail) => {
@@ -33,7 +34,8 @@ export class IndexEmailHandler extends BaseHandler {
 				accountId: parsedEmail.account_id,
 				folderId: parsedEmail.folder_id,
 				userId: parsedEmail.user_id,
-				subject: parsedEmail.parsedEmail.subject
+				subject: parsedEmail.parsedEmail.subject,
+				textBody: parsedEmail.parsedEmail.text ? parsedEmail.parsedEmail.text : ''
 			});
 		});
 
