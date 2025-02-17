@@ -122,7 +122,7 @@ services:
       - archiveium
 
   meilisearch:
-    image: getmeili/meilisearch:v1.9.0
+    image: getmeili/meilisearch:v1.13.0
     environment:
       - MEILI_MASTER_KEY='$MEILI_MASTER_KEY'
       - MEILI_ENV=production
