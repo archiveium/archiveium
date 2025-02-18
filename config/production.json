@@ -1,0 +1,50 @@
+{
+	"app": {
+		"name": "Archiveium",
+		"url": "",
+		"logLevel": "info",
+		"useAsCronProcessor": false,
+		"adminEmail": "",
+		"adminPassword": "",
+		"encryptionKey": ""
+	},
+	"database": {
+		"user": "",
+		"password": "",
+		"host": "",
+		"port": 5432,
+		"database": "",
+		"max": 10
+	},
+	"redis": {
+		"host": "redis",
+		"port": 6379
+	},
+	"search": {
+		"host": "meilisearch",
+		"port": 7700,
+		"apiKey": "meilisearch-api-key"
+	},
+	"s3": {
+		"endpoint": "http://s3:9000",
+		"region": "us-east-1",
+		"credentials": {
+			"accessKeyId": "",
+			"secretAccessKey": ""
+		},
+		"forcePathStyle": true
+	},
+	"session": {
+		"secrets": [""]
+	},
+	"mail": {
+		"host": "",
+		"port": 587,
+		"secure": false,
+		"auth": {
+			"user": "",
+			"pass": ""
+		},
+		"fromAddress": ""
+	}
+}
