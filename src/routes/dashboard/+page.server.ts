@@ -1,6 +1,7 @@
 import { findAccountsCountByUserId } from '$lib/server/repositories/accountRepository';
 import * as accountService from '$lib/server/services/accountService';
 import * as emailService from '$lib/server/services/emailService';
+import { searchService } from '$lib/server/services/searchService';
 import { requireUserId } from '../../utils/auth';
 
 // TODO Save this in database
@@ -17,6 +18,7 @@ export const load = ({ locals }) => {
 			},
 			emails: {
 				processed: emailService.findEmailCountByUserId(userId),
+				indexed: searchService.count(`userId = ${userId}`),
 				failure: emailService.findFailedEmailCountByUserId(userId),
 				quota: EMAIL_QUOTA
 			}
