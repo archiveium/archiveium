@@ -39,15 +39,15 @@ export class IndexEmailHandler extends BaseHandler {
 			});
 		});
 
-        try {
-            await searchService.addDocuments(documentsToIndex);
-        } catch (error) {
+		try {
+			await searchService.addDocuments(documentsToIndex);
+		} catch (error) {
 			await emailService.updateIndexingStatus(emailIds, {
 				indexed: false,
 				indexerProcessing: false
 			});
-            throw error;
-        }
+			throw error;
+		}
 
 		logger.info(`${this.jobName}: Email Ids to process ${JSON.stringify(emailIds)}`);
 		await emailService.updateIndexingStatus(emailIds, { indexed: true, indexerProcessing: false });

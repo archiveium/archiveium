@@ -3,6 +3,7 @@ import { logger } from '../../../utils/logger';
 import MeiliSearch, {
 	DocumentOptions,
 	DocumentsDeletionQuery,
+	Filter,
 	Index,
 	MeiliSearchApiError,
 	SearchParams,
@@ -63,6 +64,11 @@ class SearchService {
 	public async deleteDocuments(params: DocumentsDeletionQuery): Promise<void> {
 		const enqueuedTask = await this.meilisearchIndex.deleteDocuments(params);
 		await this.waitForTaskCompletion(enqueuedTask.taskUid);
+	}
+
+	public async count(filter: Filter): Promise<number> {
+		const res = await this.search('', { limit: 0, filter });
+		return res.estimatedTotalHits;
 	}
 
 	public async search(
