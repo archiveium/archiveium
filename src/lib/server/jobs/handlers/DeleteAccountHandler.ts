@@ -4,26 +4,28 @@ import * as folderService from '../../services/folderService';
 import * as s3Service from '../../services/s3Service';
 import { logger } from '../../../../utils/logger';
 import { searchService } from '$lib/server/services/searchService';
-// import timersPromises from "node:timers/promises";
+import timersPromises from 'node:timers/promises';
 
 export class DeleteAccountHandler extends BaseHandler {
 	async handle(): Promise<void> {
 		const allDeletedAccounts = await accountService.findDeletedAccounts();
 		for (const deletedAccount of allDeletedAccounts) {
-			logger.info(`${this.jobName}: Started deleting indexed documents`);
-
 			let estimatedTotalHits = 0;
 			do {
+				logger.info(`${this.jobName}: Deleting indexed documents`);
 				await searchService.deleteDocuments({
 					filter: `userId = ${deletedAccount.user_id} AND accountId = ${deletedAccount.id}`
 				});
-				const searchRes = await searchService.search('', {
-					limit: 0,
-					filter: `userId = ${deletedAccount.user_id} AND accountId = ${deletedAccount.id}`
-				});
-				estimatedTotalHits = searchRes.estimatedTotalHits;
+				logger.info(`${this.jobName}: Finished deleting indexed documents`);
+
+				// wait before checking count
+				// this allows any on-going IndexEmail job to finish running
+				await timersPromises.setTimeout(5 * 1000);
+				estimatedTotalHits = await searchService.count(
+					`userId = ${deletedAccount.user_id} AND accountId = ${deletedAccount.id}`
+				);
+				logger.info(`${this.jobName}: Found additional ${estimatedTotalHits} indexed documents`);
 			} while (estimatedTotalHits > 0);
-			logger.info(`${this.jobName}: Finished deleting indexed documents`);
 
 			// TODO Can there be a case wherein account is flagged for deletion
 			// folders are flagged as well but new one's still get added?
@@ -51,6 +53,5 @@ export class DeleteAccountHandler extends BaseHandler {
 			await accountService.deleteAccount(deletedAccount.id);
 			logger.info(`${this.jobName}: Finished deleting account, folder & emails`);
 		}
-		// await timersPromises.setTimeout(2000, null);
 	}
 }
