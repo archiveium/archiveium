@@ -1,6 +1,6 @@
 {
 	"name": "archiveium",
-	"version": "0.0.28-beta.3",
+	"version": "0.0.28-beta.4",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev --host",
