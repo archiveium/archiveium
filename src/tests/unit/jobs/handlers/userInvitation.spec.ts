@@ -1,4 +1,4 @@
-import { userInvitation } from '$lib/server/jobs/handlers/userInvitation';
+import { UserInvitationHandler } from '$lib/server/jobs/handlers/UserInvitationHandler';
 import * as registrationService from '$lib/server/services/registrationService';
 import * as userInvitationService from '$lib/server/services/userInvitiationService';
 import { expect, describe, it, vi, afterEach } from 'vitest';
@@ -36,7 +36,8 @@ describe('userInvitation', () => {
 		// act
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		await userInvitation({ name: 'some-job' });
+		const handler = new UserInvitationHandler({ name: 'some-job' });
+		await handler.execute();
 
 		// assert
 		expect(registrationServiceSpy).not.toHaveBeenCalled();
@@ -53,7 +54,8 @@ describe('userInvitation', () => {
 		// act
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		await userInvitation({ name: 'some-job' });
+		const handler = new UserInvitationHandler({ name: 'some-job' });
+		await handler.execute();
 
 		// assert
 		expect(registrationServiceSpy).toHaveBeenCalledWith(invitedUser.username);
