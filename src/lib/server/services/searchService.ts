@@ -1,15 +1,17 @@
 import config from 'config';
 import { logger } from '../../../utils/logger';
-import MeiliSearch, {
+import {
 	DocumentOptions,
 	DocumentsDeletionQuery,
 	Filter,
 	Index,
+	MeiliSearch,
 	MeiliSearchApiError,
 	SearchParams,
 	SearchResponse
 } from 'meilisearch';
 import { SearchTaskTimedOutException, SearchUnhealthyException } from '../../../exceptions/search';
+import { building } from '$app/environment';
 
 type SearchServiceConfig = {
 	host: string;
@@ -90,7 +92,7 @@ class SearchService {
 		try {
 			await this.meilisearch.index(this.INDEX_NAME).getRawInfo();
 		} catch (error) {
-			if (error instanceof MeiliSearchApiError && error.httpStatus === 404) {
+			if (error instanceof MeiliSearchApiError) {
 				return false;
 			}
 			logger.error(`[SearchService] MeiliSearch ${JSON.stringify(error)}`);
@@ -118,7 +120,9 @@ const searchService = new SearchService({
 	apiKey: config.get<string>('search.apiKey')
 });
 
-await searchService.checkHealth();
-await searchService.createIndex();
+if (!building) {
+	await searchService.checkHealth();
+	await searchService.createIndex();
+}
 
 export { searchService };
