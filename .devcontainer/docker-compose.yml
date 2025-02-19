@@ -2,7 +2,7 @@ version: '2'
 
 services:
   archiveium:
-    image: 'node:18.19.1'
+    image: 'node:18.20.6'
     command: sleep infinity
     volumes:
       - ..:/workspace:cached
