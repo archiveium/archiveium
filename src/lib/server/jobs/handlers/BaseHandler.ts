@@ -26,7 +26,7 @@ export abstract class BaseHandler {
 		const timer = setTimeout(() => {
 			logger.info(`${this.jobName}: Aborting operation due to timeout`);
 			controller.abort();
-		}, 120 * 1000); // 120 seconds
+		}, 5 * 60 * 1000); // 5 minutes
 
 		try {
 			await Promise.race([
