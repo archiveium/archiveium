@@ -6,6 +6,8 @@ import { parseEmail } from '../../../../utils/emailHelper';
 import { GetObjectCommandOutput } from '@aws-sdk/client-s3';
 import { searchService } from '$lib/server/services/searchService';
 
+// TODO Handle IndexEmail jobs that get stuck if indexer_processing=true
+// but the job fails. Currently the job doesn't pick it up in next run.
 export class IndexEmailHandler extends BaseHandler {
 	private readonly EMAIL_PROCESS_LIMIT = 20;
 
@@ -29,14 +31,16 @@ export class IndexEmailHandler extends BaseHandler {
 		}[] = [];
 		parsedEmails.map((parsedEmail) => {
 			emailIds.push(parsedEmail.id);
-			documentsToIndex.push({
-				id: parsedEmail.id,
-				accountId: parsedEmail.account_id,
-				folderId: parsedEmail.folder_id,
-				userId: parsedEmail.user_id,
-				subject: parsedEmail.parsedEmail.subject,
-				textBody: parsedEmail.parsedEmail.text ? parsedEmail.parsedEmail.text : ''
-			});
+			if (parsedEmail.parsedEmail) {
+				documentsToIndex.push({
+					id: parsedEmail.id,
+					accountId: parsedEmail.account_id,
+					folderId: parsedEmail.folder_id,
+					userId: parsedEmail.user_id,
+					subject: parsedEmail.parsedEmail.subject,
+					textBody: parsedEmail.parsedEmail.text ? parsedEmail.parsedEmail.text : ''
+				});
+			}
 		});
 
 		try {
@@ -59,18 +63,22 @@ export class IndexEmailHandler extends BaseHandler {
 			account_id: string;
 			folder_id: string;
 			user_id: string;
-			sourceData: GetObjectCommandOutput;
+			sourceData: GetObjectCommandOutput | undefined;
 		}[]
 	) {
 		const promises = emailsWithSource.map(async (emailWithSource) => {
-			const stringSource = await emailWithSource.sourceData.Body?.transformToString();
-			const parsedEmail = await parseEmail(stringSource);
+			let parsedEmail;
+			if (emailWithSource.sourceData) {
+				const stringSource = await emailWithSource.sourceData.Body?.transformToString();
+				parsedEmail = await parseEmail(stringSource);
+			}
+
 			return {
 				id: emailWithSource.id,
 				account_id: emailWithSource.account_id,
 				folder_id: emailWithSource.folder_id,
 				user_id: emailWithSource.user_id,
-				parsedEmail
+				parsedEmail: parsedEmail ?? undefined
 			};
 		});
 
@@ -87,13 +95,16 @@ export class IndexEmailHandler extends BaseHandler {
 		const emails = await emailService.updateIndexerProcessing(true, this.EMAIL_PROCESS_LIMIT);
 
 		const promises = emails.map(async (email) => {
-			const emailSourceData = await s3Service.getS3Data(email.user_id, email.folder_id, email.id);
+			let emailSourceData;
+			if (email.has_source) {
+				emailSourceData = await s3Service.getS3Data(email.user_id, email.folder_id, email.id);
+			}
 			return {
 				id: email.id,
 				account_id: email.account_id,
 				folder_id: email.folder_id,
 				user_id: email.user_id,
-				sourceData: emailSourceData
+				sourceData: emailSourceData ?? undefined
 			};
 		});
 
