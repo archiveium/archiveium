@@ -23,7 +23,7 @@
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "3.749.0",
-		"@floating-ui/dom": "1.6.3",
+		"@floating-ui/dom": "1.6.13",
 		"@smithy/util-stream": "2.1.1",
 		"bullmq": "5.13.2",
 		"config": "3.3.12",
