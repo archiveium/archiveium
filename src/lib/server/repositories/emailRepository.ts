@@ -123,6 +123,16 @@ export async function findEmailCountByFolderAndUserId(
 	return result.count as number;
 }
 
+export async function findIndexedEmailCountByUserId(userId: string): Promise<number> {
+	const result = await db
+		.selectFrom('emails')
+		.select((eb) => eb.fn('count', ['emails.id']).as('count'))
+		.where('emails.user_id', '=', userId)
+		.where('emails.indexed', '=', true)
+		.executeTakeFirstOrThrow();
+	return result.count as number;
+}
+
 export async function findEmailCountByAccountIdAndUserId(
 	userId: string,
 	accountId: string
