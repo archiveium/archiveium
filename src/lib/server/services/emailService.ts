@@ -43,6 +43,10 @@ export async function findEmailByIdAndUserId(userId: string, emailId: string) {
 	return emailRepository.findEmailByIdAndUserId(userId, emailId);
 }
 
+export async function findIndexedEmailCountByUserId(userId: string): Promise<number> {
+	return emailRepository.findEmailCountByUserId(userId);
+}
+
 export async function findEmailCountByFolderAndUserId(
 	userId: string,
 	folderId: string
