@@ -18,7 +18,10 @@ FROM node:18.19.1
 LABEL authors="Paritosh Bhatia"
 ENV NODE_ENV=production
 WORKDIR /app
+
 COPY package*.json ./
+RUN npm ci --omit dev
+
 COPY --from=0 /app/build ./build
 COPY --from=0 /app/config ./config
 COPY --from=0 /app/src/lib/mailTransport/templates ./templates
