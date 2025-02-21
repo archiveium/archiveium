@@ -2,6 +2,10 @@
 FROM node:18.19.1
 LABEL authors="Paritosh Bhatia"
 WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
 COPY . .
 # RUN npm update -g npm
 # RUN npm config set registry https://registry.npmjs.org/
