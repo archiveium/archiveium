@@ -199,6 +199,12 @@ export async function updateIndexerProcessing(indexerProcessing: boolean, limit:
 		)
 		.selectFrom('locked_emails')
 		.innerJoin('email_folders', 'email_folders.email_id', 'locked_emails.id')
-		.select(['locked_emails.id', 'locked_emails.account_id', 'locked_emails.user_id', 'folder_id'])
+		.select([
+			'locked_emails.id',
+			'locked_emails.account_id',
+			'locked_emails.user_id',
+			'folder_id',
+			'has_source'
+		])
 		.execute();
 }
