@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: archiveium/archiveium:0.0.28
+    image: archiveium/archiveium:0.0.29
     restart: always
     ports:
       - 5292:3000
@@ -40,7 +40,7 @@ services:
     #   - "traefik.http.services.archiveium.loadbalancer.server.port=3000"
 
   cron:
-    image: archiveium/archiveium:0.0.28
+    image: archiveium/archiveium:0.0.29
     restart: always
     volumes:
       - ./config.json:/app/config/production-0.json
