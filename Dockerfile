@@ -1,5 +1,5 @@
 # Stage release
-FROM node:22.23.4
+FROM --platform=$BUILDPLATFORM node:22.23.4
 LABEL authors="Paritosh Bhatia"
 WORKDIR /app
 COPY . .
